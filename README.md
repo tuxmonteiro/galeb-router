@@ -1,7 +1,7 @@
-Open Virtual Router as a Service - Core Libraries
+OpenVRaaS - Core Libraries
 ===========================
 
-OpenVRaas is a dynamic software router built on JBOSS Undertow and XNIO.<br/>
+OpenVRaaS is a dynamic software router built on JBOSS Undertow and XNIO.<br/>
 It's a massively parallel routing system running a shared-nothing architecture.
 
 Its main features are:
