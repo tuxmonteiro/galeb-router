@@ -28,7 +28,4 @@ $ mvn clean install
 <code>
 $ mvn exec:exec
 </code><br/>
-<code>
-$ ./addRoutes.sh
-</code>
 
