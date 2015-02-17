@@ -8,6 +8,8 @@ import com.openvraas.core.json.JsonObject;
 
 public class VirtualHost extends Entity {
 
+    private static final long serialVersionUID = 1L;
+
     @Expose private Set<Rule> rules = new HashSet<>();
 
     public Rule getRule(String ruleId) {

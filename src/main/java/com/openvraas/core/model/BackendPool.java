@@ -8,6 +8,8 @@ import com.openvraas.core.json.JsonObject;
 
 public class BackendPool extends Entity {
 
+    private static final long serialVersionUID = 1L;
+
     @Expose private Set<Backend> backends = new HashSet<>();
 
     public Backend getBackend(String backendId) {

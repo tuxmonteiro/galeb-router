@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.google.gson.annotations.Expose;
 
-public class Entity implements Serializable {
+public abstract class Entity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
