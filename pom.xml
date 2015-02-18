@@ -25,9 +25,15 @@
     <org.apache.logging.log4j.version>2.1</org.apache.logging.log4j.version>
     <org.apache.commons.commons-lang3.version>3.3.2</org.apache.commons.commons-lang3.version>
     <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
+    <guava.version>18.0</guava.version>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
+    </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
