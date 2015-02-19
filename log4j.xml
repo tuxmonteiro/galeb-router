@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
+  <Properties>
+    <Property name="LOGLEVEL">INFO</Property>
+  </Properties>
   <Appenders>
     <File name="File" fileName="openvraas.log">
       <PatternLayout>
@@ -12,7 +15,7 @@
   </Appenders>
   <Loggers>
     <Root level="trace">
-      <AppenderRef ref="Async" level="DEBUG"/>
+      <AppenderRef ref="Async" level="${env:LOGLEVEL}"/>
     </Root>
   </Loggers>
 </Configuration>
