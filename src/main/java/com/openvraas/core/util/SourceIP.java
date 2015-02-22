@@ -8,4 +8,6 @@ public interface SourceIP {
 
     public String get();
 
+    public SourceIP pullFrom(final Object extractable);
+
 }
