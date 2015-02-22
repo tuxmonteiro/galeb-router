@@ -161,6 +161,10 @@
         <configuration>
           <executable>java</executable>
           <arguments>
+            <!--
+            <argument>-Xdebug</argument>
+            <argument>-Xrunjdwp:transport=dt_socket,address=3000,server=y,suspend=y</argument>
+            -->
             <argument>-server</argument>
             <argument>-Xms1024m</argument>
             <argument>-Xmx1024m</argument>
