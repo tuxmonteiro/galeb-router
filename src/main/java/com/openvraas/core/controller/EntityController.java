@@ -43,11 +43,11 @@ public interface EntityController {
         }
     };
 
-    public EntityController add(JsonObject json);
+    public EntityController add(JsonObject json) throws Exception;
 
-    public EntityController del(JsonObject json);
+    public EntityController del(JsonObject json) throws Exception;
 
-    public EntityController change(JsonObject json);
+    public EntityController change(JsonObject json) throws Exception;
 
     public String get(String id);
 

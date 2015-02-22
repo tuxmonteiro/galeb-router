@@ -151,7 +151,7 @@ public class Farm extends Entity {
         backendPools.clear();
     }
 
-    public Farm addBackend(JsonObject jsonObject) {
+    public Farm addBackend(JsonObject jsonObject) throws Exception {
         Backend backend = (Backend) JsonObject.fromJson(jsonObject.toString(), Backend.class);
         return addBackend(backend);
     }
@@ -176,7 +176,7 @@ public class Farm extends Entity {
         return this;
     }
 
-    public Farm delBackend(JsonObject jsonObject) {
+    public Farm delBackend(JsonObject jsonObject) throws Exception {
         Backend backend = (Backend) JsonObject.fromJson(jsonObject.toString(), Backend.class);
         return delBackend(backend);
     }

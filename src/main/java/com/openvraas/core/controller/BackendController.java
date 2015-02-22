@@ -17,21 +17,21 @@ public class BackendController implements EntityController {
     }
 
     @Override
-    public EntityController add(JsonObject json) {
+    public EntityController add(JsonObject json) throws Exception {
         farm.addBackend(json);
         notifyListeners(json, Action.ADD);
         return this;
     }
 
     @Override
-    public EntityController del(JsonObject json) {
+    public EntityController del(JsonObject json) throws Exception {
         farm.delBackend(json);
         notifyListeners(json, Action.DEL);
         return this;
     }
 
     @Override
-    public EntityController change(JsonObject json) {
+    public EntityController change(JsonObject json) throws Exception {
         farm.delBackend(json);
         farm.addBackend(json);
         notifyListeners(json, Action.CHANGE);
