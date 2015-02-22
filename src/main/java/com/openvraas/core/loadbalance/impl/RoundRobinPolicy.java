@@ -5,8 +5,8 @@ import com.openvraas.core.loadbalance.LoadBalancePolicy;
 public class RoundRobinPolicy extends LoadBalancePolicy {
 
     @Override
-    public int getChoice(final Object[] hosts) {
-        return last.incrementAndGet() % hosts.length;
+    public int getChoice() {
+        return last.incrementAndGet() % hosts.size();
     }
 
     @Override

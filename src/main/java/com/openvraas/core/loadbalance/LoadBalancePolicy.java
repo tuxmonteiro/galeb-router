@@ -3,8 +3,11 @@ package com.openvraas.core.loadbalance;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.openvraas.core.util.SourceIP;
 
 public abstract class LoadBalancePolicy {
 
@@ -38,20 +41,22 @@ public abstract class LoadBalancePolicy {
         return ALGORITHM_MAP.containsKey(algorithmStr);
     }
 
-    public static final String    LOADBALANCE_POLICY_FIELD = "loadBalancePolicy";
+    public static final String LOADBALANCE_POLICY_FIELD = "loadBalancePolicy";
 
-    public static final Algorithm DEFAULT_ALGORITHM        = Algorithm.ROUNDROBIN;
+    public static final String SOURCE_IP_CRITERION      = "SourceIP";
 
-    public static final String    SOURCE_IP_CRITERION      = "SourceIP";
+    private final Map<String, Object> loadBalancePolicyCriteria = new HashMap<>();
 
+    protected final Map<Integer, Object> hosts = new TreeMap<Integer, Object>();
 
     protected AtomicInteger last = new AtomicInteger(0);
-    protected AtomicBoolean needRebuild = new AtomicBoolean(true);
+
+    private AtomicBoolean needRebuild = new AtomicBoolean(true);
 
     public static LoadBalancePolicy NULL = new LoadBalancePolicy() {
 
         @Override
-        public int getChoice(Object[] hosts) {
+        public int getChoice() {
             return 0;
         }
 
@@ -61,7 +66,7 @@ public abstract class LoadBalancePolicy {
         }
     };
 
-    public abstract int getChoice(final Object[] hosts);
+    public abstract int getChoice();
 
     public boolean needSourceIP() {
         return false;
@@ -76,8 +81,36 @@ public abstract class LoadBalancePolicy {
         needRebuild.set(true);
     }
 
+    public boolean isReseted() {
+        return needRebuild.get();
+    }
+
+    public void rebuilt() {
+        needRebuild.compareAndSet(true, false);
+    }
+
     public LoadBalancePolicy setCriteria(final Map<String, Object> criteria) {
+        if (criteria!=null && isReseted()) {
+            loadBalancePolicyCriteria.putAll(criteria);
+        }
         return this;
     };
+
+    public LoadBalancePolicy setCriteria(final SourceIP sourceIP, Object extractable) {
+        if (sourceIP!=null && extractable != null && needSourceIP()) {
+            loadBalancePolicyCriteria.put(SOURCE_IP_CRITERION, sourceIP.pullFrom(extractable).get());
+        }
+        return this;
+    }
+
+    public LoadBalancePolicy mapOfHosts(final Object[] myHosts) {
+        if (isReseted()) {
+            hosts.clear();
+            for (int x=0;x<myHosts.length;x++) {
+                hosts.put(x, myHosts[x]);
+            }
+        }
+        return this;
+    }
 
 }

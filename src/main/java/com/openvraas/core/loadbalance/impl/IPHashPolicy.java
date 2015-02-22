@@ -1,8 +1,6 @@
 package com.openvraas.core.loadbalance.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Map;
 
 import com.openvraas.core.loadbalance.LoadBalancePolicy;
@@ -20,19 +18,16 @@ public class IPHashPolicy extends LoadBalancePolicy {
 
     private int numReplicas = 1;
 
-    private final ConsistentHash<Integer> consistentHash = new ConsistentHash<Integer>(hashAlgorithm, numReplicas, new ArrayList<Integer>());
+    private final ConsistentHash<Integer> consistentHash =
+            new ConsistentHash<Integer>(hashAlgorithm, numReplicas, new ArrayList<Integer>());
 
     private volatile String sourceIP = "127.0.0.1";
 
     @Override
-    public int getChoice(final Object[] hosts) {
-        if (needRebuild.get()) {
-            Collection<Integer> hostsPos = new LinkedList<Integer>();
-            for (int x=0;x<hosts.length;x++) {
-                hostsPos.add(x);
-            }
-            consistentHash.rebuild(hashAlgorithm, numReplicas, hostsPos);
-            needRebuild.compareAndSet(true, false);
+    public int getChoice() {
+        if (isReseted()) {
+            consistentHash.rebuild(hashAlgorithm, numReplicas, hosts.keySet());
+            rebuilt();
         }
         int chosen = consistentHash.get(sourceIP);
         last.lazySet(chosen);
