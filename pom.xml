@@ -172,6 +172,7 @@
             <argument>-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager</argument>
             <argument>-Dlog4j.configurationFile=log4j.xml</argument>
             <argument>-Dcom.openvraas.router.port=8080</argument>
+            <argument>-Dcom.openvraas.router.enableMetrics=false</argument>
             <argument>-jar</argument>
             <argument>target/openvraas-${project.version}-uber.jar</argument>
           </arguments>
