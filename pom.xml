@@ -3,7 +3,7 @@
 
   <groupId>com.openvraas</groupId>
   <artifactId>openvraas-router</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
 
   <licenses>
     <license>
@@ -48,12 +48,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.mortbay.jetty.alpn</groupId>
-      <artifactId>alpn-boot</artifactId>
-      <version>${org.mortbay.jetty.alpn.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.openvraas</groupId>
       <artifactId>openvraas-core</artifactId>
       <version>${project.version}</version>
@@ -67,6 +61,17 @@
       <groupId>com.openvraas</groupId>
       <artifactId>openvraas-hazelcast</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.openvraas</groupId>
+      <artifactId>openvraas-services</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mortbay.jetty.alpn</groupId>
+      <artifactId>alpn-boot</artifactId>
+      <version>${org.mortbay.jetty.alpn.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.weld.se</groupId>
@@ -108,11 +113,6 @@
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
       <version>${org.apache.logging.log4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.openvraas</groupId>
-      <artifactId>openvraas-services</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
