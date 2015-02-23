@@ -24,8 +24,15 @@ public class Farm extends Entity {
 
     private final Map<String, EntityController> entityMap = new ConcurrentHashMap<>();
 
+    protected final Map<String, String> options = new ConcurrentHashMap<>();
+
     public Farm() {
         this.setEntityType(Farm.class.getSimpleName().toLowerCase());
+    }
+
+    public Farm setOptions(Map<String, String> options) {
+        this.options.putAll(options);
+        return this;
     }
 
     public Map<String, EntityController> getEntityMap() {
