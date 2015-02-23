@@ -3,7 +3,7 @@
 
   <groupId>com.openvraas</groupId>
   <artifactId>openvraas-core</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
 
   <licenses>
     <license>
@@ -14,17 +14,11 @@
   </licenses>
 
   <properties>
-    <undertow.version>1.2.0.Beta8-SNAPSHOT</undertow.version>
-    <hazelcast.version>3.4</hazelcast.version>
-    <org.jboss.resteasy.version>3.0.10.Final</org.jboss.resteasy.version>
-    <org.mortbay.jetty.alpn.jdk7.version>7.1.2.v20141202</org.mortbay.jetty.alpn.jdk7.version>
-    <org.mortbay.jetty.alpn.jdk8.version>8.1.2.v20141202</org.mortbay.jetty.alpn.jdk8.version>
     <google.gson.version>2.3.1</google.gson.version>
     <org.jboss.weld.version>2.2.8.Final</org.jboss.weld.version>
     <org.jboss.logging.version>3.2.0.Final</org.jboss.logging.version>
     <org.apache.logging.log4j.version>2.1</org.apache.logging.log4j.version>
     <org.apache.commons.commons-lang3.version>3.3.2</org.apache.commons.commons-lang3.version>
-    <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
     <guava.version>18.0</guava.version>
   </properties>
 
