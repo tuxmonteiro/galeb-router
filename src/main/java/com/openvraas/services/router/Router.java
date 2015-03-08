@@ -18,6 +18,8 @@ public class Router extends AbstractService {
 
     private static final String PROP_ROUTER_METRICS   = PROP_ROUTER_PREFIX+"enableMetrics";
 
+    private static final String PROP_ROUTER_MAXCONN   = PROP_ROUTER_PREFIX+"maxConn";
+
     static {
         if (System.getProperty(PROP_ROUTER_PORT)==null) {
             System.setProperty(PROP_ROUTER_PORT, "8080");
@@ -27,6 +29,9 @@ public class Router extends AbstractService {
         }
         if (System.getProperty(PROP_ROUTER_METRICS)==null) {
             System.setProperty(PROP_ROUTER_METRICS, "false");
+        }
+        if (System.getProperty(PROP_ROUTER_MAXCONN)==null) {
+            System.setProperty(PROP_ROUTER_MAXCONN, "100");
         }
 
     }

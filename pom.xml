@@ -173,6 +173,7 @@
             <argument>-Dlog4j.configurationFile=log4j.xml</argument>
             <argument>-Dcom.openvraas.router.port=8080</argument>
             <argument>-Dcom.openvraas.router.enableMetrics=false</argument>
+            <argument>-Dcom.openvraas.router.maxConn=300</argument>
             <argument>-jar</argument>
             <argument>target/openvraas-${project.version}-uber.jar</argument>
           </arguments>
