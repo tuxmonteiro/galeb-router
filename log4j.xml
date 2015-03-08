@@ -4,18 +4,29 @@
     <Property name="LOGLEVEL">INFO</Property>
   </Properties>
   <Appenders>
-    <File name="File" fileName="openvraas.log">
+    <File name="System" fileName="openvraas.log">
       <PatternLayout>
         <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
       </PatternLayout>
     </File>
-    <Async name="Async">
-      <AppenderRef ref="File"/>
+    <File name="AccessLog" fileName="accesslog.log" immediateFlush="false">
+      <PatternLayout>
+        <Pattern>%d %p %m %ex%n</Pattern>
+      </PatternLayout>
+    </File>
+    <Async name="AsyncSystem">
+      <AppenderRef ref="System"/>
+    </Async>
+    <Async name="AsyncAccessLog">
+      <AppenderRef ref="AccessLog"/>
     </Async>
   </Appenders>
   <Loggers>
+    <Logger name="com.openvraas.accesslog" level="debug" additivity="false">
+      <AppenderRef ref="AsyncAccessLog" level="${env:LOGLEVEL}"/>
+    </Logger>
     <Root level="trace">
-      <AppenderRef ref="Async" level="${env:LOGLEVEL}"/>
+      <AppenderRef ref="AsyncSystem" level="${env:LOGLEVEL}"/>
     </Root>
   </Loggers>
 </Configuration>
