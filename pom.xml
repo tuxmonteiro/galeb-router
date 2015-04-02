@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.openvraas</groupId>
-  <artifactId>openvraas-router</artifactId>
-  <version>0.0.1</version>
+  <groupId>io.galeb</groupId>
+  <artifactId>galeb-router</artifactId>
+  <version>3.0.0-SNAPSHOT</version>
 
   <licenses>
     <license>
@@ -48,23 +48,23 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.openvraas</groupId>
-      <artifactId>openvraas-core</artifactId>
+      <groupId>io.galeb</groupId>
+      <artifactId>galeb-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.openvraas</groupId>
-      <artifactId>openvraas-undertow</artifactId>
+      <groupId>io.galeb</groupId>
+      <artifactId>galeb-undertow</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.openvraas</groupId>
-      <artifactId>openvraas-hazelcast</artifactId>
+      <groupId>io.galeb</groupId>
+      <artifactId>galeb-hazelcast</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.openvraas</groupId>
-      <artifactId>openvraas-services</artifactId>
+      <groupId>io.galeb</groupId>
+      <artifactId>galeb-services</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -137,7 +137,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <outputFile>target/openvraas-${project.version}-uber.jar</outputFile>
+              <outputFile>target/galeb-${project.version}-uber.jar</outputFile>
             </configuration>
           </execution>
         </executions>
@@ -148,7 +148,7 @@
         <configuration>
         <archive>
           <manifest>
-            <mainClass>com.openvraas.services.router.Starter</mainClass>
+            <mainClass>io.galeb.services.router.Starter</mainClass>
             <addClasspath>true</addClasspath>
           </manifest>
         </archive>
@@ -161,8 +161,8 @@
         <configuration>
           <executable>java</executable>
           <arguments>
-            <!--
             <argument>-Xdebug</argument>
+            <!--
             <argument>-Xrunjdwp:transport=dt_socket,address=3000,server=y,suspend=y</argument>
             -->
             <argument>-server</argument>
@@ -171,11 +171,11 @@
             <argument>-Dorg.jboss.logging.provider=log4j2</argument>
             <argument>-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager</argument>
             <argument>-Dlog4j.configurationFile=log4j.xml</argument>
-            <argument>-Dcom.openvraas.router.port=8080</argument>
-            <argument>-Dcom.openvraas.router.enableMetrics=false</argument>
-            <argument>-Dcom.openvraas.router.maxConn=300</argument>
+            <argument>-Dio.galeb.router.port=8080</argument>
+            <argument>-Dio.galeb.router.enableMetrics=false</argument>
+            <argument>-Dio.galeb.router.maxConn=300</argument>
             <argument>-jar</argument>
-            <argument>target/openvraas-${project.version}-uber.jar</argument>
+            <argument>target/galeb-${project.version}-uber.jar</argument>
           </arguments>
         </configuration>
       </plugin>

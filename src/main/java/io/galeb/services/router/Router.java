@@ -1,16 +1,16 @@
-package com.openvraas.services.router;
+package io.galeb.services.router;
+
+import io.galeb.services.AbstractService;
+import io.galeb.undertow.router.RouterApplication;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import com.openvraas.services.AbstractService;
-import com.openvraas.undertow.router.RouterApplication;
-
 public class Router extends AbstractService {
 
-    private static final String PROP_ROUTER_PREFIX    = "com.openvraas.router.";
+    private static final String PROP_ROUTER_PREFIX    = "io.galeb.router.";
 
     private static final String PROP_ROUTER_PORT      = PROP_ROUTER_PREFIX+"port";
 

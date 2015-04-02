@@ -4,7 +4,7 @@
     <Property name="LOGLEVEL">INFO</Property>
   </Properties>
   <Appenders>
-    <File name="System" fileName="openvraas.log">
+    <File name="System" fileName="galeb.log">
       <PatternLayout>
         <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
       </PatternLayout>
@@ -22,7 +22,7 @@
     </Async>
   </Appenders>
   <Loggers>
-    <Logger name="com.openvraas.accesslog" level="debug" additivity="false">
+    <Logger name="io.galeb.accesslog" level="debug" additivity="false">
       <AppenderRef ref="AsyncAccessLog" level="${env:LOGLEVEL}"/>
     </Logger>
     <Root level="trace">

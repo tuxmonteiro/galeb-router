@@ -7,6 +7,6 @@
           http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd">
 
     <weld:scan>
-        <weld:include name="com.openvraas.**" />
+        <weld:include name="io.galeb.**" />
     </weld:scan>
 </beans>

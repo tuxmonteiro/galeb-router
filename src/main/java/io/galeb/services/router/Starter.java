@@ -1,6 +1,6 @@
-package com.openvraas.services.router;
+package io.galeb.services.router;
 
-import com.openvraas.services.cdi.WeldContext;
+import io.galeb.services.cdi.WeldContext;
 
 public class Starter {
 
