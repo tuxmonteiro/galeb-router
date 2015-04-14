@@ -10,8 +10,6 @@ public interface Logger {
         ERROR
     }
 
-    public void setSource(Object source);
-
     public void trace(String message);
 
     public void debug(String message);

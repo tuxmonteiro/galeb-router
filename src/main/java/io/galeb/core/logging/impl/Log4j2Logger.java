@@ -19,13 +19,9 @@ public class Log4j2Logger implements Logger {
 
     private static final Log4j2Logger INSTANCE = new Log4j2Logger();
 
-    private static final String FQCN = Log4j2Logger.class.getName();
-
     private static final Map<String, Level> LOG_LEVELS = new HashMap<>();
 
-    private static ExtendedLogger logger = LogManager.getContext().getLogger(FQCN);
-
-    private Object source = null;
+    private static ExtendedLogger logger = LogManager.getContext().getLogger("io.galeb");
 
     static {
         for (Level level : EnumSet.allOf(Level.class)) {
@@ -41,41 +37,29 @@ public class Log4j2Logger implements Logger {
         return INSTANCE;
     }
 
-    private String addSourceToMessage(String message) {
-        if (source!=null) {
-            message = "<"+source.toString()+"> "+message;
-        }
-        return message;
-    }
-
-    @Override
-    public void setSource(Object source) {
-        this.source = source;
-    }
-
     @Override
     public void trace(String message) {
-        logger.trace(addSourceToMessage(message));
+        logger.trace(message);
     }
 
     @Override
     public void debug(String message) {
-        logger.debug(addSourceToMessage(message));
+        logger.debug(message);
     }
 
     @Override
     public void info(String message) {
-        logger.info(addSourceToMessage(message));
+        logger.info(message);
     }
 
     @Override
     public void warn(String message) {
-        logger.warn(addSourceToMessage(message));
+        logger.warn(message);
     }
 
     @Override
     public void error(String message) {
-        logger.error(addSourceToMessage(message));
+        logger.error(message);
     }
 
     @Override
