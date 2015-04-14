@@ -32,7 +32,7 @@ public abstract class LoadBalancePolicy {
     /** The Constant ALGORITHM_MAP. */
     private static final Map<String, Algorithm> ALGORITHM_MAP = new HashMap<>();
     static {
-        for (Algorithm algorithm : EnumSet.allOf(Algorithm.class)) {
+        for (final Algorithm algorithm : EnumSet.allOf(Algorithm.class)) {
             ALGORITHM_MAP.put(algorithm.toString(), algorithm);
         }
     }
@@ -51,7 +51,7 @@ public abstract class LoadBalancePolicy {
 
     protected AtomicInteger last = new AtomicInteger(0);
 
-    private AtomicBoolean needRebuild = new AtomicBoolean(true);
+    private final AtomicBoolean needRebuild = new AtomicBoolean(true);
 
     public static LoadBalancePolicy NULL = new LoadBalancePolicy() {
 
@@ -74,7 +74,7 @@ public abstract class LoadBalancePolicy {
 
     public int getLastChoice() {
         return last.get();
-    };
+    }
 
     public synchronized void reset() {
         last.lazySet(0);
@@ -94,7 +94,7 @@ public abstract class LoadBalancePolicy {
             loadBalancePolicyCriteria.putAll(criteria);
         }
         return this;
-    };
+    }
 
     public LoadBalancePolicy setCriteria(final SourceIP sourceIP, Object extractable) {
         if (sourceIP!=null && extractable != null && needSourceIP()) {
