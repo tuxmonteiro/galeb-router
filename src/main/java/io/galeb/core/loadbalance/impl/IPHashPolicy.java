@@ -29,20 +29,18 @@ public class IPHashPolicy extends LoadBalancePolicy {
             consistentHash.rebuild(hashAlgorithm, numReplicas, hosts.keySet());
             rebuilt();
         }
-        int chosen = consistentHash.get(sourceIP);
+        final int chosen = consistentHash.get(sourceIP);
         last.lazySet(chosen);
         return chosen;
     }
 
     @Override
     public synchronized LoadBalancePolicy setCriteria(final Map<String, Object> criteria) {
-        String hashAlgorithmStr = (String) criteria.get(HASH_ALGORITHM);
-        if (hashAlgorithmStr!=null) {
-            if (HashAlgorithm.hashTypeFromString(hashAlgorithmStr)!=null) {
-                hashAlgorithm = new HashAlgorithm(hashAlgorithmStr);
-            }
+        final String hashAlgorithmStr = (String) criteria.get(HASH_ALGORITHM);
+        if (hashAlgorithmStr!=null && HashAlgorithm.hashTypeFromString(hashAlgorithmStr)!=null) {
+            hashAlgorithm = new HashAlgorithm(hashAlgorithmStr);
         }
-        String numReplicaStr = (String) criteria.get(NUM_REPLICAS);
+        final String numReplicaStr = (String) criteria.get(NUM_REPLICAS);
         if (numReplicaStr!=null) {
             numReplicas = Integer.valueOf(numReplicaStr);
         }
