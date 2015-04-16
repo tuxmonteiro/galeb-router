@@ -7,7 +7,8 @@ public interface EntityController {
     public enum Action {
         ADD,
         DEL,
-        CHANGE
+        CHANGE,
+        UNKNOWN
     }
 
     public static final EntityController NULL = new EntityController() {
