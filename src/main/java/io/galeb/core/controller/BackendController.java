@@ -56,7 +56,7 @@ public class BackendController implements EntityController {
 
     @Override
     public void notifyListeners(final JsonObject json, Action action) {
-        for (ListenerController listener: listeners) {
+        for (final ListenerController listener: listeners) {
             listener.handleController(json, action);
         }
     }

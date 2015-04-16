@@ -17,21 +17,21 @@ public class BackendPoolController implements EntityController {
     }
 
     @Override
-    public EntityController add(JsonObject json) {
+    public EntityController add(JsonObject json) throws Exception {
         farm.addBackendPool(json);
         notifyListeners(json, Action.ADD);
         return this;
     }
 
     @Override
-    public EntityController del(JsonObject json) {
+    public EntityController del(JsonObject json) throws Exception {
         farm.delBackendPool(json);
         notifyListeners(json, Action.DEL);
         return this;
     }
 
     @Override
-    public EntityController change(JsonObject json) {
+    public EntityController change(JsonObject json) throws Exception {
         farm.delBackendPool(json);
         farm.addBackendPool(json);
         notifyListeners(json, Action.CHANGE);
@@ -56,7 +56,7 @@ public class BackendPoolController implements EntityController {
 
     @Override
     public void notifyListeners(final JsonObject json, Action action) {
-        for (ListenerController listener: listeners) {
+        for (final ListenerController listener: listeners) {
             listener.handleController(json, action);
         }
     }

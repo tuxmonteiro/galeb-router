@@ -51,7 +51,7 @@ public interface EntityController {
 
     public String get(String id);
 
-    public EntityController registerListenerController(ListenerController listenerController);
+    public EntityController registerListenerController(final ListenerController listenerController);
 
     public void notifyListeners(final JsonObject json, Action action);
 

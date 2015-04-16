@@ -15,11 +15,14 @@
 
   <properties>
     <google.gson.version>2.3.1</google.gson.version>
-    <org.jboss.weld.version>2.2.8.Final</org.jboss.weld.version>
+    <org.jboss.weld.version>2.2.10.Final</org.jboss.weld.version>
     <org.jboss.logging.version>3.2.0.Final</org.jboss.logging.version>
     <org.apache.logging.log4j.version>2.1</org.apache.logging.log4j.version>
     <org.apache.commons.commons-lang3.version>3.3.2</org.apache.commons.commons-lang3.version>
     <guava.version>18.0</guava.version>
+    <mockito.version>1.10.19</mockito.version>
+    <assertj.version>2.0.0</assertj.version>
+    <junit.version>4.12</junit.version>
   </properties>
 
   <dependencies>
@@ -64,6 +67,27 @@
       <artifactId>commons-lang3</artifactId>
       <version>${org.apache.commons.commons-lang3.version}</version>
     </dependency>
+
+    <!--Test dependencies-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${assertj.version}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
