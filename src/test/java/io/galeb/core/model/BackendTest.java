@@ -25,6 +25,18 @@ public class BackendTest {
     }
 
     @Test
+    public void healthSetDeadyAtBackend() {
+        backend.setHealth(Health.DEADY);
+        assertThat(backend.getHealth()).isEqualTo(Health.DEADY);
+    }
+
+    @Test
+    public void healthSetUnknownAtBackend() {
+        backend.setHealth(Health.UNKNOWN);
+        assertThat(backend.getHealth()).isEqualTo(Health.UNKNOWN);
+    }
+
+    @Test
     public void healthCantSetNullAtBackend() {
         exception.expect(NullPointerException.class);
         exception.expectMessage("health");
