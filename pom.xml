@@ -138,6 +138,9 @@
                 <formats>
                     <format>xml</format>
                 </formats>
+                <instrumentation>
+                    <ignoreTrivial>true</ignoreTrivial>
+                </instrumentation>
             </configuration>
         </plugin>
     </plugins>
