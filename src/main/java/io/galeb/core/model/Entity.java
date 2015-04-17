@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.NonNull;
+
 import com.google.gson.annotations.Expose;
 
 public class Entity implements Serializable {
@@ -35,7 +37,7 @@ public class Entity implements Serializable {
     @Expose private String                     hash          = "";
 
     public Entity updateHash() {
-        //TODO: updateHash
+        hash = "0";
         return this;
     }
 
@@ -52,7 +54,7 @@ public class Entity implements Serializable {
         return id;
     }
 
-    public Entity setId(String id) {
+    public final Entity setId(@NonNull String id) {
         this.id = id;
         return this;
     }
@@ -61,7 +63,7 @@ public class Entity implements Serializable {
         return parentId;
     }
 
-    public Entity setParentId(String parentId) {
+    public final Entity setParentId(@NonNull String parentId) {
         this.parentId = parentId;
         return this;
     }
@@ -70,7 +72,7 @@ public class Entity implements Serializable {
         return modifiedAt;
     }
 
-    public Entity setModifiedAt(Long modifiedAt) {
+    public final Entity setModifiedAt(@NonNull Long modifiedAt) {
         this.modifiedAt = modifiedAt;
         return this;
     }
@@ -79,7 +81,7 @@ public class Entity implements Serializable {
         return properties;
     }
 
-    public Entity setProperties(final Map<String, Object> properties) {
+    public final Entity setProperties(@NonNull final Map<String, Object> properties) {
         this.properties.clear();
         this.properties.putAll(properties);
         return this;
@@ -89,7 +91,7 @@ public class Entity implements Serializable {
         return entityType;
     }
 
-    public Entity setEntityType(String entityType) {
+    public final Entity setEntityType(@NonNull String entityType) {
         this.entityType = entityType;
         return this;
     }
@@ -98,7 +100,7 @@ public class Entity implements Serializable {
         return hash;
     }
 
-    public Entity setHash(String hash) {
+    public final Entity setHash(@NonNull String hash) {
         this.hash = hash;
         return this;
     }
