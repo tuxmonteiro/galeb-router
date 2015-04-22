@@ -98,7 +98,7 @@ public abstract class LoadBalancePolicy {
 
     public LoadBalancePolicy setCriteria(final SourceIP sourceIP, Object extractable) {
         if (sourceIP!=null && extractable != null && needSourceIP()) {
-            loadBalancePolicyCriteria.put(SOURCE_IP_CRITERION, sourceIP.pullFrom(extractable).get());
+            loadBalancePolicyCriteria.put(SOURCE_IP_CRITERION, sourceIP.pullFrom(extractable).getRealSourceIP());
         }
         return this;
     }
