@@ -9,8 +9,10 @@ public class BackendPoolTest {
 
     BackendPool backendPool;
     Backend backend;
+    Backend nullBackend = null;
     String backendId = "http://0.0.0.0:00";
-    String backendIdAsJson = "{'id':'" + backendId + "'}";
+    String backendIdAsJson = String.format("{'id':'%s'}", backendId);
+    String backendId2AsJson = "{'id':'http://1.1.1.1:11'}";
 
     @Before
     public void setUp() {
@@ -43,22 +45,26 @@ public class BackendPoolTest {
     }
 
     @Test
-    public void addBackendWithBackendAtBackendPool() {
-        assertThat(backendPool.addBackend(backend)).isInstanceOf(BackendPool.class);
-    }
-
-    @Test
-    public void addBackendWithJSONAtBackendPool() {
-        backendPool.addBackend(backendIdAsJson);
-        assertThat(backendPool.getBackends()).hasSize(1);
-    }
-
-    @Test
     public void delBackendAtBackendPool() {
         backendPool.addBackend(backendIdAsJson);
         assertThat(backendPool.getBackends()).hasSize(1);
         backendPool.delBackend(backendId);
         assertThat(backendPool.getBackends()).isEmpty();
+    }
+
+    @Test
+    public void delNullBackendAtBackendPool() {
+        backendPool.addBackend(backendIdAsJson);
+        assertThat(backendPool.getBackends()).hasSize(1);
+        backendPool.delBackend(nullBackend);
+        assertThat(backendPool.getBackends()).hasSize(1);
+    }
+
+    @Test
+    public void getSingleBackendAtBackendPool() {
+        backendPool.addBackend(backendIdAsJson);
+        backendPool.addBackend(backendId2AsJson);
+        assertThat(backendPool.getBackend(backendId)).isInstanceOf(Backend.class);
     }
 
 }
