@@ -27,7 +27,7 @@ public class Event implements Serializable {
     }
 
     public JsonObject getData() {
-        return new JsonObject(JsonObject.toJson(data));
+        return JsonObject.toJsonObject(data);
     }
 
 }
