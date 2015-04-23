@@ -41,9 +41,9 @@ public class RuleController implements EntityController {
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJson(farm.getRule(id));
+            return JsonObject.toJsonString(farm.getRule(id));
         } else {
-            return JsonObject.toJson(farm.getRules());
+            return JsonObject.toJsonString(farm.getRules());
         }
     }
 

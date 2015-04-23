@@ -41,9 +41,9 @@ public class BackendPoolController implements EntityController {
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJson(farm.getBackendPool(id));
+            return JsonObject.toJsonString(farm.getBackendPool(id));
         } else {
-            return JsonObject.toJson(farm.getBackendPools());
+            return JsonObject.toJsonString(farm.getBackendPools());
         }
     }
 

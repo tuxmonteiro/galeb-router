@@ -41,9 +41,9 @@ public class BackendController implements EntityController {
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJson(farm.getBackend(id));
+            return JsonObject.toJsonString(farm.getBackend(id));
         } else {
-            return JsonObject.toJson(farm.getBackends());
+            return JsonObject.toJsonString(farm.getBackends());
         }
     }
 

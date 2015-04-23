@@ -13,8 +13,12 @@ public class JsonObject {
 
     public static final String NULL = jsonParser.toJson(null);
 
-    public static String toJson(Object obj) {
+    public static String toJsonString(Object obj) {
         return jsonParser.toJson(obj);
+    }
+
+    public static JsonObject toJsonObject(Object obj) {
+        return new JsonObject(toJsonString(obj));
     }
 
     public static Object fromJson(final String json, final Class<?> aClass) {
