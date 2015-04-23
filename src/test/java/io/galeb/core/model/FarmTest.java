@@ -3,8 +3,12 @@ package io.galeb.core.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.galeb.core.json.JsonObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class FarmTest {
 
@@ -22,6 +26,7 @@ public class FarmTest {
     JsonObject backendPoolIdJson;
     JsonObject backendPoolIdJson2;
 
+    Backend nullBackend = null;
     String backendId = "http://0.0.0.0:00";
     String backendId2 = "http://1.1.1.1:11";
     JsonObject backendIdJson;
@@ -31,6 +36,9 @@ public class FarmTest {
     String ruleId2 = "/test";
     JsonObject ruleIdJson;
     JsonObject ruleIdJson2;
+
+    @org.junit.Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Before
     public void setUp() {
@@ -55,7 +63,9 @@ public class FarmTest {
 
     @Test
     public void setOptionsAtFarm() {
-        farm.options.put("key", "value");
+        final Map<String, String> newOptions = new HashMap<>();
+        newOptions.put("key", "value");
+        farm.setOptions(newOptions);
         assertThat(farm.options.get("key")).isEqualTo("value");
     }
 
@@ -80,19 +90,19 @@ public class FarmTest {
     }
 
     @Test
-    public void containVirtualHostIsTrueAfterAddVirtualHostAtFarm() throws Exception {
+    public void containVirtualHostIsTrueAfterAddVirtualHostAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         assertThat(farm.containVirtualHost(virtualHostIdJson)).isTrue();
     }
 
     @Test
-    public void containVirtualHostWithStringIsTrueAfterAddVirtualHostAtFarm() throws Exception {
+    public void containVirtualHostWithStringIsTrueAfterAddVirtualHostAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         assertThat(farm.containVirtualHost(virtualHostId)).isTrue();
     }
 
     @Test
-    public void clearVirtualHostAtFarm() throws Exception {
+    public void clearVirtualHostAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         assertThat(farm.getVirtualHosts()).hasSize(1);
         farm.clearVirtualHosts();
@@ -100,14 +110,14 @@ public class FarmTest {
     }
 
     @Test
-    public void getSingleVirtualHostAtFarm() throws Exception {
+    public void getSingleVirtualHostAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         farm.addVirtualHost(virtualHostIdJson2);
         assertThat(farm.getVirtualHost(virtualHostIdJson)).isInstanceOf(VirtualHost.class);
     }
 
     @Test
-    public void delVirtualHostAtFarm() throws Exception {
+    public void delVirtualHostAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         assertThat(farm.getVirtualHosts()).hasSize(1);
         farm.delVirtualHost(virtualHostIdJson);
@@ -115,7 +125,7 @@ public class FarmTest {
     }
 
     @Test
-    public void delVirtualHostWithStringAtFarm() throws Exception {
+    public void delVirtualHostWithStringAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         assertThat(farm.getVirtualHosts()).hasSize(1);
         farm.delVirtualHost(virtualHostId);
@@ -123,7 +133,7 @@ public class FarmTest {
     }
 
     @Test
-    public void delNullVirtualHostAtFarm() throws Exception {
+    public void delNullVirtualHostAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         assertThat(farm.getVirtualHosts()).hasSize(1);
         farm.delVirtualHost(virtualhostNull);
@@ -146,19 +156,19 @@ public class FarmTest {
     }
 
     @Test
-    public void containBackendPoolIsTrueAfterAddBackendPoolAtFarm() throws Exception {
+    public void containBackendPoolIsTrueAfterAddBackendPoolAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         assertThat(farm.containBackendPool(backendPoolIdJson)).isTrue();
     }
 
     @Test
-    public void containBackendPoolWithStringIsTrueAfterAddBackendPoolAtFarm() throws Exception {
+    public void containBackendPoolWithStringIsTrueAfterAddBackendPoolAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         assertThat(farm.containBackendPool(backendPoolId)).isTrue();
     }
 
     @Test
-    public void clearBackendPoolAtFarm() throws Exception {
+    public void clearBackendPoolAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         assertThat(farm.getBackendPools()).hasSize(1);
         farm.clearBackendPool();
@@ -166,14 +176,14 @@ public class FarmTest {
     }
 
     @Test
-    public void getSingleBackendPoolAtFarm() throws Exception {
+    public void getSingleBackendPoolAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         farm.addBackendPool(backendPoolIdJson2);
         assertThat(farm.getBackendPool(backendPoolIdJson)).isInstanceOf(BackendPool.class);
     }
 
     @Test
-    public void delBackendPoolAtFarm() throws Exception {
+    public void delBackendPoolAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         assertThat(farm.getBackendPools()).hasSize(1);
         farm.delBackendPool(backendPoolIdJson);
@@ -181,7 +191,7 @@ public class FarmTest {
     }
 
     @Test
-    public void delBackendPoolWithStringAtFarm() throws Exception {
+    public void delBackendPoolWithStringAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         assertThat(farm.getBackendPools()).hasSize(1);
         farm.delBackendPool(backendPoolId);
@@ -189,7 +199,7 @@ public class FarmTest {
     }
 
     @Test
-    public void delNullBackendPoolAtFarm() throws Exception {
+    public void delNullBackendPoolAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         assertThat(farm.getBackendPools()).hasSize(1);
         farm.delBackendPool(backendPoolNull);
@@ -202,12 +212,12 @@ public class FarmTest {
     }
 
     @Test
-    public void getSingleBackendWithoutBackendAtFarm() throws Exception {
+    public void getSingleBackendWithoutBackendAtFarm() {
         assertThat(farm.getBackend(backendId)).isNull();
     }
 
     @Test
-    public void getSingleBackendAtFarm() throws Exception {
+    public void getSingleBackendAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         farm.addBackend(backendIdJson);
         assertThat(farm.getBackend(backendId)).hasSize(1);
@@ -216,7 +226,14 @@ public class FarmTest {
     }
 
     @Test
-    public void delBackendAtFarm() throws Exception {
+    public void addBackendWithNullBackendAtFarm() {
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("backend");
+        farm.addBackend(nullBackend);
+    }
+
+    @Test
+    public void delBackendAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         farm.addBackend(backendIdJson);
         assertThat(farm.getBackend(backendId)).hasSize(1);
@@ -225,7 +242,23 @@ public class FarmTest {
     }
 
     @Test
-    public void delBackendWithNullBackendPoolAtFarm() throws Exception {
+    public void delBackendWithStringAtFarm() {
+        farm.addBackendPool(backendPoolIdJson);
+        farm.addBackend(backendIdJson);
+        assertThat(farm.getBackend(backendId)).hasSize(1);
+        farm.delBackend(backendId);
+        assertThat(farm.getBackend(backendId)).isNull();
+    }
+
+    @Test
+    public void delBackendWithNullBackendAtFarm() {
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("backend");
+        farm.delBackend(nullBackend);
+    }
+
+    @Test
+    public void delBackendWithNullBackendPoolAtFarm() {
         farm.delBackend(backendIdJson2);
         assertThat(farm.getBackend(backendId2)).isNull();
     }
@@ -236,12 +269,12 @@ public class FarmTest {
     }
 
     @Test
-    public void getSingleRuleWithoutVirtualHostAtFarm() throws Exception {
+    public void getSingleRuleWithoutVirtualHostAtFarm() {
         assertThat(farm.getRule(virtualHostId)).isNull();
     }
 
     @Test
-    public void getSingleRuleAtFarm() throws Exception {
+    public void getSingleRuleAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         farm.addRule(ruleIdJson);
         farm.addRule(ruleIdJson2);
@@ -249,7 +282,7 @@ public class FarmTest {
     }
 
     @Test
-    public void delRuleAtFarm() throws Exception {
+    public void delRuleAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         farm.addRule(ruleIdJson);
         assertThat(farm.getRule(ruleId)).hasSize(1);
@@ -258,7 +291,7 @@ public class FarmTest {
     }
 
     @Test
-    public void delRuleWithNullVirtualHostAtFarm() throws Exception {
+    public void delRuleWithNullVirtualHostAtFarm() {
         farm.addRule(ruleIdJson2);
         assertThat(farm.getRule(ruleId)).isNull();
     }
