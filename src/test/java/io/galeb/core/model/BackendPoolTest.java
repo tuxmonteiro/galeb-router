@@ -1,6 +1,7 @@
 package io.galeb.core.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import io.galeb.core.json.JsonObject;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -8,16 +9,17 @@ import org.junit.Test;
 public class BackendPoolTest {
 
     BackendPool backendPool;
-    Backend backend;
     Backend nullBackend = null;
     String backendId = "http://0.0.0.0:00";
-    String backendIdAsJson = String.format("{'id':'%s'}", backendId);
-    String backendId2AsJson = "{'id':'http://1.1.1.1:11'}";
+    String backendId2 = "http://1.1.1.1:11";
+    String backendIdJson;
+    String backendIdJson2;
 
     @Before
     public void setUp() {
         backendPool = new BackendPool();
-        backend = (Backend) new Backend().setId(backendId);
+        backendIdJson = JsonObject.toJsonString(new Backend().setId(backendId));
+        backendIdJson2 = JsonObject.toJsonString(new Backend().setId(backendId2));
     }
 
     @Test
@@ -27,7 +29,7 @@ public class BackendPoolTest {
 
     @Test
     public void clearBackendsAtBackendPool() {
-        backendPool.addBackend(backendIdAsJson);
+        backendPool.addBackend(backendIdJson);
         assertThat(backendPool.getBackends()).hasSize(1);
         backendPool.clearBackends();
         assertThat(backendPool.getBackends()).isEmpty();
@@ -40,13 +42,13 @@ public class BackendPoolTest {
 
     @Test
     public void containBackendIsTrueAfterAddBackendsAtBackendPool() {
-        backendPool.addBackend(backendIdAsJson);
+        backendPool.addBackend(backendIdJson);
         assertThat(backendPool.containBackend(backendId)).isTrue();
     }
 
     @Test
     public void delBackendAtBackendPool() {
-        backendPool.addBackend(backendIdAsJson);
+        backendPool.addBackend(backendIdJson);
         assertThat(backendPool.getBackends()).hasSize(1);
         backendPool.delBackend(backendId);
         assertThat(backendPool.getBackends()).isEmpty();
@@ -54,7 +56,7 @@ public class BackendPoolTest {
 
     @Test
     public void delNullBackendAtBackendPool() {
-        backendPool.addBackend(backendIdAsJson);
+        backendPool.addBackend(backendIdJson);
         assertThat(backendPool.getBackends()).hasSize(1);
         backendPool.delBackend(nullBackend);
         assertThat(backendPool.getBackends()).hasSize(1);
@@ -62,8 +64,8 @@ public class BackendPoolTest {
 
     @Test
     public void getSingleBackendAtBackendPool() {
-        backendPool.addBackend(backendIdAsJson);
-        backendPool.addBackend(backendId2AsJson);
+        backendPool.addBackend(backendIdJson);
+        backendPool.addBackend(backendIdJson2);
         assertThat(backendPool.getBackend(backendId)).isInstanceOf(Backend.class);
     }
 
