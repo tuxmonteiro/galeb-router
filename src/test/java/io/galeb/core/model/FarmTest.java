@@ -12,21 +12,56 @@ public class FarmTest {
 
     VirtualHost virtualhostNull = null;
     String virtualHostId = "test.localhost";
-    JsonObject virtualHostIdJson = new JsonObject(String.format("{'id':'%s'}", virtualHostId));
-    JsonObject virtualHostId2Json = new JsonObject("{'id':'test2.localhost'}");
+    String virtualHostId2 = "test2.localhost";
+    JsonObject virtualHostIdJson;
+    JsonObject virtualHostIdJson2;
 
     BackendPool backendPoolNull = null;
     String backendPoolId = "backendpool";
-    JsonObject backendPoolIdJson = new JsonObject(String.format("{'id':'%s'}", backendPoolId));
-    JsonObject backendPoolId2Json = new JsonObject("{'id':'backendpool2'}");
+    String backendPoolId2 = "backendpool2";
+    JsonObject backendPoolIdJson;
+    JsonObject backendPoolIdJson2;
 
     String backendId = "http://0.0.0.0:00";
-    JsonObject backendIdJson = new JsonObject(String.format("{'id':'%s'}", backendId));
-    JsonObject backendId2Json = new JsonObject("{'id':'http://1.1.1.1:11'}");
+    String backendId2 = "http://1.1.1.1:11";
+    JsonObject backendIdJson;
+    JsonObject backendIdJson2;
+
+    String ruleId = "/";
+    String ruleId2 = "/test";
+    JsonObject ruleIdJson;
+    JsonObject ruleIdJson2;
 
     @Before
     public void setUp() {
         farm = new Farm();
+        virtualHostIdJson = JsonObject.toJsonObject(new VirtualHost().setId(virtualHostId));
+        virtualHostIdJson2 = JsonObject.toJsonObject(new VirtualHost().setId(virtualHostId2));
+
+        backendPoolIdJson = JsonObject.toJsonObject(new BackendPool().setId(backendPoolId));
+        backendPoolIdJson2 = JsonObject.toJsonObject(new BackendPool().setId(backendPoolId2));
+
+        backendIdJson = JsonObject.toJsonObject(new Backend().setId(backendId).setParentId(backendPoolId));
+        backendIdJson2 = JsonObject.toJsonObject(new Backend().setId(backendId2));
+
+        ruleIdJson = JsonObject.toJsonObject(new Rule().setId(ruleId).setParentId(virtualHostId));
+        ruleIdJson2 = JsonObject.toJsonObject(new Rule().setId(ruleId2));
+    }
+
+    @Test
+    public void optionsDefaultIsEmptyAtFarm() {
+        assertThat(farm.options.isEmpty()).isTrue();
+    }
+
+    @Test
+    public void setOptionsAtFarm() {
+        farm.options.put("key", "value");
+        assertThat(farm.options.get("key")).isEqualTo("value");
+    }
+
+    @Test
+    public void getEntityMapDefaultIsEmptyAtFarm() {
+        assertThat(farm.getEntityMap()).isEmpty();
     }
 
     @Test
@@ -67,7 +102,7 @@ public class FarmTest {
     @Test
     public void getSingleVirtualHostAtFarm() throws Exception {
         farm.addVirtualHost(virtualHostIdJson);
-        farm.addVirtualHost(virtualHostId2Json);
+        farm.addVirtualHost(virtualHostIdJson2);
         assertThat(farm.getVirtualHost(virtualHostIdJson)).isInstanceOf(VirtualHost.class);
     }
 
@@ -133,7 +168,7 @@ public class FarmTest {
     @Test
     public void getSingleBackendPoolAtFarm() throws Exception {
         farm.addBackendPool(backendPoolIdJson);
-        farm.addBackendPool(backendPoolId2Json);
+        farm.addBackendPool(backendPoolIdJson2);
         assertThat(farm.getBackendPool(backendPoolIdJson)).isInstanceOf(BackendPool.class);
     }
 
@@ -167,8 +202,65 @@ public class FarmTest {
     }
 
     @Test
+    public void getSingleBackendWithoutBackendAtFarm() throws Exception {
+        assertThat(farm.getBackend(backendId)).isNull();
+    }
+
+    @Test
+    public void getSingleBackendAtFarm() throws Exception {
+        farm.addBackendPool(backendPoolIdJson);
+        farm.addBackend(backendIdJson);
+        assertThat(farm.getBackend(backendId)).hasSize(1);
+        farm.addBackend(backendIdJson2);
+        assertThat(farm.getBackend(backendId)).hasSize(1);
+    }
+
+    @Test
+    public void delBackendAtFarm() throws Exception {
+        farm.addBackendPool(backendPoolIdJson);
+        farm.addBackend(backendIdJson);
+        assertThat(farm.getBackend(backendId)).hasSize(1);
+        farm.delBackend(backendIdJson);
+        assertThat(farm.getBackend(backendId)).isNull();
+    }
+
+    @Test
+    public void delBackendWithNullBackendPoolAtFarm() throws Exception {
+        farm.delBackend(backendIdJson2);
+        assertThat(farm.getBackend(backendId2)).isNull();
+    }
+
+    @Test
     public void getRulesAtFarm() {
         assertThat(farm.getRules()).isEmpty();
+    }
+
+    @Test
+    public void getSingleRuleWithoutVirtualHostAtFarm() throws Exception {
+        assertThat(farm.getRule(virtualHostId)).isNull();
+    }
+
+    @Test
+    public void getSingleRuleAtFarm() throws Exception {
+        farm.addVirtualHost(virtualHostIdJson);
+        farm.addRule(ruleIdJson);
+        farm.addRule(ruleIdJson2);
+        assertThat(farm.getRule(ruleId)).hasSize(1);
+    }
+
+    @Test
+    public void delRuleAtFarm() throws Exception {
+        farm.addVirtualHost(virtualHostIdJson);
+        farm.addRule(ruleIdJson);
+        assertThat(farm.getRule(ruleId)).hasSize(1);
+        farm.delRule(ruleIdJson);
+        assertThat(farm.getRule(ruleId)).isNull();
+    }
+
+    @Test
+    public void delRuleWithNullVirtualHostAtFarm() throws Exception {
+        farm.addRule(ruleIdJson2);
+        assertThat(farm.getRule(ruleId)).isNull();
     }
 
 }
