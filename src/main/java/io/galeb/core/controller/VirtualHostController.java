@@ -41,9 +41,9 @@ public class VirtualHostController implements EntityController {
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJson(farm.getVirtualHost(id));
+            return JsonObject.toJsonString(farm.getVirtualHost(id));
         } else {
-            return JsonObject.toJson(farm.getVirtualHosts());
+            return JsonObject.toJsonString(farm.getVirtualHosts());
         }
     }
 
