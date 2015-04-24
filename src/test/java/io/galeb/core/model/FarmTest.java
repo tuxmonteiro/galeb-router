@@ -212,6 +212,13 @@ public class FarmTest {
     }
 
     @Test
+    public void getBackendsAfterAddBackendsAtFarm() {
+        farm.addBackendPool(backendPoolIdJson);
+        farm.addBackend(backendIdJson);
+        assertThat(farm.getBackends()).hasSize(1);
+    }
+
+    @Test
     public void getSingleBackendWithoutBackendAtFarm() {
         assertThat(farm.getBackend(backendId)).isNull();
     }
@@ -269,6 +276,13 @@ public class FarmTest {
     }
 
     @Test
+    public void getRulesAfterAddRulesAtFarm() {
+        farm.addVirtualHost(virtualHostIdJson);
+        farm.addRule(ruleIdJson);
+        assertThat(farm.getRules()).hasSize(1);
+    }
+
+    @Test
     public void getSingleRuleWithoutVirtualHostAtFarm() {
         assertThat(farm.getRule(virtualHostId)).isNull();
     }
@@ -287,6 +301,15 @@ public class FarmTest {
         farm.addRule(ruleIdJson);
         assertThat(farm.getRule(ruleId)).hasSize(1);
         farm.delRule(ruleIdJson);
+        assertThat(farm.getRule(ruleId)).isNull();
+    }
+
+    @Test
+    public void delRuleWithStringAtFarm() {
+        farm.addVirtualHost(virtualHostIdJson);
+        farm.addRule(ruleIdJson);
+        assertThat(farm.getRule(ruleId)).hasSize(1);
+        farm.delRule(ruleId);
         assertThat(farm.getRule(ruleId)).isNull();
     }
 
