@@ -16,24 +16,20 @@ public class Router extends AbstractService {
 
     private static final String PROP_ROUTER_IOTHREADS = PROP_ROUTER_PREFIX+"iothread";
 
-    private static final String PROP_ROUTER_METRICS   = PROP_ROUTER_PREFIX+"enableMetrics";
-
     private static final String PROP_ROUTER_MAXCONN   = PROP_ROUTER_PREFIX+"maxConn";
+
+    public static final int     DEFAULT_PORT          = 8080;
 
     static {
         if (System.getProperty(PROP_ROUTER_PORT)==null) {
-            System.setProperty(PROP_ROUTER_PORT, "8080");
+            System.setProperty(PROP_ROUTER_PORT, Integer.toString(DEFAULT_PORT));
         }
         if (System.getProperty(PROP_ROUTER_IOTHREADS)==null) {
             System.setProperty(PROP_ROUTER_IOTHREADS, String.valueOf(Runtime.getRuntime().availableProcessors()));
         }
-        if (System.getProperty(PROP_ROUTER_METRICS)==null) {
-            System.setProperty(PROP_ROUTER_METRICS, "false");
-        }
         if (System.getProperty(PROP_ROUTER_MAXCONN)==null) {
-            System.setProperty(PROP_ROUTER_MAXCONN, "100");
+            System.setProperty(PROP_ROUTER_MAXCONN, Integer.toString(100));
         }
-
     }
 
     @PostConstruct
@@ -46,7 +42,6 @@ public class Router extends AbstractService {
 
         final Map<String, String> options = new HashMap<>();
         options.put("IoThreads", iothreads);
-        options.put("EnableMetrics", !"false".equals(System.getProperty(PROP_ROUTER_METRICS)) ? "true" : "false");
 
         new RouterApplication().setHost("0.0.0.0")
                                .setPort(port)

@@ -166,7 +166,6 @@
             <argument>-Dlog4j.configurationFile=log4j.xml</argument>
             <argument>-Dhazelcast.config=hazelcast.xml</argument>
             <argument>-Dio.galeb.router.port=8080</argument>
-            <argument>-Dio.galeb.router.enableMetrics=false</argument>
             <argument>-Dio.galeb.router.maxConn=300</argument>
             <argument>-jar</argument>
             <argument>target/galeb-${project.version}-uber.jar</argument>
