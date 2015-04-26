@@ -18,7 +18,6 @@ import io.galeb.core.model.Farm;
 import io.galeb.core.model.Metrics;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
-import io.galeb.core.services.AbstractService;
 
 import java.util.Map;
 

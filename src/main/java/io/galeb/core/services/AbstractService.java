@@ -63,8 +63,13 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     }
 
     @Override
+    public IEventBus getEventBus() {
+        return eventbus;
+    }
+
+    @Override
     public void handleController(JsonObject json, EntityController.Action action) {
-        throw new UnsupportedOperationException(this.toString());
+        throw new UnsupportedOperationException(toString());
     }
 
     @Override
