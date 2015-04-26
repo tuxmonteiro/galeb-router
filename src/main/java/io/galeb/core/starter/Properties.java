@@ -6,7 +6,7 @@ public abstract class Properties {
     private static final String PROP_ORG_JBOSS_LOGGING_PROVIDER = "org.jboss.logging.provider";
     private static final String PROP_HAZELCAST_LOGGING_TYPE     = "hazelcast.logging.type";
 
-	static {
+    static {
         if (System.getProperty(PROP_HAZELCAST_LOGGING_TYPE)==null) {
             System.setProperty(PROP_HAZELCAST_LOGGING_TYPE, "log4j2");
         }
