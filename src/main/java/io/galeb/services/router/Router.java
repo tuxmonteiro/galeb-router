@@ -1,6 +1,6 @@
 package io.galeb.services.router;
 
-import io.galeb.services.AbstractService;
+import io.galeb.core.services.AbstractService;
 import io.galeb.undertow.router.RouterApplication;
 
 import java.util.HashMap;
