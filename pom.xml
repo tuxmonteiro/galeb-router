@@ -163,9 +163,8 @@
             <argument>-server</argument>
             <argument>-Xms1024m</argument>
             <argument>-Xmx1024m</argument>
-            <argument>-Dorg.jboss.logging.provider=log4j2</argument>
-            <argument>-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager</argument>
             <argument>-Dlog4j.configurationFile=log4j.xml</argument>
+            <argument>-Dhazelcast.config=hazelcast.xml</argument>
             <argument>-Dio.galeb.router.port=8080</argument>
             <argument>-Dio.galeb.router.enableMetrics=false</argument>
             <argument>-Dio.galeb.router.maxConn=300</argument>

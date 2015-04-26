@@ -1,10 +1,9 @@
 package io.galeb.services.router;
 
 
-import io.galeb.core.cdi.WeldContext;
-import io.galeb.core.starter.Properties;
+import io.galeb.core.starter.AbstractStarter;
 
-public class Starter extends Properties {
+public class Starter extends AbstractStarter {
 
     private Starter() {
         // main class
@@ -12,7 +11,7 @@ public class Starter extends Properties {
 
     public static void main(String[] args) {
 
-        WeldContext.INSTANCE.getBean(Router.class);
+        loadService(Router.class);
 
     }
 
