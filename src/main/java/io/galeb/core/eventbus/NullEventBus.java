@@ -15,7 +15,7 @@ public class NullEventBus implements IEventBus {
     }
 
     @Override
-    public void sendMetrics(Metrics metrics) throws InterruptedException {
+    public void sendMetrics(Metrics metrics) {
         // NULL
     }
 

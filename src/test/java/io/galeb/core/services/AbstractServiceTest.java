@@ -51,7 +51,7 @@ public class AbstractServiceTest {
         }
 
         @Override
-        public void sendMetrics(Metrics metrics) throws InterruptedException {
+        public void sendMetrics(Metrics metrics) {
             // NULL
         }
 
