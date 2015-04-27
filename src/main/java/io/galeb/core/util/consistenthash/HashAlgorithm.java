@@ -44,7 +44,7 @@ public class HashAlgorithm {
     /** The Constant HASH_TYPE_MAP. */
     private static final Map<String, HashType> HASH_TYPE_MAP = new HashMap<>();
     static {
-        for (HashType hash : EnumSet.allOf(HashType.class)) {
+        for (final HashType hash : EnumSet.allOf(HashType.class)) {
             HASH_TYPE_MAP.put(hash.toString(), hash);
         }
     }
