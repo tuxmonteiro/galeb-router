@@ -6,4 +6,6 @@ public class Metrics extends Entity {
 
     public static final String METRICS_QUEUE = "METRICS_QUEUE";
 
+    public static final String PROP_METRICS_TOTAL = "METRICS_TOTAL";
+
 }
