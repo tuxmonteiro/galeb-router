@@ -1,5 +1,7 @@
 package io.galeb.services.router;
 
+import io.galeb.core.controller.EntityController.Action;
+import io.galeb.core.json.JsonObject;
 import io.galeb.core.services.AbstractService;
 import io.galeb.undertow.router.RouterApplication;
 
@@ -54,6 +56,11 @@ public class Router extends AbstractService {
 
     public Router() {
         super();
+    }
+
+    @Override
+    public void handleController(JsonObject json, Action action) {
+        // future
     }
 
 }
