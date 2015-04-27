@@ -46,6 +46,7 @@ public class IPHashPolicyTest {
         final long samples = 10000L;
         final int rounds = 5;
         final double percentMarginOfError = 0.5;
+        final int numClients = 100;
         final Set<HashType> hashs = EnumSet.allOf(HashAlgorithm.HashType.class);
 
         for (int round=0; round < rounds; round++) {
@@ -54,14 +55,17 @@ public class IPHashPolicyTest {
             for (final HashType hash: hashs) {
 
                 criteria.put("HASH_ALGORITHM", hash.toString());
-                IPHashPolicy.setCriteria(criteria);
-                IPHashPolicy.reset();
+
+                final int chosen = (int) (Math.random() * (numClients - Float.MIN_VALUE));
 
                 long sum = 0L;
                 final long initialTime = System.currentTimeMillis();
                 for (Integer counter=0; counter<samples; counter++) {
+                    criteria.put("SOURCE_IP_CRITERION", Integer.toString(chosen));
+                    IPHashPolicy.setCriteria(criteria);
                     sum += IPHashPolicy.getChoice();
                 }
+
                 final long finishTime = System.currentTimeMillis();
 
                 final double result = (numBackends*(numBackends-1)/2.0) * (samples/numBackends);
