@@ -2,6 +2,7 @@ package io.galeb.core.loadbalance.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import io.galeb.core.json.JsonObject;
+import io.galeb.core.loadbalance.LoadBalancePolicy;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.util.consistenthash.HashAlgorithm;
@@ -19,19 +20,19 @@ import org.junit.Test;
 public class IPHashPolicyTest {
 
     int numBackends = 10;
-    IPHashPolicy IPHashPolicy;
+    IPHashPolicy ipHashPolicy;
     BackendPool backendPool;
     Map<String, Object> criteria;
 
     @Before
     public void setUp(){
         backendPool = new BackendPool();
-        IPHashPolicy = new IPHashPolicy();
+        ipHashPolicy = new IPHashPolicy();
 
         for (int x=0; x<numBackends; x++) {
             backendPool.addBackend(JsonObject.toJsonString(new Backend().setId(String.format("http://0.0.0.0:%s", x))));
         }
-        IPHashPolicy.mapOfHosts(backendPool.getBackends().toArray());
+        ipHashPolicy.mapOfHosts(backendPool.getBackends().toArray());
         criteria = new HashMap<String, Object>();
     }
 
@@ -54,16 +55,15 @@ public class IPHashPolicyTest {
 
             for (final HashType hash: hashs) {
 
-                criteria.put("HASH_ALGORITHM", hash.toString());
-
-                final int chosen = (int) (Math.random() * (numClients - Float.MIN_VALUE));
+                criteria.put(IPHashPolicy.HASH_ALGORITHM, hash.toString());
 
                 long sum = 0L;
                 final long initialTime = System.currentTimeMillis();
                 for (Integer counter=0; counter<samples; counter++) {
-                    criteria.put("SOURCE_IP_CRITERION", Integer.toString(chosen));
-                    IPHashPolicy.setCriteria(criteria);
-                    sum += IPHashPolicy.getChoice();
+                    final int chosen = (int) (Math.random() * (numClients - Float.MIN_VALUE));
+                    criteria.put(LoadBalancePolicy.SOURCE_IP_CRITERION, Integer.toString(chosen));
+                    ipHashPolicy.setCriteria(criteria);
+                    sum += ipHashPolicy.getChoice();
                 }
 
                 final long finishTime = System.currentTimeMillis();
