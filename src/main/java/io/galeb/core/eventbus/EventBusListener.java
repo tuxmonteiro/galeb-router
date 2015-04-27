@@ -7,8 +7,15 @@ public interface EventBusListener {
         public void onEvent(Event event) {
             return;
         }
+
+        @Override
+        public IEventBus getEventBus() {
+            return IEventBus.NULL;
+        }
     };
 
     public void onEvent(final Event event);
+
+    public IEventBus getEventBus();
 
 }
