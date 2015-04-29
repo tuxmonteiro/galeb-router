@@ -73,7 +73,7 @@ public class Router extends AbstractService implements CounterConnectionsListene
     public void hasNewData() {
         final Data data = CounterConnections.poolData();
         final Metrics metrics = (Metrics) new Metrics().setId(data.getKey()).getProperties().put(Metrics.PROP_METRICS_TOTAL, data.getTotal());
-        eventbus.sendMetrics(metrics);
+        eventbus.onRequestMetrics(metrics);
     }
 
 }
