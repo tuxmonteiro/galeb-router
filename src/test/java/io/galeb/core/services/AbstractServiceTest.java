@@ -51,7 +51,12 @@ public class AbstractServiceTest {
         }
 
         @Override
-        public void sendMetrics(Metrics metrics) {
+        public void onRequestMetrics(Metrics metrics) {
+            // NULL
+        }
+
+        @Override
+        public void onConnectionsMetrics(Metrics metrics) {
             // NULL
         }
 
@@ -64,7 +69,6 @@ public class AbstractServiceTest {
         public void start() {
             // NULL
         }
-
     }
 
     @Inject
