@@ -10,7 +10,9 @@ public interface IEventBus {
 
     public void publishEntity(Entity entity, String entityType, Action action);
 
-    public void sendMetrics(Metrics metrics);
+    public void onRequestMetrics(Metrics metrics);
+
+    public void onConnectionsMetrics(Metrics metrics);
 
     public IEventBus setEventBusListener(EventBusListener eventBusListener);
 

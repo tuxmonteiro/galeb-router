@@ -15,7 +15,12 @@ public class NullEventBus implements IEventBus {
     }
 
     @Override
-    public void sendMetrics(Metrics metrics) {
+    public void onRequestMetrics(Metrics metrics) {
+        // NULL
+    }
+
+    @Override
+    public void onConnectionsMetrics(Metrics metrics) {
         // NULL
     }
 
