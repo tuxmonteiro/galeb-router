@@ -72,7 +72,7 @@ public class BackendPoolUpdater implements JobListener {
                 jobdataMap.put("eventbus", eventBus);
 
                 JobDetail job = newJob(BackendPoolUpdaterJob.class)
-                                    .withIdentity(BackendPoolUpdaterJob.class.getName())
+                                    .withIdentity(toString())
                                     .setJobData(jobdataMap)
                                     .build();
 
