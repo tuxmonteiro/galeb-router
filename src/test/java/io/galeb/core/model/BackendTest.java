@@ -37,13 +37,6 @@ public class BackendTest {
     }
 
     @Test
-    public void healthCantSetNullAtBackend() {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("health");
-        backend.setHealth(null);
-    }
-
-    @Test
     public void healthHasHealthyAtBackend() {
         assertThat(Health.valueOf("HEALTHY")).isEqualTo(Health.HEALTHY);
     }

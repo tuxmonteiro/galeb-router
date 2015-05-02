@@ -233,13 +233,6 @@ public class FarmTest {
     }
 
     @Test
-    public void addBackendWithNullBackendAtFarm() {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("backend");
-        farm.addBackend(nullBackend);
-    }
-
-    @Test
     public void delBackendAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         farm.addBackend(backendIdJson);
@@ -255,13 +248,6 @@ public class FarmTest {
         assertThat(farm.getBackend(backendId)).hasSize(1);
         farm.delBackend(backendId);
         assertThat(farm.getBackend(backendId)).isNull();
-    }
-
-    @Test
-    public void delBackendWithNullBackendAtFarm() {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("backend");
-        farm.delBackend(nullBackend);
     }
 
     @Test
