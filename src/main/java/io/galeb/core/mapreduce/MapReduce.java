@@ -12,6 +12,8 @@ public interface MapReduce {
 
     public void addMetrics(final Metrics metrics);
 
+    public boolean contains(String backendId);
+
     public Map<String, Integer> reduce();
 
 }
