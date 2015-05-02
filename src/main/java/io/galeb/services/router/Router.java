@@ -2,10 +2,6 @@ package io.galeb.services.router;
 
 import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.json.JsonObject;
-import io.galeb.core.metrics.CounterConnections;
-import io.galeb.core.metrics.CounterConnections.Data;
-import io.galeb.core.metrics.CounterConnectionsListener;
-import io.galeb.core.model.Metrics;
 import io.galeb.core.services.AbstractService;
 import io.galeb.undertow.router.RouterApplication;
 
@@ -14,7 +10,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-public class Router extends AbstractService implements CounterConnectionsListener {
+public class Router extends AbstractService {
 
     private static final String PROP_ROUTER_PREFIX    = "io.galeb.router.";
 
@@ -41,8 +37,6 @@ public class Router extends AbstractService implements CounterConnectionsListene
     @PostConstruct
     protected void init() {
 
-        CounterConnections.registerListener(this);
-
         super.prelaunch();
 
         final int port = Integer.parseInt(System.getProperty(PROP_ROUTER_PORT));
@@ -67,13 +61,6 @@ public class Router extends AbstractService implements CounterConnectionsListene
     @Override
     public void handleController(JsonObject json, Action action) {
         // future
-    }
-
-    @Override
-    public void hasNewData() {
-        final Data data = CounterConnections.poolData();
-        final Metrics metrics = (Metrics) new Metrics().setId(data.getKey()).getProperties().put(Metrics.PROP_METRICS_TOTAL, data.getTotal());
-        eventbus.onRequestMetrics(metrics);
     }
 
 }
