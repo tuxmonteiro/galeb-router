@@ -1,7 +1,5 @@
 package io.galeb.core.model;
 
-import lombok.NonNull;
-
 import com.google.gson.annotations.Expose;
 
 public class Backend extends Entity {
@@ -20,7 +18,7 @@ public class Backend extends Entity {
         return health;
     }
 
-    public final void setHealth(@NonNull Health health) {
+    public final void setHealth(Health health) {
         this.health = health;
     }
 

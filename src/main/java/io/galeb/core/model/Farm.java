@@ -12,8 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.inject.Alternative;
 
-import lombok.NonNull;
-
 import com.google.gson.annotations.Expose;
 
 @Alternative
@@ -30,7 +28,7 @@ public class Farm extends Entity {
     protected final Map<String, String> options = new ConcurrentHashMap<>();
 
     public Farm() {
-        this.setEntityType(Farm.class.getSimpleName().toLowerCase());
+        setEntityType(Farm.class.getSimpleName().toLowerCase());
     }
 
     public Farm setOptions(Map<String, String> options) {
@@ -166,7 +164,7 @@ public class Farm extends Entity {
         return addBackend(backend);
     }
 
-    public Farm addBackend(@NonNull Backend backend) {
+    public Farm addBackend(Backend backend) {
         final BackendPool backendPool = getBackendPool(backend.getParentId());
         if (backendPool!=null) {
             backendPool.addBackend(backend);
@@ -189,7 +187,7 @@ public class Farm extends Entity {
         return delBackend(backend);
     }
 
-    public Farm delBackend(@NonNull Backend backend) {
+    public Farm delBackend(Backend backend) {
         final BackendPool backendPool = getBackendPool(backend.getParentId());
         if (backendPool!=null) {
             backendPool.delBackend(backend);

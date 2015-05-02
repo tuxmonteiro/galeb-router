@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.NonNull;
-
 import com.google.gson.annotations.Expose;
 
 public class Entity implements Serializable {
@@ -54,7 +52,7 @@ public class Entity implements Serializable {
         return id;
     }
 
-    public final Entity setId(@NonNull String id) {
+    public final Entity setId(String id) {
         this.id = id;
         return this;
     }
@@ -63,7 +61,7 @@ public class Entity implements Serializable {
         return parentId;
     }
 
-    public final Entity setParentId(@NonNull String parentId) {
+    public final Entity setParentId(String parentId) {
         this.parentId = parentId;
         return this;
     }
@@ -72,7 +70,7 @@ public class Entity implements Serializable {
         return modifiedAt;
     }
 
-    public final Entity setModifiedAt(@NonNull Long modifiedAt) {
+    public final Entity setModifiedAt(Long modifiedAt) {
         this.modifiedAt = modifiedAt;
         return this;
     }
@@ -81,7 +79,7 @@ public class Entity implements Serializable {
         return properties;
     }
 
-    public final Entity setProperties(@NonNull final Map<String, Object> properties) {
+    public final Entity setProperties(final Map<String, Object> properties) {
         this.properties.clear();
         this.properties.putAll(properties);
         return this;
@@ -91,7 +89,7 @@ public class Entity implements Serializable {
         return entityType;
     }
 
-    public final Entity setEntityType(@NonNull String entityType) {
+    public final Entity setEntityType(String entityType) {
         this.entityType = entityType;
         return this;
     }
@@ -100,7 +98,7 @@ public class Entity implements Serializable {
         return hash;
     }
 
-    public final Entity setHash(@NonNull String hash) {
+    public final Entity setHash(String hash) {
         this.hash = hash;
         return this;
     }
@@ -111,13 +109,13 @@ public class Entity implements Serializable {
 
     @Override
     public int hashCode() {
-        return this.getId().hashCode();
+        return getId().hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Entity
-               && ((Entity) obj).getId().equals(this.getId());
+               && ((Entity) obj).getId().equals(getId());
     }
 
 }
