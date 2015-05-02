@@ -14,10 +14,13 @@ import io.galeb.core.json.JsonObject;
 import io.galeb.core.logging.Logger;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
+import io.galeb.core.sched.BackendPoolUpdater;
 
 import java.util.Map;
 
 import javax.inject.Inject;
+
+import org.quartz.SchedulerException;
 
 public abstract class AbstractService implements ListenerController, EventBusListener {
 
@@ -30,6 +33,8 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     @Inject
     protected Logger logger;
 
+    private BackendPoolUpdater backendPoolUpdater;
+
     public AbstractService() {
         super();
     }
@@ -37,6 +42,7 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     protected void prelaunch() {
         eventbus.setEventBusListener(this).start();
         registerControllers();
+        startBackendPoolUpdater();
     }
 
     protected void registerControllers() {
@@ -52,6 +58,15 @@ public abstract class AbstractService implements ListenerController, EventBusLis
         entityMap.put(getControllerName(VirtualHostController.class),
                 new VirtualHostController(farm).registerListenerController(this));
 
+    }
+
+    protected void startBackendPoolUpdater() {
+        backendPoolUpdater = new BackendPoolUpdater(farm, eventbus, logger);
+        try {
+            backendPoolUpdater.start();
+        } catch (SchedulerException e) {
+            logger.error(e);
+        }
     }
 
     private String getControllerName(Class<?> clazz) {

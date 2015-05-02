@@ -28,8 +28,9 @@ public class Backend extends Entity {
         return connections;
     }
 
-    public void setConnections(int connections) {
+    public Backend setConnections(int connections) {
         this.connections = connections;
+        return this;
     }
 
 }
