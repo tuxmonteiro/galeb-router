@@ -137,14 +137,13 @@ public class Farm extends Entity {
     }
 
     private Map<String, Object> defineLoadBalancePolicy(final BackendPool backendPool) {
-        Map<String, Object> properties = backendPool.getProperties();
+        final Map<String, Object> properties = backendPool.getProperties();
         final String loadBalanceAlgorithm = (String) properties.get(LoadBalancePolicy.LOADBALANCE_POLICY_FIELD);
         final boolean loadBalanceDefined = loadBalanceAlgorithm!=null && LoadBalancePolicy.hasLoadBalanceAlgorithm(loadBalanceAlgorithm);
 
         if (!loadBalanceDefined) {
             properties.put(LoadBalancePolicy.LOADBALANCE_POLICY_FIELD, LoadBalancePolicyLocator.DEFAULT_ALGORITHM.toString());
         }
-        properties.put(BackendPool.class.getSimpleName(), backendPool);
         return properties;
     }
 
