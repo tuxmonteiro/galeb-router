@@ -1,8 +1,12 @@
 package io.galeb.core.loadbalance;
 
-import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.*;
+import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.IPHASH;
+import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.LEASTCONN;
+import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.RANDOM;
+import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.ROUNDROBIN;
 import io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm;
 import io.galeb.core.loadbalance.impl.IPHashPolicy;
+import io.galeb.core.loadbalance.impl.LeastConnPolicy;
 import io.galeb.core.loadbalance.impl.RandomPolicy;
 import io.galeb.core.loadbalance.impl.RoundRobinPolicy;
 
@@ -21,6 +25,7 @@ public class LoadBalancePolicyLocator {
         loadbalanceCriterionMap.put(ROUNDROBIN.toString(), new RoundRobinPolicy());
         loadbalanceCriterionMap.put(RANDOM.toString(), new RandomPolicy());
         loadbalanceCriterionMap.put(IPHASH.toString(), new IPHashPolicy());
+        loadbalanceCriterionMap.put(LEASTCONN.toString(), new LeastConnPolicy());
     }
 
     public LoadBalancePolicy get() {

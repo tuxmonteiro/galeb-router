@@ -45,7 +45,7 @@ public abstract class LoadBalancePolicy {
 
     public static final String SOURCE_IP_CRITERION      = "SourceIP";
 
-    private final Map<String, Object> loadBalancePolicyCriteria = new HashMap<>();
+    protected final Map<String, Object> loadBalancePolicyCriteria = new HashMap<>();
 
     protected final Map<Integer, Object> hosts = new TreeMap<Integer, Object>();
 
