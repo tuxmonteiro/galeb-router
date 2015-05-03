@@ -118,4 +118,13 @@ public class Entity implements Serializable {
                && ((Entity) obj).getId().equals(getId());
     }
 
+    public Entity copy() {
+        Entity entityCopy = new Entity();
+        entityCopy.setPk(getPk());
+        entityCopy.setId(getId());
+        entityCopy.setParentId(getParentId());
+        entityCopy.setProperties(getProperties());
+        return entityCopy;
+    }
+
 }

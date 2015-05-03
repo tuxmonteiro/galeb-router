@@ -46,9 +46,11 @@ public class BackendPoolUpdaterJob implements Job {
                             return backend1.getConnections() - backend2.getConnections() ;
                         }
                     });
-            backendPool.setBackendWithLeastConn(backendWithLeastConn);
 
-            eventBus.publishEntity(backendPool, BackendPool.class.getSimpleName(), Action.CHANGE);
+            BackendPool newBackendPool = (BackendPool) backendPool.copy();
+            newBackendPool.setBackendWithLeastConn(backendWithLeastConn);
+
+            eventBus.publishEntity(newBackendPool, BackendPool.class.getSimpleName(), Action.CHANGE);
         }
 
         logger.debug(String.format("Job %s done.", this.getClass().getSimpleName()));

@@ -36,7 +36,7 @@ public class BackendPoolController implements EntityController {
     @Override
     public EntityController change(JsonObject json) throws Exception {
         BackendPool backendPoolWithChanges = (BackendPool) JsonObject.fromJson(json.toString(), BackendPool.class);
-        BackendPool backendPoolOriginal = farm.getBackendPool(backendPoolWithChanges.getId());
+        BackendPool backendPoolOriginal = farm.getBackendPool(json);
         if (backendPoolOriginal!=null) {
             Map<String, Object> properties = new HashMap<>();
 
@@ -46,7 +46,7 @@ public class BackendPoolController implements EntityController {
             backendPoolOriginal.setProperties(properties);
             backendPoolOriginal.updateHash();
 
-            farm.changeBackendPool(backendPoolOriginal);
+            farm.changeBackendPool(JsonObject.toJsonObject(backendPoolOriginal));
             notifyListeners(json, Action.CHANGE);
         }
         return this;
