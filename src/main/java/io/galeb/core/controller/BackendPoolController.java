@@ -1,9 +1,12 @@
 package io.galeb.core.controller;
 
 import io.galeb.core.json.JsonObject;
+import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Farm;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class BackendPoolController implements EntityController {
@@ -32,9 +35,20 @@ public class BackendPoolController implements EntityController {
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
-        farm.delBackendPool(json);
-        farm.addBackendPool(json);
-        notifyListeners(json, Action.CHANGE);
+        BackendPool backendPoolWithChanges = (BackendPool) JsonObject.fromJson(json.toString(), BackendPool.class);
+        BackendPool backendPoolOriginal = farm.getBackendPool(backendPoolWithChanges.getId());
+        if (backendPoolOriginal!=null) {
+            Map<String, Object> properties = new HashMap<>();
+
+            properties.putAll(backendPoolOriginal.getProperties());
+            properties.putAll(backendPoolWithChanges.getProperties());
+            backendPoolOriginal.setModifiedAt(System.currentTimeMillis());
+            backendPoolOriginal.setProperties(properties);
+            backendPoolOriginal.updateHash();
+
+            farm.changeBackendPool(backendPoolOriginal);
+            notifyListeners(json, Action.CHANGE);
+        }
         return this;
     }
 

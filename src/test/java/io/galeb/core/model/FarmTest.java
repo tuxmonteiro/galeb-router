@@ -132,7 +132,7 @@ public class FarmTest {
         assertThat(farm.getVirtualHosts()).isEmpty();
     }
 
-    @Test
+    @Test(expected=NullPointerException.class)
     public void delNullVirtualHostAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         assertThat(farm.getVirtualHosts()).hasSize(1);
@@ -198,7 +198,7 @@ public class FarmTest {
         assertThat(farm.getBackendPools()).isEmpty();
     }
 
-    @Test
+    @Test(expected=NullPointerException.class)
     public void delNullBackendPoolAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         assertThat(farm.getBackendPools()).hasSize(1);
@@ -239,24 +239,6 @@ public class FarmTest {
         assertThat(farm.getBackend(backendId)).hasSize(1);
         farm.delBackend(backendIdJson);
         assertThat(farm.getBackend(backendId)).isNull();
-    }
-
-    @Test
-    public void delBackendWithStringAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        farm.addBackend(backendIdJson);
-        assertThat(farm.getBackend(backendId)).hasSize(1);
-        farm.delBackend(backendId);
-        assertThat(farm.getBackend(backendId)).isNull();
-    }
-
-    @Test
-    public void delBackendWithNullBackendIdAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        farm.addBackend(backendIdJson);
-        assertThat(farm.getBackend(backendId)).hasSize(1);
-        farm.delBackend(backendId2);
-        assertThat(farm.getBackend(backendId)).hasSize(1);
     }
 
     @Test
@@ -306,15 +288,6 @@ public class FarmTest {
         assertThat(farm.getRule(ruleId)).hasSize(1);
         farm.delRule((Rule) new Rule().setId(ruleId).setParentId(virtualHostId));
         assertThat(farm.getRule(ruleId)).isNull();
-    }
-
-    @Test
-    public void delRuleWithNullRuleAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        farm.addRule(ruleIdJson);
-        assertThat(farm.getRule(ruleId)).hasSize(1);
-        farm.delRule(ruleId2);
-        assertThat(farm.getRule(ruleId)).hasSize(1);
     }
 
     @Test
