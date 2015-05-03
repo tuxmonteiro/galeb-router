@@ -13,6 +13,16 @@ public class BackendPool extends Entity {
 
     @Expose private Set<Backend> backends = new HashSet<>();
 
+    private Backend backendWithLeastConn;
+
+    public Backend getBackendWithLeastConn() {
+        return backendWithLeastConn;
+    }
+
+    public synchronized void setBackendWithLeastConn(final Backend backendWithLeastConn) {
+        this.backendWithLeastConn = backendWithLeastConn;
+    }
+
     public Backend getBackend(String backendId) {
         Backend backend = null;
         for (Backend backendTemp : backends) {
