@@ -2,6 +2,8 @@ package io.galeb.core.model;
 
 import io.galeb.core.controller.EntityController;
 import io.galeb.core.json.JsonObject;
+import io.galeb.core.loadbalance.LoadBalancePolicy;
+import io.galeb.core.loadbalance.LoadBalancePolicyLocator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -83,12 +85,24 @@ public class Farm extends Entity {
 
     public Farm addVirtualHost(JsonObject jsonObject) {
         final VirtualHost virtualhost = (VirtualHost) JsonObject.fromJson(jsonObject.toString(), VirtualHost.class);
-        return addVirtualHost(virtualhost);
+        virtualHosts.add(virtualhost);
+        return this;
     }
 
     public Farm addVirtualHost(VirtualHost virtualhost) {
-        virtualHosts.add(virtualhost);
+        return addVirtualHost(JsonObject.toJsonObject(virtualhost));
+    }
+
+    public Farm changeVirtualHost(JsonObject jsonObject) {
+        if (containVirtualHost(jsonObject)) {
+            delVirtualHost(jsonObject);
+            addVirtualHost(jsonObject);
+        }
         return this;
+    }
+
+    public Farm changeVirtualHost(VirtualHost virtualHost) {
+        return changeBackendPool(JsonObject.toJsonObject(virtualHost));
     }
 
     public Farm delVirtualHost(String virtualhostId) {
@@ -98,14 +112,14 @@ public class Farm extends Entity {
 
     public Farm delVirtualHost(JsonObject jsonObject) {
         final VirtualHost virtualHost = getVirtualHost(jsonObject);
-        return delVirtualHost(virtualHost);
-    }
-
-    public Farm delVirtualHost(VirtualHost virtualHost) {
         if (virtualHost!=null) {
             virtualHosts.remove(virtualHost);
         }
         return this;
+    }
+
+    public Farm delVirtualHost(VirtualHost virtualHost) {
+        return delVirtualHost(JsonObject.toJsonObject(virtualHost));
     }
 
     public boolean containVirtualHost(JsonObject jsonObject) {
@@ -117,22 +131,52 @@ public class Farm extends Entity {
     }
 
     public void clearVirtualHosts() {
-        virtualHosts.clear();
+        for (VirtualHost virtualHost: getVirtualHosts()) {
+            delVirtualHost(JsonObject.toJsonObject(virtualHost));
+        }
+    }
+
+    private Map<String, Object> defineLoadBalancePolicy(final BackendPool backendPool) {
+        Map<String, Object> properties = backendPool.getProperties();
+        final String loadBalanceAlgorithm = (String) properties.get(LoadBalancePolicy.LOADBALANCE_POLICY_FIELD);
+        final boolean loadBalanceDefined = loadBalanceAlgorithm!=null && LoadBalancePolicy.hasLoadBalanceAlgorithm(loadBalanceAlgorithm);
+
+        if (!loadBalanceDefined) {
+            properties.put(LoadBalancePolicy.LOADBALANCE_POLICY_FIELD, LoadBalancePolicyLocator.DEFAULT_ALGORITHM.toString());
+        }
+        properties.put(BackendPool.class.getSimpleName(), backendPool);
+        return properties;
     }
 
     public Farm addBackendPool(JsonObject jsonObject) {
         final BackendPool backendPool = (BackendPool) JsonObject.fromJson(jsonObject.toString(), BackendPool.class);
-        return addBackendPool(backendPool);
-    }
-
-    public Farm addBackendPool(BackendPool backendPool) {
+        backendPool.setProperties(defineLoadBalancePolicy(backendPool));
         backendPools.add(backendPool);
         return this;
     }
 
+    public Farm addBackendPool(BackendPool backendPool) {
+        return addBackendPool(JsonObject.toJsonObject(backendPool));
+    }
+
+    public Farm changeBackendPool(JsonObject jsonObject) {
+        if (containBackendPool(jsonObject)) {
+            delBackendPool(jsonObject);
+            addBackendPool(jsonObject);
+        }
+        return this;
+    }
+
+    public Farm changeBackendPool(BackendPool backendPool) {
+        return changeBackendPool(JsonObject.toJsonObject(backendPool));
+    }
+
     public Farm delBackendPool(JsonObject jsonObject) {
         final BackendPool backendPool = getBackendPool(jsonObject);
-        return delBackendPool(backendPool);
+        if (backendPool!=null) {
+            backendPools.remove(backendPool);
+        }
+        return this;
     }
 
     public Farm delBackendPool(String backendId) {
@@ -141,10 +185,7 @@ public class Farm extends Entity {
     }
 
     public Farm delBackendPool(BackendPool backendPool) {
-        if (backendPool!=null) {
-            backendPools.remove(backendPool);
-        }
-        return this;
+        return delBackendPool(JsonObject.toJsonObject(backendPool));
     }
 
     public boolean containBackendPool(JsonObject jsonObject) {
@@ -156,15 +197,13 @@ public class Farm extends Entity {
     }
 
     public void clearBackendPool() {
-        backendPools.clear();
+        for (BackendPool backendPool: getBackendPools()) {
+            delBackendPool(JsonObject.toJsonObject(backendPool));
+        }
     }
 
     public Farm addBackend(JsonObject jsonObject) {
         final Backend backend = (Backend) JsonObject.fromJson(jsonObject.toString(), Backend.class);
-        return addBackend(backend);
-    }
-
-    public Farm addBackend(Backend backend) {
         final BackendPool backendPool = getBackendPool(backend.getParentId());
         if (backendPool!=null) {
             backendPool.addBackend(backend);
@@ -172,27 +211,35 @@ public class Farm extends Entity {
         return this;
     }
 
-    public Farm delBackend(String backendId) {
-        for (final BackendPool backendPool: backendPools) {
-            final Backend backend = backendPool.getBackend(backendId);
-            if (backend!=null) {
-                delBackend(backend);
-            }
+    public Farm addBackend(Backend backend) {
+        return addBackend(JsonObject.toJsonObject(backend));
+    }
+
+    public Farm changeBackend(JsonObject jsonObject) {
+        final Backend backend = (Backend) JsonObject.fromJson(jsonObject.toString(), Backend.class);
+        final BackendPool backendPool = getBackendPool(backend.getParentId());
+        if (backendPool != null && backendPool.containBackend(backend.getId())) {
+            delBackend(jsonObject);
+            addBackend(jsonObject);
         }
         return this;
     }
 
-    public Farm delBackend(JsonObject jsonObject) {
-        final Backend backend = (Backend) JsonObject.fromJson(jsonObject.toString(), Backend.class);
-        return delBackend(backend);
+    public Farm changeBackend(Backend backend) {
+        return changeBackend(JsonObject.toJsonObject(backend));
     }
 
-    public Farm delBackend(Backend backend) {
+    public Farm delBackend(JsonObject jsonObject) {
+        final Backend backend = (Backend) JsonObject.fromJson(jsonObject.toString(), Backend.class);
         final BackendPool backendPool = getBackendPool(backend.getParentId());
         if (backendPool!=null) {
             backendPool.delBackend(backend);
         }
         return this;
+    }
+
+    public Farm delBackend(Backend backend) {
+        return delBackend(JsonObject.toJsonObject(backend));
     }
 
     public List<Backend> getBackend(String backendId) {
@@ -216,10 +263,6 @@ public class Farm extends Entity {
 
     public Farm addRule(JsonObject jsonObject) {
         final Rule rule = (Rule) JsonObject.fromJson(jsonObject.toString(), Rule.class);
-        return addRule(rule);
-    }
-
-    public Farm addRule(Rule rule) {
         final VirtualHost virtualHost = getVirtualHost(rule.getParentId());
         if (virtualHost!=null) {
             virtualHost.addRule(rule);
@@ -227,21 +270,19 @@ public class Farm extends Entity {
         return this;
     }
 
+    public Farm addRule(Rule rule) {
+        return addRule(JsonObject.toJsonObject(rule));
+    }
+
     public Farm delRule(Rule rule) {
-        return delRule(rule.getId());
+        return delRule(JsonObject.toJsonObject(rule));
     }
 
     public Farm delRule(JsonObject jsonObject) {
         final Rule rule = (Rule) JsonObject.fromJson(jsonObject.toString(), Rule.class);
-        return delRule(rule.getId());
-    }
-
-    public Farm delRule(String ruleId) {
-        for (final VirtualHost virtualHost: virtualHosts) {
-            final Rule rule = virtualHost.getRule(ruleId);
-            if (rule!=null) {
-                getVirtualHost(virtualHost.getId()).delRule(ruleId);
-            }
+        final VirtualHost virtualHost = getVirtualHost(rule.getParentId());
+        if (virtualHost != null) {
+            virtualHost.delRule(rule.getId());
         }
         return this;
     }

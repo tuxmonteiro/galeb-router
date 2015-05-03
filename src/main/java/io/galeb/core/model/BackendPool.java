@@ -11,16 +11,17 @@ public class BackendPool extends Entity {
 
     private static final long serialVersionUID = 1L;
 
+    private static final String PROP_BACKEND_WITH_LEASTCONN = "backendWithLeastConn";
+
     @Expose private Set<Backend> backends = new HashSet<>();
 
-    private Backend backendWithLeastConn;
-
     public Backend getBackendWithLeastConn() {
-        return backendWithLeastConn;
+        String backendID = (String) getProperties().get(PROP_BACKEND_WITH_LEASTCONN);
+        return backendID != null ? getBackend(backendID) : (Backend) getBackends().toArray()[0];
     }
 
-    public synchronized void setBackendWithLeastConn(final Backend backendWithLeastConn) {
-        this.backendWithLeastConn = backendWithLeastConn;
+    public synchronized void setBackendWithLeastConn(final Backend backendWithLeastConnObj) {
+        getProperties().put(PROP_BACKEND_WITH_LEASTCONN, backendWithLeastConnObj.getId());
     }
 
     public Backend getBackend(String backendId) {
