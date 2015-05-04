@@ -15,6 +15,7 @@ import io.galeb.core.logging.Logger;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 import io.galeb.core.sched.BackendPoolUpdater;
+import io.galeb.core.sched.BackendUpdater;
 
 import java.util.Map;
 
@@ -35,6 +36,8 @@ public abstract class AbstractService implements ListenerController, EventBusLis
 
     private BackendPoolUpdater backendPoolUpdater;
 
+    private BackendUpdater backendUpdater;
+
     public AbstractService() {
         super();
     }
@@ -42,7 +45,7 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     protected void prelaunch() {
         eventbus.setEventBusListener(this).start();
         registerControllers();
-        startBackendPoolUpdater();
+        startSchedulers();
     }
 
     protected void registerControllers() {
@@ -60,10 +63,13 @@ public abstract class AbstractService implements ListenerController, EventBusLis
 
     }
 
-    protected void startBackendPoolUpdater() {
+    protected void startSchedulers() {
         backendPoolUpdater = new BackendPoolUpdater(farm, eventbus, logger);
+        backendUpdater = new BackendUpdater(farm, eventbus, logger);
+
         try {
             backendPoolUpdater.start();
+            backendUpdater.start();
         } catch (SchedulerException e) {
             logger.error(e);
         }
