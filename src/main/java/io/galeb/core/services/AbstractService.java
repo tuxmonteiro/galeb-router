@@ -36,7 +36,7 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     protected Logger logger;
 
     @Inject
-    private MapReduce mapReduce;
+    protected MapReduce mapReduce;
 
     private BackendPoolUpdater backendPoolUpdater;
 

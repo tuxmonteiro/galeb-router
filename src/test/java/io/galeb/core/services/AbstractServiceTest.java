@@ -11,6 +11,7 @@ import io.galeb.core.eventbus.Event;
 import io.galeb.core.eventbus.EventBusListener;
 import io.galeb.core.eventbus.IEventBus;
 import io.galeb.core.logging.impl.Log4j2Logger;
+import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
@@ -19,6 +20,7 @@ import io.galeb.core.model.Metrics;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -71,6 +73,33 @@ public class AbstractServiceTest {
         }
     }
 
+    static class FakeMapReduce implements MapReduce {
+        @Override
+        public MapReduce setTimeOut(Long timeOut) {
+            return this;
+        }
+
+        @Override
+        public Long getTimeOut() {
+            return -1L;
+        }
+
+        @Override
+        public void addMetrics(Metrics metrics) {
+            // NULL
+        }
+
+        @Override
+        public boolean contains(String backendId) {
+            return false;
+        }
+
+        @Override
+        public Map<String, Integer> reduce() {
+            return Collections.emptyMap();
+        }
+    }
+
     @Inject
     private AbstractService serviceImplemented;
 
@@ -83,7 +112,8 @@ public class AbstractServiceTest {
                                  ServiceImplemented.class,
                                  Log4j2Logger.class,
                                  FakeEventBus.class,
-                                 FakeFarm.class)
+                                 FakeFarm.class,
+                                 FakeMapReduce.class)
                          .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
