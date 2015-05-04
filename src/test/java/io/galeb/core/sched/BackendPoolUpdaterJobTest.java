@@ -5,11 +5,17 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import io.galeb.core.controller.BackendPoolController;
+import io.galeb.core.controller.EntityController.Action;
+import io.galeb.core.eventbus.EventBusListener;
 import io.galeb.core.eventbus.IEventBus;
+import io.galeb.core.json.JsonObject;
 import io.galeb.core.logging.Logger;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
+import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
+import io.galeb.core.model.Metrics;
 
 import java.util.UUID;
 
@@ -24,11 +30,46 @@ public class BackendPoolUpdaterJobTest {
 
     private JobExecutionContext jobExecutionContext = mock(JobExecutionContext.class);
 
-    private Farm farm = new Farm();
+    private final Farm farm = new Farm();
+
+    private class FakeEventBus implements IEventBus {
+        @Override
+        public void publishEntity(Entity entity, String entityType, Action action) {
+            BackendPoolController backendPoolController = new BackendPoolController(farm);
+            BackendPool backendPool = ((BackendPool)entity);
+            try {
+                backendPoolController.change(JsonObject.toJsonObject(backendPool));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onRequestMetrics(Metrics metrics) {
+            // Fake
+        }
+
+        @Override
+        public void onConnectionsMetrics(Metrics metrics) {
+            // Fake
+        }
+
+        @Override
+        public IEventBus setEventBusListener(EventBusListener eventBusListener) {
+            // Fake
+            return this;
+        }
+
+        @Override
+        public void start() {
+            // Fake
+        }
+    }
 
     @Before
     public void setUp() {
         Logger logger = mock(Logger.class);
+        IEventBus eventBus = new FakeEventBus();
         doNothing().when(logger).error(any(Throwable.class));
         doNothing().when(logger).debug(any(Throwable.class));
 
@@ -38,7 +79,7 @@ public class BackendPoolUpdaterJobTest {
         JobDataMap jobdataMap = new JobDataMap();
         jobdataMap.put("farm", farm);
         jobdataMap.put("logger", logger);
-        jobdataMap.put("eventbus", IEventBus.NULL);
+        jobdataMap.put("eventbus", eventBus);
         when(jobDetail.getJobDataMap()).thenReturn(jobdataMap);
     }
 
@@ -62,7 +103,8 @@ public class BackendPoolUpdaterJobTest {
         }
 
         new BackendPoolUpdaterJob().execute(jobExecutionContext);
-        Backend backendWithLeastConn = farm.getBackendPool(backendPoolId).getBackendWithLeastConn();
+        BackendPool backendPool = farm.getBackendPool(backendPoolId);
+        Backend backendWithLeastConn = backendPool.getBackendWithLeastConn();
 
         assertThat(backendWithLeastConn.getConnections()).isEqualTo(minConn);
     }

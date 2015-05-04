@@ -6,6 +6,7 @@ import io.galeb.core.loadbalance.LoadBalancePolicy;
 import io.galeb.core.loadbalance.LoadBalancePolicyLocator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -137,7 +138,7 @@ public class Farm extends Entity {
     }
 
     private Map<String, Object> defineLoadBalancePolicy(final BackendPool backendPool) {
-        final Map<String, Object> properties = backendPool.getProperties();
+        final Map<String, Object> properties = new HashMap<>(backendPool.getProperties());
         final String loadBalanceAlgorithm = (String) properties.get(LoadBalancePolicy.LOADBALANCE_POLICY_FIELD);
         final boolean loadBalanceDefined = loadBalanceAlgorithm!=null && LoadBalancePolicy.hasLoadBalanceAlgorithm(loadBalanceAlgorithm);
 

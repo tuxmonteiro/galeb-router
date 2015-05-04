@@ -47,7 +47,7 @@ public class BackendPoolUpdaterJob implements Job {
                         }
                     });
 
-            BackendPool newBackendPool = (BackendPool) backendPool.copy();
+            BackendPool newBackendPool = new BackendPool(backendPool);
             newBackendPool.setBackendWithLeastConn(backendWithLeastConn);
 
             eventBus.publishEntity(newBackendPool, BackendPool.class.getSimpleName(), Action.CHANGE);

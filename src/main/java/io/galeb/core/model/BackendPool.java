@@ -16,12 +16,29 @@ public class BackendPool extends Entity {
     @Expose private Set<Backend> backends = new HashSet<>();
 
     public Backend getBackendWithLeastConn() {
-        String backendID = (String) getProperties().get(PROP_BACKEND_WITH_LEASTCONN);
-        return backendID != null ? getBackend(backendID) : (Backend) getBackends().toArray()[0];
+        if (!getBackends().isEmpty()) {
+            String backendID = (String) getProperties().get(PROP_BACKEND_WITH_LEASTCONN);
+            return getBackend(backendID);
+        }
+        return null;
     }
 
     public synchronized void setBackendWithLeastConn(final Backend backendWithLeastConnObj) {
         getProperties().put(PROP_BACKEND_WITH_LEASTCONN, backendWithLeastConnObj.getId());
+    }
+
+    public BackendPool() {
+        super();
+    }
+
+    public BackendPool(BackendPool backendPool) {
+        this();
+        setPk(backendPool.getPk());
+        setId(backendPool.getId());
+        setParentId(backendPool.getParentId());
+        setProperties(backendPool.getProperties());
+        setBackends(backendPool.getBackends());
+        updateHash();
     }
 
     public Backend getBackend(String backendId) {
@@ -67,6 +84,12 @@ public class BackendPool extends Entity {
 
     public Set<Backend> getBackends() {
         return backends;
+    }
+
+    public void setBackends(final Set<Backend> myBackends) {
+        Set<Backend> copyBackends = new HashSet<>(myBackends);
+        backends.clear();
+        backends.addAll(copyBackends);
     }
 
 }

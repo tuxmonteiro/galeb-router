@@ -79,9 +79,9 @@ public class Entity implements Serializable {
         return properties;
     }
 
-    public final Entity setProperties(final Map<String, Object> properties) {
-        this.properties.clear();
-        this.properties.putAll(properties);
+    public final Entity setProperties(final Map<String, Object> myProperties) {
+        properties.clear();
+        properties.putAll(myProperties);
         return this;
     }
 
@@ -116,15 +116,6 @@ public class Entity implements Serializable {
     public boolean equals(Object obj) {
         return obj instanceof Entity
                && ((Entity) obj).getId().equals(getId());
-    }
-
-    public Entity copy() {
-        Entity entityCopy = new Entity();
-        entityCopy.setPk(getPk());
-        entityCopy.setId(getId());
-        entityCopy.setParentId(getParentId());
-        entityCopy.setProperties(getProperties());
-        return entityCopy;
     }
 
 }
