@@ -10,8 +10,6 @@ import io.galeb.core.model.Farm;
 
 import java.util.UUID;
 
-import javax.inject.Inject;
-
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -24,23 +22,22 @@ import org.quartz.impl.StdSchedulerFactory;
 
 public class BackendUpdater implements JobListener {
 
-    @Inject
-    private MapReduce mapReduce;
-
     private Scheduler scheduler;
 
     private final Logger logger;
     private final Farm farm;
     private final IEventBus eventBus;
+    private final MapReduce mapReduce;
 
     private long schedulerInterval = 10000L;
 
     private boolean started = false;
 
-    public BackendUpdater(Farm farm, IEventBus eventBus, Logger logger) {
+    public BackendUpdater(Farm farm, IEventBus eventBus, Logger logger, MapReduce mapReduce) {
         this.farm = farm;
         this.eventBus = eventBus;
         this.logger = logger;
+        this.mapReduce = mapReduce;
     }
 
     public boolean isStarted() {
