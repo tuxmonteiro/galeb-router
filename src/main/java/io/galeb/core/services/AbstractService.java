@@ -98,6 +98,7 @@ public abstract class AbstractService implements ListenerController, EventBusLis
         EntityController entityController = farm.getEntityMap().get(entityType);
         if (entityController==null) {
             entityController = EntityController.NULL;
+            logger.error("EntityController is NULL");
         }
 
         final Object eventType = event.getType();

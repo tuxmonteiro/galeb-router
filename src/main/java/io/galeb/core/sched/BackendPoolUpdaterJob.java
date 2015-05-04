@@ -50,7 +50,8 @@ public class BackendPoolUpdaterJob implements Job {
             BackendPool newBackendPool = new BackendPool(backendPool);
             newBackendPool.setBackendWithLeastConn(backendWithLeastConn);
 
-            eventBus.publishEntity(newBackendPool, BackendPool.class.getSimpleName(), Action.CHANGE);
+            eventBus.publishEntity(newBackendPool,
+                    BackendPool.class.getSimpleName().toLowerCase(), Action.CHANGE);
         }
 
         logger.debug(String.format("Job %s done.", this.getClass().getSimpleName()));
