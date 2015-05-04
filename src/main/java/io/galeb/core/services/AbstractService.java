@@ -12,7 +12,6 @@ import io.galeb.core.eventbus.EventBusListener;
 import io.galeb.core.eventbus.IEventBus;
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.logging.Logger;
-import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 import io.galeb.core.sched.BackendPoolUpdater;
@@ -34,9 +33,6 @@ public abstract class AbstractService implements ListenerController, EventBusLis
 
     @Inject
     protected Logger logger;
-
-    @Inject
-    protected MapReduce mapReduce;
 
     private BackendPoolUpdater backendPoolUpdater;
 
@@ -69,11 +65,11 @@ public abstract class AbstractService implements ListenerController, EventBusLis
 
     protected void startSchedulers() {
         backendPoolUpdater = new BackendPoolUpdater(farm, eventbus, logger);
-        backendUpdater = new BackendUpdater(farm, eventbus, logger, mapReduce);
+        //backendUpdater = new BackendUpdater(farm, eventbus, logger, mapReduce);
 
         try {
             backendPoolUpdater.start();
-            backendUpdater.start();
+            //backendUpdater.start();
         } catch (SchedulerException e) {
             logger.error(e);
         }
