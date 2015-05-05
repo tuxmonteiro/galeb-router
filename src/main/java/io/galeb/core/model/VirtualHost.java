@@ -2,8 +2,8 @@ package io.galeb.core.model;
 
 import io.galeb.core.json.JsonObject;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.google.gson.annotations.Expose;
 
@@ -11,7 +11,7 @@ public class VirtualHost extends Entity {
 
     private static final long serialVersionUID = 1L;
 
-    @Expose private Set<Rule> rules = new TreeSet<>();
+    @Expose private Set<Rule> rules = new LinkedHashSet<>();
 
     public Rule getRule(String ruleId) {
         Rule rule = null;
