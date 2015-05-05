@@ -2,10 +2,12 @@ package io.galeb.core.loadbalance;
 
 import io.galeb.core.util.SourceIP;
 
+import java.net.URI;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -47,11 +49,11 @@ public abstract class LoadBalancePolicy {
 
     protected final Map<String, Object> loadBalancePolicyCriteria = new HashMap<>();
 
-    protected final Map<Integer, Object> hosts = new TreeMap<Integer, Object>();
-
     protected AtomicInteger last = new AtomicInteger(0);
 
     private final AtomicBoolean needRebuild = new AtomicBoolean(true);
+
+    protected List<URI> uris = Collections.emptyList();
 
     public static LoadBalancePolicy NULL = new LoadBalancePolicy() {
 
@@ -103,12 +105,9 @@ public abstract class LoadBalancePolicy {
         return this;
     }
 
-    public LoadBalancePolicy mapOfHosts(final Object[] myHosts) {
+    public LoadBalancePolicy mapOfHosts(final List<URI> uris) {
         if (isReseted()) {
-            hosts.clear();
-            for (int x=0;x<myHosts.length;x++) {
-                hosts.put(x, myHosts[x]);
-            }
+            this.uris = uris;
         }
         return this;
     }

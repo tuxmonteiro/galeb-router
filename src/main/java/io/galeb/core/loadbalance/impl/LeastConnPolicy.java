@@ -1,9 +1,10 @@
 package io.galeb.core.loadbalance.impl;
 
 import io.galeb.core.loadbalance.LoadBalancePolicy;
-import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
+import io.galeb.core.model.Farm;
 
+import java.net.URI;
 import java.util.Map;
 
 public class LeastConnPolicy extends LoadBalancePolicy {
@@ -12,14 +13,11 @@ public class LeastConnPolicy extends LoadBalancePolicy {
 
     @Override
     public int getChoice() {
-        int chosen = 0;
         if (backendPool!=null) {
-            for (Object backendObj: hosts.values()) {
-                if (backendObj instanceof Backend &&
-                        ((Backend)backendObj).equals(backendPool.getBackendWithLeastConn())) {
-                    return chosen;
+            for (final URI uri: uris) {
+                if (uri.toString().equals(backendPool.getBackendWithLeastConn().getId())) {
+                    return uris.indexOf(uri);
                 }
-                chosen++;
             }
         }
         return 0;
@@ -28,10 +26,9 @@ public class LeastConnPolicy extends LoadBalancePolicy {
     @Override
     public LoadBalancePolicy setCriteria(Map<String, Object> criteria) {
         super.setCriteria(criteria);
-        final Object backendPoolObj = loadBalancePolicyCriteria.get(BackendPool.class.getSimpleName());
-        if (backendPoolObj instanceof BackendPool) {
-            backendPool = (BackendPool) backendPoolObj;
-        }
+        final Farm farm = (Farm) loadBalancePolicyCriteria.get(Farm.class.getSimpleName());
+        final String backendPoolId = (String) loadBalancePolicyCriteria.get(BackendPool.class.getSimpleName());
+        backendPool = farm.getBackendPool(backendPoolId);
         return this;
     }
 

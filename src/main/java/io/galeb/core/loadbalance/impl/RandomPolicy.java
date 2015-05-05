@@ -6,7 +6,7 @@ public class RandomPolicy extends LoadBalancePolicy {
 
     @Override
     public int getChoice() {
-        int chosen = (int) (Math.random() * (hosts.size() - Float.MIN_VALUE));
+        final int chosen = (int) (Math.random() * (uris.size() - Float.MIN_VALUE));
         last.lazySet(chosen);
         return chosen;
     }
