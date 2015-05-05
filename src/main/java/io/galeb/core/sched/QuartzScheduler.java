@@ -5,11 +5,11 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 import io.galeb.core.eventbus.IEventBus;
 import io.galeb.core.logging.Logger;
-import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Farm;
 
 import java.util.UUID;
 
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -20,73 +20,57 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
-public class BackendUpdater implements JobListener {
+public class QuartzScheduler implements JobListener {
 
-    private Scheduler scheduler;
+    public static final String LOGGER   = "logger";
+    public static final String FARM     = "farm";
+    public static final String EVENTBUS = "eventbus";
 
-    private final Logger logger;
     private final Farm farm;
     private final IEventBus eventBus;
-    private final MapReduce mapReduce;
-
-    private long schedulerInterval = 10000L;
-
+    private final Logger logger;
+    private final Scheduler scheduler;
     private boolean started = false;
 
-    public BackendUpdater(Farm farm, IEventBus eventBus, Logger logger, MapReduce mapReduce) {
+    public QuartzScheduler(Farm farm, IEventBus eventBus, Logger logger) throws SchedulerException {
         this.farm = farm;
         this.eventBus = eventBus;
         this.logger = logger;
-        this.mapReduce = mapReduce;
+        scheduler = new StdSchedulerFactory().getScheduler();
+        scheduler.getListenerManager().addJobListener(this);
+        scheduler.start();
+        started = scheduler.isStarted();
     }
 
     public boolean isStarted() {
         return started;
     }
 
-    public void start() throws SchedulerException {
-        setupScheduler();
-        startJob();
-        started = scheduler.isStarted();
-    }
-
-    private void setupScheduler() {
-        try {
-            scheduler = new StdSchedulerFactory().getScheduler();
-            scheduler.getListenerManager().addJobListener(this);
-            scheduler.start();
-        } catch (SchedulerException e) {
-            logger.error(e);
-        }
-    }
-
-    private void startJob() {
+    public QuartzScheduler startPeriodicJob(Class<? extends Job> jobClass, long interval) {
         try {
             if (scheduler.isStarted()) {
 
                 Trigger trigger = newTrigger().withIdentity(UUID.randomUUID().toString())
                                               .startNow()
-                                              .withSchedule(simpleSchedule().withIntervalInMilliseconds(schedulerInterval).repeatForever())
+                                              .withSchedule(simpleSchedule().withIntervalInMilliseconds(interval).repeatForever())
                                               .build();
 
                 JobDataMap jobdataMap = new JobDataMap();
-                jobdataMap.put("farm", farm);
-                jobdataMap.put("logger", logger);
-                jobdataMap.put("eventbus", eventBus);
-                jobdataMap.put("mapreduce", mapReduce);
+                jobdataMap.put(FARM, farm);
+                jobdataMap.put(LOGGER, logger);
+                jobdataMap.put(EVENTBUS, eventBus);
 
-                JobDetail job = newJob(BackendUpdaterJob.class)
-                                    .withIdentity(toString())
-                                    .setJobData(jobdataMap)
-                                    .build();
-
+                JobDetail job = newJob(jobClass).withIdentity(jobClass.getSimpleName()+this)
+                                                .setJobData(jobdataMap)
+                                                .build();
 
                 scheduler.scheduleJob(job, trigger);
-
             }
         } catch (SchedulerException e) {
             logger.error(e);
         }
+
+        return this;
     }
 
     @Override

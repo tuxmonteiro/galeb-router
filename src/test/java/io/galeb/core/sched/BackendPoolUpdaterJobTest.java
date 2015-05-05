@@ -9,8 +9,10 @@ import io.galeb.core.controller.BackendPoolController;
 import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.eventbus.EventBusListener;
 import io.galeb.core.eventbus.IEventBus;
+import io.galeb.core.eventbus.NullEventBus;
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.logging.Logger;
+import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
@@ -63,6 +65,11 @@ public class BackendPoolUpdaterJobTest {
         @Override
         public void start() {
             // Fake
+        }
+
+        @Override
+        public MapReduce getMapReduce() {
+            return NullEventBus.NULL_MAP_REDUCE;
         }
     }
 

@@ -1,6 +1,8 @@
 package io.galeb.core.eventbus;
 
 import io.galeb.core.controller.EntityController.Action;
+import io.galeb.core.mapreduce.MapReduce;
+import io.galeb.core.mapreduce.NullMapReduce;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Metrics;
 
@@ -8,6 +10,8 @@ import javax.enterprise.inject.Alternative;
 
 @Alternative
 public class NullEventBus implements IEventBus {
+
+    public static final MapReduce NULL_MAP_REDUCE = new NullMapReduce();
 
     @Override
     public void publishEntity(Entity entity, String entityType, Action action) {
@@ -32,6 +36,11 @@ public class NullEventBus implements IEventBus {
     @Override
     public void start() {
         // NULL
+    }
+
+    @Override
+    public MapReduce getMapReduce() {
+        return NULL_MAP_REDUCE;
     }
 
 }

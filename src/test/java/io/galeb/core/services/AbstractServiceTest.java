@@ -10,6 +10,7 @@ import io.galeb.core.controller.VirtualHostController;
 import io.galeb.core.eventbus.Event;
 import io.galeb.core.eventbus.EventBusListener;
 import io.galeb.core.eventbus.IEventBus;
+import io.galeb.core.eventbus.NullEventBus;
 import io.galeb.core.logging.impl.Log4j2Logger;
 import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
@@ -70,6 +71,11 @@ public class AbstractServiceTest {
         @Override
         public void start() {
             // NULL
+        }
+
+        @Override
+        public MapReduce getMapReduce() {
+            return NullEventBus.NULL_MAP_REDUCE;
         }
     }
 

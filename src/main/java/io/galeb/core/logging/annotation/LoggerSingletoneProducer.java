@@ -6,8 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
+import javax.inject.Singleton;
 
 @Qualifier
+@Singleton
 @Target({ ElementType.TYPE,
           ElementType.METHOD,
           ElementType.FIELD,

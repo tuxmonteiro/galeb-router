@@ -14,8 +14,9 @@ import io.galeb.core.json.JsonObject;
 import io.galeb.core.logging.Logger;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
-import io.galeb.core.sched.BackendPoolUpdater;
-import io.galeb.core.sched.BackendUpdater;
+import io.galeb.core.sched.BackendPoolUpdaterJob;
+import io.galeb.core.sched.BackendUpdaterJob;
+import io.galeb.core.sched.QuartzScheduler;
 
 import java.util.Map;
 
@@ -34,9 +35,7 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     @Inject
     protected Logger logger;
 
-    private BackendPoolUpdater backendPoolUpdater;
-
-    private BackendUpdater backendUpdater;
+    protected QuartzScheduler scheduler;
 
     public AbstractService() {
         super();
@@ -45,7 +44,11 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     protected void prelaunch() {
         eventbus.setEventBusListener(this).start();
         registerControllers();
-        startSchedulers();
+        try {
+            startSchedulers();
+        } catch (SchedulerException e) {
+            logger.error(e);
+        }
     }
 
     protected void registerControllers() {
@@ -63,16 +66,10 @@ public abstract class AbstractService implements ListenerController, EventBusLis
 
     }
 
-    protected void startSchedulers() {
-        backendPoolUpdater = new BackendPoolUpdater(farm, eventbus, logger);
-        //backendUpdater = new BackendUpdater(farm, eventbus, logger, mapReduce);
-
-        try {
-            backendPoolUpdater.start();
-            //backendUpdater.start();
-        } catch (SchedulerException e) {
-            logger.error(e);
-        }
+    protected void startSchedulers() throws SchedulerException {
+        scheduler = new QuartzScheduler(farm, eventbus, logger)
+                        .startPeriodicJob(BackendPoolUpdaterJob.class, 10000L)
+                        .startPeriodicJob(BackendUpdaterJob.class, 10000L);
     }
 
     private String getControllerName(Class<?> clazz) {
