@@ -5,7 +5,10 @@ import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,14 +20,17 @@ public class RoundRobinPolicyTest {
     BackendPool backendPool;
 
     @Before
-    public void setUp(){
+    public void setUp() throws URISyntaxException{
         backendPool = new BackendPool();
         roundRobinPolicy = new RoundRobinPolicy();
+        final List<URI> uris = new LinkedList<>();
 
         for (int x=0; x<numBackends; x++) {
-            backendPool.addBackend(JsonObject.toJsonString(new Backend().setId(String.format("http://0.0.0.0:%s", x))));
+            final String backendId = String.format("http://0.0.0.0:%s", x);
+            backendPool.addBackend(JsonObject.toJsonString(new Backend().setId(backendId)));
+            uris.add(new URI(backendId));
         }
-        roundRobinPolicy.mapOfHosts(backendPool.getBackends().toArray());
+        roundRobinPolicy.mapOfHosts(uris);
     }
 
 

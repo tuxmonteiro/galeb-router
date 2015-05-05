@@ -6,7 +6,7 @@ public class RoundRobinPolicy extends LoadBalancePolicy {
 
     @Override
     public int getChoice() {
-        return last.incrementAndGet() % hosts.size();
+        return last.incrementAndGet() % uris.size();
     }
 
     @Override

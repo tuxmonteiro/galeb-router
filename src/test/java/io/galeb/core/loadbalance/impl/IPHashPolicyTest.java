@@ -8,8 +8,12 @@ import io.galeb.core.model.BackendPool;
 import io.galeb.core.util.consistenthash.HashAlgorithm;
 import io.galeb.core.util.consistenthash.HashAlgorithm.HashType;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,14 +29,16 @@ public class IPHashPolicyTest {
     Map<String, Object> criteria;
 
     @Before
-    public void setUp(){
+    public void setUp() throws URISyntaxException{
         backendPool = new BackendPool();
         ipHashPolicy = new IPHashPolicy();
+        final List<URI> uris = new LinkedList<>();
 
         for (int x=0; x<numBackends; x++) {
+            uris.add(new URI(String.format("http://0.0.0.0:%s", x)));
             backendPool.addBackend(JsonObject.toJsonString(new Backend().setId(String.format("http://0.0.0.0:%s", x))));
         }
-        ipHashPolicy.mapOfHosts(backendPool.getBackends().toArray());
+        ipHashPolicy.mapOfHosts(uris);
         criteria = new HashMap<String, Object>();
     }
 
