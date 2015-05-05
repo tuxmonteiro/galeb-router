@@ -4,6 +4,7 @@ import io.galeb.core.json.JsonObject;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.gson.annotations.Expose;
 
@@ -13,7 +14,7 @@ public class BackendPool extends Entity {
 
     private static final String PROP_BACKEND_WITH_LEASTCONN = "backendWithLeastConn";
 
-    @Expose private Set<Backend> backends = new HashSet<>();
+    @Expose private Set<Backend> backends = new TreeSet<>();
 
     public Backend getBackendWithLeastConn() {
         if (!getBackends().isEmpty()) {
