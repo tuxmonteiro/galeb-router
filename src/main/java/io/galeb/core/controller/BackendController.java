@@ -36,8 +36,7 @@ public class BackendController implements EntityController {
     @Override
     public EntityController change(JsonObject json) throws Exception {
         Backend backendWithChanges = (Backend) JsonObject.fromJson(json.toString(), Backend.class);
-        Backend backendOriginal = farm.getBackend(backendWithChanges.getId()).get(0);
-        if (backendOriginal!=null) {
+        for (Backend backendOriginal: farm.getBackend(backendWithChanges.getId())) {
             Map<String, Object> properties = new HashMap<>();
 
             properties.putAll(backendOriginal.getProperties());

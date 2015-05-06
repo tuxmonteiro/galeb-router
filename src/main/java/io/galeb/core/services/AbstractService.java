@@ -68,8 +68,8 @@ public abstract class AbstractService implements ListenerController, EventBusLis
 
     protected void startSchedulers() throws SchedulerException {
         scheduler = new QuartzScheduler(farm, eventbus, logger)
-                        .startPeriodicJob(BackendPoolUpdaterJob.class, 10000L)
-                        .startPeriodicJob(BackendUpdaterJob.class, 10000L);
+                        .startPeriodicJob(BackendPoolUpdaterJob.class, 5000L)
+                        .startPeriodicJob(BackendUpdaterJob.class, 5000L);
     }
 
     private String getControllerName(Class<?> clazz) {
