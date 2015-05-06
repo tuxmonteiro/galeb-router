@@ -26,6 +26,16 @@ import org.quartz.SchedulerException;
 
 public abstract class AbstractService implements ListenerController, EventBusListener {
 
+    public static final String PREFIX_SERVICE          = "io.galeb.core.services";
+
+    public static final String PROP_SCHEDULER_INTERVAL = "schedulerInterval";
+
+    static {
+        if (System.getProperty(PREFIX_SERVICE+"."+PROP_SCHEDULER_INTERVAL)==null) {
+            System.setProperty(PREFIX_SERVICE+"."+PROP_SCHEDULER_INTERVAL, String.valueOf(1000L));
+        }
+    }
+
     @Inject
     protected Farm farm;
 
@@ -46,7 +56,7 @@ public abstract class AbstractService implements ListenerController, EventBusLis
         registerControllers();
         try {
             startSchedulers();
-        } catch (SchedulerException e) {
+        } catch (final SchedulerException e) {
             logger.error(e);
         }
     }
@@ -67,9 +77,10 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     }
 
     protected void startSchedulers() throws SchedulerException {
+        final long interval = Long.parseLong(System.getProperty(PREFIX_SERVICE+"."+PROP_SCHEDULER_INTERVAL));
         scheduler = new QuartzScheduler(farm, eventbus, logger)
-                        .startPeriodicJob(BackendPoolUpdaterJob.class, 5000L)
-                        .startPeriodicJob(BackendUpdaterJob.class, 5000L);
+                        .startPeriodicJob(BackendPoolUpdaterJob.class, interval)
+                        .startPeriodicJob(BackendUpdaterJob.class, interval);
     }
 
     private String getControllerName(Class<?> clazz) {
