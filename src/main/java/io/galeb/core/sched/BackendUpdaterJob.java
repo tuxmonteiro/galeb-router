@@ -4,7 +4,6 @@ import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -15,25 +14,37 @@ import org.quartz.JobExecutionException;
 @DisallowConcurrentExecution
 public class BackendUpdaterJob extends AbstractJob {
 
+    private static final long TTL = 10000L;
+
     private MapReduce mapReduce;
+
+    private final String entityType = Backend.class.getSimpleName().toLowerCase();
+
+    private void cleanUpConnectionsInfo() {
+        for (Backend backendWithTTL: farm.getBackends()) {
+            long now = System.currentTimeMillis();
+            if (backendWithTTL.getConnections()>0 &&  backendWithTTL.getModifiedAt()<(now-TTL)) {
+                backendWithTTL.setConnections(0);
+                eventBus.publishEntity(backendWithTTL, entityType, Action.CHANGE);
+            }
+        }
+    }
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
 
         setEnvironment(context.getJobDetail().getJobDataMap());
-        mapReduce = eventBus.getMapReduce();
+        cleanUpConnectionsInfo();
 
+        mapReduce = eventBus.getMapReduce();
         Map<String, Integer> backEndMap = mapReduce.reduce();
 
         for (Entry<String, Integer> entry: backEndMap.entrySet()) {
-            List<Backend> backends = farm.getBackend(entry.getKey());
-            Backend backend = null;
-            if (!backends.isEmpty() && backends.size()==1) {
-                backend = backends.get(0);
+            String backendId = entry.getKey();
+            for (Backend backend: farm.getBackend(backendId)) {
+                backend.setConnections(entry.getValue());
+                eventBus.publishEntity(backend, entityType, Action.CHANGE);
             }
-            backend.setConnections(entry.getValue());
-
-            eventBus.publishEntity(backend, Backend.class.getSimpleName().toLowerCase(), Action.CHANGE);
         }
 
         logger.debug(String.format("Job %s done.", this.getClass().getSimpleName()));

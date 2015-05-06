@@ -250,7 +250,7 @@ public class Farm extends Entity {
                 backends.add(backend);
             }
         }
-        return backends.isEmpty() ? null : backends;
+        return backends;
     }
 
     public List<Backend> getBackends() {
@@ -295,7 +295,7 @@ public class Farm extends Entity {
                 rules.add(rule);
             }
         }
-        return rules.isEmpty() ? null : rules;
+        return rules;
     }
 
     public List<Rule> getRules() {
