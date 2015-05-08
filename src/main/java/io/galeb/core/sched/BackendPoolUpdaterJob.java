@@ -20,6 +20,9 @@ public class BackendPoolUpdaterJob extends AbstractJob {
         setEnvironment(context.getJobDetail().getJobDataMap());
 
         for (BackendPool backendPool: farm.getBackendPools()) {
+            if (backendPool.getBackends().isEmpty()) {
+                continue;
+            }
             Backend backendWithLeastConn = Collections.min(backendPool.getBackends(),
                     new Comparator<Backend>() {
                         @Override

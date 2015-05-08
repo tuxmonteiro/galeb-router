@@ -1,6 +1,7 @@
 package io.galeb.core.loadbalance.impl;
 
 import io.galeb.core.loadbalance.LoadBalancePolicy;
+import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Farm;
 
@@ -15,7 +16,11 @@ public class LeastConnPolicy extends LoadBalancePolicy {
     public int getChoice() {
         if (backendPool!=null) {
             for (final URI uri: uris) {
-                if (uri.toString().equals(backendPool.getBackendWithLeastConn().getId())) {
+                final Backend backendWithLeastConn = backendPool.getBackendWithLeastConn();
+                if (backendWithLeastConn==null) {
+                    return 0;
+                }
+                if (uri.toString().equals(backendWithLeastConn.getId())) {
                     return uris.indexOf(uri);
                 }
             }
