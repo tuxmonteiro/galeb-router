@@ -77,6 +77,11 @@ public class BackendPoolUpdaterJobTest {
         public QueueManager getQueueManager() {
             return QueueManager.NULL;
         }
+
+        @Override
+        public String getClusterId() {
+            return String.valueOf(null);
+        }
     }
 
     @Before

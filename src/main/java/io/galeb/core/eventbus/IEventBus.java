@@ -24,4 +24,6 @@ public interface IEventBus {
 
     public QueueManager getQueueManager();
 
+    public String getClusterId();
+
 }

@@ -83,6 +83,11 @@ public class AbstractServiceTest {
         public QueueManager getQueueManager() {
             return QueueManager.NULL;
         }
+
+        @Override
+        public String getClusterId() {
+            return String.valueOf(null);
+        }
     }
 
     static class FakeMapReduce implements MapReduce {

@@ -49,4 +49,9 @@ public class NullEventBus implements IEventBus {
         return QueueManager.NULL;
     }
 
+    @Override
+    public String getClusterId() {
+        return String.valueOf(null);
+    }
+
 }
