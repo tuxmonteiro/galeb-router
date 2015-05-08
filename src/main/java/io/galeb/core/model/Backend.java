@@ -6,6 +6,8 @@ public class Backend extends Entity {
 
     private static final long serialVersionUID = 1L;
 
+    public static final String PROP_ACTIVECONN = "activeConn";
+
     public enum Health {
         HEALTHY,
         DEADY,
