@@ -20,6 +20,7 @@ import io.galeb.core.model.Farm;
 import io.galeb.core.model.Metrics;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
+import io.galeb.core.queue.QueueManager;
 
 import java.util.Collections;
 import java.util.Map;
@@ -76,6 +77,11 @@ public class AbstractServiceTest {
         @Override
         public MapReduce getMapReduce() {
             return NullEventBus.NULL_MAP_REDUCE;
+        }
+
+        @Override
+        public QueueManager getQueueManager() {
+            return QueueManager.NULL;
         }
     }
 

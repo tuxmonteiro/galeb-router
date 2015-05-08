@@ -4,6 +4,7 @@ import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Metrics;
+import io.galeb.core.queue.QueueManager;
 
 public interface IEventBus {
 
@@ -20,5 +21,7 @@ public interface IEventBus {
     public void start();
 
     public MapReduce getMapReduce();
+
+    public QueueManager getQueueManager();
 
 }

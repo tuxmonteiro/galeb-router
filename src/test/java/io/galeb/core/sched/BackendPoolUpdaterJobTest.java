@@ -18,6 +18,7 @@ import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 import io.galeb.core.model.Metrics;
+import io.galeb.core.queue.QueueManager;
 
 import java.util.UUID;
 
@@ -30,18 +31,18 @@ import org.quartz.JobExecutionException;
 
 public class BackendPoolUpdaterJobTest {
 
-    private JobExecutionContext jobExecutionContext = mock(JobExecutionContext.class);
+    private final JobExecutionContext jobExecutionContext = mock(JobExecutionContext.class);
 
     private final Farm farm = new Farm();
 
     private class FakeEventBus implements IEventBus {
         @Override
         public void publishEntity(Entity entity, String entityType, Action action) {
-            BackendPoolController backendPoolController = new BackendPoolController(farm);
-            BackendPool backendPool = ((BackendPool)entity);
+            final BackendPoolController backendPoolController = new BackendPoolController(farm);
+            final BackendPool backendPool = ((BackendPool)entity);
             try {
                 backendPoolController.change(JsonObject.toJsonObject(backendPool));
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
             }
         }
@@ -71,19 +72,24 @@ public class BackendPoolUpdaterJobTest {
         public MapReduce getMapReduce() {
             return NullEventBus.NULL_MAP_REDUCE;
         }
+
+        @Override
+        public QueueManager getQueueManager() {
+            return QueueManager.NULL;
+        }
     }
 
     @Before
     public void setUp() {
-        Logger logger = mock(Logger.class);
-        IEventBus eventBus = new FakeEventBus();
+        final Logger logger = mock(Logger.class);
+        final IEventBus eventBus = new FakeEventBus();
         doNothing().when(logger).error(any(Throwable.class));
         doNothing().when(logger).debug(any(Throwable.class));
 
-        JobDetail jobDetail = mock(JobDetail.class);
+        final JobDetail jobDetail = mock(JobDetail.class);
         when(jobExecutionContext.getJobDetail()).thenReturn(jobDetail);
 
-        JobDataMap jobdataMap = new JobDataMap();
+        final JobDataMap jobdataMap = new JobDataMap();
         jobdataMap.put("farm", farm);
         jobdataMap.put("logger", logger);
         jobdataMap.put("eventbus", eventBus);
@@ -93,25 +99,25 @@ public class BackendPoolUpdaterJobTest {
     @Test
     public void executeTest() throws JobExecutionException {
         final String backendPoolId = "pool1";
-        int numBackends = 10;
-        int maxConn = 1000;
+        final int numBackends = 10;
+        final int maxConn = 1000;
         int minConn = maxConn;
 
         farm.addBackendPool(((BackendPool)new BackendPool().setId(backendPoolId)));
 
         for (int x=0; x<=numBackends;x++) {
-            int numConn = (int) (Math.random() * (maxConn - Float.MIN_VALUE));
+            final int numConn = (int) (Math.random() * (maxConn - Float.MIN_VALUE));
             minConn = numConn < minConn ? numConn : minConn;
 
-            Backend backend = (Backend)new Backend().setConnections(numConn)
+            final Backend backend = (Backend)new Backend().setConnections(numConn)
                                                     .setParentId(backendPoolId)
                                                     .setId(UUID.randomUUID().toString());
             farm.addBackend(backend);
         }
 
         new BackendPoolUpdaterJob().execute(jobExecutionContext);
-        BackendPool backendPool = farm.getBackendPool(backendPoolId);
-        Backend backendWithLeastConn = backendPool.getBackendWithLeastConn();
+        final BackendPool backendPool = farm.getBackendPool(backendPoolId);
+        final Backend backendWithLeastConn = backendPool.getBackendWithLeastConn();
 
         assertThat(backendWithLeastConn.getConnections()).isEqualTo(minConn);
     }

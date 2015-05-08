@@ -5,6 +5,7 @@ import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.mapreduce.NullMapReduce;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Metrics;
+import io.galeb.core.queue.QueueManager;
 
 import javax.enterprise.inject.Alternative;
 
@@ -41,6 +42,11 @@ public class NullEventBus implements IEventBus {
     @Override
     public MapReduce getMapReduce() {
         return NULL_MAP_REDUCE;
+    }
+
+    @Override
+    public QueueManager getQueueManager() {
+        return QueueManager.NULL;
     }
 
 }
