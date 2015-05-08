@@ -3,8 +3,8 @@ package io.galeb.core.model;
 import io.galeb.core.json.JsonObject;
 
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.google.gson.annotations.Expose;
 
@@ -14,12 +14,14 @@ public class BackendPool extends Entity {
 
     private static final String PROP_BACKEND_WITH_LEASTCONN = "backendWithLeastConn";
 
-    @Expose private Set<Backend> backends = new LinkedHashSet<>();
+    @Expose private final Set<Backend> backends = new CopyOnWriteArraySet<>();
 
     public Backend getBackendWithLeastConn() {
         if (!getBackends().isEmpty()) {
-            String backendID = (String) getProperties().get(PROP_BACKEND_WITH_LEASTCONN);
-            return getBackend(backendID);
+            final String backendID = (String) getProperties().get(PROP_BACKEND_WITH_LEASTCONN);
+            if (backendID!=null) {
+                return getBackend(backendID);
+            }
         }
         return null;
     }
@@ -44,7 +46,7 @@ public class BackendPool extends Entity {
 
     public Backend getBackend(String backendId) {
         Backend backend = null;
-        for (Backend backendTemp : backends) {
+        for (final Backend backendTemp : backends) {
             if (backendId.equals(backendTemp.getId())) {
                 backend = backendTemp;
                 break;
@@ -54,7 +56,7 @@ public class BackendPool extends Entity {
     }
 
     public BackendPool addBackend(String json) {
-        Backend backend = (Backend) JsonObject.fromJson(json, Backend.class);
+        final Backend backend = (Backend) JsonObject.fromJson(json, Backend.class);
         return addBackend(backend);
     }
 
@@ -64,7 +66,7 @@ public class BackendPool extends Entity {
     }
 
     public BackendPool delBackend(String backendId) {
-        Backend backend = getBackend(backendId);
+        final Backend backend = getBackend(backendId);
         return delBackend(backend);
     }
 
@@ -88,7 +90,7 @@ public class BackendPool extends Entity {
     }
 
     public void setBackends(final Set<Backend> myBackends) {
-        Set<Backend> copyBackends = new HashSet<>(myBackends);
+        final Set<Backend> copyBackends = new HashSet<>(myBackends);
         backends.clear();
         backends.addAll(copyBackends);
     }
