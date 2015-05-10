@@ -12,7 +12,7 @@ import javax.annotation.PostConstruct;
 
 public class Router extends AbstractService {
 
-    private static final String PROP_ROUTER_PREFIX    = "io.galeb.router.";
+    private static final String PROP_ROUTER_PREFIX    = Router.class.getPackage().getName()+".";
 
     private static final String PROP_ROUTER_PORT      = PROP_ROUTER_PREFIX+"port";
 
