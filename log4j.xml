@@ -22,6 +22,8 @@
     </Async>
   </Appenders>
   <Loggers>
+    <Logger name="org.xnio.listener" level="FATAL" additivity="false"/>
+    <Logger name="io.undertow.request" level="FATAL" additivity="false"/>
     <Logger name="io.galeb.accesslog" level="debug" additivity="false">
       <AppenderRef ref="AsyncAccessLog" level="${env:LOGLEVEL}"/>
     </Logger>
