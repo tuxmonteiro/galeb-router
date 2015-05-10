@@ -14,11 +14,17 @@ public class BackendPool extends Entity {
 
     private static final String PROP_BACKEND_WITH_LEASTCONN = "backendWithLeastConn";
 
+    public static final String PROP_HEALTHCHECK_RETURN      = "hcExpectedReturn";
+
+    public static final String PROP_HEALTHCHECK_PATH        = "hcPath";
+
+    public static final String PROP_LOADBALANCE_POLICY      = "loadBalancePolicy";
+
     @Expose private final Set<Backend> backends = new CopyOnWriteArraySet<>();
 
     public Backend getBackendWithLeastConn() {
         if (!getBackends().isEmpty()) {
-            final String backendID = (String) getProperties().get(PROP_BACKEND_WITH_LEASTCONN);
+            final String backendID = (String) getProperty(PROP_BACKEND_WITH_LEASTCONN);
             if (backendID!=null) {
                 return getBackend(backendID);
             }
@@ -27,7 +33,7 @@ public class BackendPool extends Entity {
     }
 
     public synchronized void setBackendWithLeastConn(final Backend backendWithLeastConnObj) {
-        getProperties().put(PROP_BACKEND_WITH_LEASTCONN, backendWithLeastConnObj.getId());
+        putProperty(PROP_BACKEND_WITH_LEASTCONN, backendWithLeastConnObj.getId());
     }
 
     public BackendPool() {

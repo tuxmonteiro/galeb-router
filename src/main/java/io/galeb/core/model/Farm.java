@@ -7,11 +7,11 @@ import io.galeb.core.loadbalance.LoadBalancePolicyLocator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.enterprise.inject.Alternative;
 
@@ -22,11 +22,11 @@ public class Farm extends Entity {
 
     private static final long serialVersionUID = 1L;
 
-    @Expose private final Set<VirtualHost> virtualHosts = new HashSet<>();
+    @Expose private final Set<VirtualHost> virtualHosts = new CopyOnWriteArraySet<>();
 
-    @Expose private final Set<BackendPool> backendPools = new HashSet<>();
+    @Expose private final Set<BackendPool> backendPools = new CopyOnWriteArraySet<>();
 
-    private final Map<String, EntityController> entityMap = new ConcurrentHashMap<>();
+    private final Map<String, EntityController> entityMap = new ConcurrentHashMap<>(16, 0.9f, 1);
 
     protected final Map<String, String> options = new ConcurrentHashMap<>();
 
@@ -139,11 +139,11 @@ public class Farm extends Entity {
 
     private Map<String, Object> defineLoadBalancePolicy(final BackendPool backendPool) {
         final Map<String, Object> properties = new HashMap<>(backendPool.getProperties());
-        final String loadBalanceAlgorithm = (String) properties.get(LoadBalancePolicy.LOADBALANCE_POLICY_FIELD);
+        final String loadBalanceAlgorithm = (String) properties.get(BackendPool.PROP_LOADBALANCE_POLICY);
         final boolean loadBalanceDefined = loadBalanceAlgorithm!=null && LoadBalancePolicy.hasLoadBalanceAlgorithm(loadBalanceAlgorithm);
 
         if (!loadBalanceDefined) {
-            properties.put(LoadBalancePolicy.LOADBALANCE_POLICY_FIELD, LoadBalancePolicyLocator.DEFAULT_ALGORITHM.toString());
+            properties.put(BackendPool.PROP_LOADBALANCE_POLICY, LoadBalancePolicyLocator.DEFAULT_ALGORITHM.toString());
         }
         return properties;
     }
@@ -219,8 +219,10 @@ public class Farm extends Entity {
         final Backend backend = (Backend) JsonObject.fromJson(jsonObject.toString(), Backend.class);
         final BackendPool backendPool = getBackendPool(backend.getParentId());
         if (backendPool != null && backendPool.containBackend(backend.getId())) {
-            delBackend(jsonObject);
-            addBackend(jsonObject);
+            Backend backendOrig = backendPool.getBackend(backend.getId());
+            backendOrig.setProperties(backend.getProperties());
+            backendOrig.setModifiedAt(System.currentTimeMillis());
+            backendOrig.updateHash();
         }
         return this;
     }
@@ -242,7 +244,7 @@ public class Farm extends Entity {
         return delBackend(JsonObject.toJsonObject(backend));
     }
 
-    public List<Backend> getBackend(String backendId) {
+    public List<Backend> getBackends(String backendId) {
         final List<Backend> backends = new ArrayList<>();
         for (final BackendPool backendPool: backendPools) {
             final Backend backend = backendPool.getBackend(backendId);

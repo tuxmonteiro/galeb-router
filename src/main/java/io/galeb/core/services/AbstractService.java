@@ -17,6 +17,7 @@ import io.galeb.core.model.Farm;
 import io.galeb.core.sched.BackendPoolUpdaterJob;
 import io.galeb.core.sched.BackendUpdaterJob;
 import io.galeb.core.sched.QuartzScheduler;
+import io.galeb.core.util.Constants;
 
 import java.util.Map;
 
@@ -25,16 +26,6 @@ import javax.inject.Inject;
 import org.quartz.SchedulerException;
 
 public abstract class AbstractService implements ListenerController, EventBusListener {
-
-    public static final String PREFIX_SERVICE          = "io.galeb.core.services";
-
-    public static final String PROP_SCHEDULER_INTERVAL = "schedulerInterval";
-
-    static {
-        if (System.getProperty(PREFIX_SERVICE+"."+PROP_SCHEDULER_INTERVAL)==null) {
-            System.setProperty(PREFIX_SERVICE+"."+PROP_SCHEDULER_INTERVAL, String.valueOf(1000L));
-        }
-    }
 
     @Inject
     protected Farm farm;
@@ -77,7 +68,7 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     }
 
     protected void startSchedulers() throws SchedulerException {
-        final long interval = Long.parseLong(System.getProperty(PREFIX_SERVICE+"."+PROP_SCHEDULER_INTERVAL));
+        final long interval = Long.parseLong(System.getProperty(Constants.PROP_SCHEDULER_INTERVAL));
         scheduler = new QuartzScheduler(farm, eventbus, logger)
                         .startPeriodicJob(BackendPoolUpdaterJob.class, interval)
                         .startPeriodicJob(BackendUpdaterJob.class, interval);

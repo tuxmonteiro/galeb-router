@@ -49,7 +49,7 @@ public class EntityTest {
 
     @Test
     public void newPropertiesOverrideOldProperties() {
-        entity.getProperties().clear();
+        entity.clearProperties();
 
         final Map<String, Object> newProperties = new HashMap<>();
         final Map<String, Object> oldProperties = entity.getProperties();

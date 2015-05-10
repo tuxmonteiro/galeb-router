@@ -33,7 +33,7 @@ public class LeastConnPolicyTest {
         final Map<String, Object> criteria = new HashMap<>();
         criteria.put(BackendPool.class.getSimpleName(), backendPool.getId());
         criteria.put(Farm.class.getSimpleName(), farm);
-        criteria.put(LoadBalancePolicy.LOADBALANCE_POLICY_FIELD, LEASTCONN.toString());
+        criteria.put(BackendPool.PROP_LOADBALANCE_POLICY, LEASTCONN.toString());
 
         leastConnPolicy  = new LoadBalancePolicyLocator().setParams(criteria).get();
         leastConnPolicy.setCriteria(criteria);

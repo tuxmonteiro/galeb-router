@@ -220,31 +220,31 @@ public class FarmTest {
 
     @Test
     public void getSingleBackendWithoutBackendAtFarm() {
-        assertThat(farm.getBackend(backendId)).isEmpty();
+        assertThat(farm.getBackends(backendId)).isEmpty();
     }
 
     @Test
     public void getSingleBackendAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         farm.addBackend(backendIdJson);
-        assertThat(farm.getBackend(backendId)).hasSize(1);
+        assertThat(farm.getBackends(backendId)).hasSize(1);
         farm.addBackend(backendIdJson2);
-        assertThat(farm.getBackend(backendId)).hasSize(1);
+        assertThat(farm.getBackends(backendId)).hasSize(1);
     }
 
     @Test
     public void delBackendAtFarm() {
         farm.addBackendPool(backendPoolIdJson);
         farm.addBackend(backendIdJson);
-        assertThat(farm.getBackend(backendId)).hasSize(1);
+        assertThat(farm.getBackends(backendId)).hasSize(1);
         farm.delBackend(backendIdJson);
-        assertThat(farm.getBackend(backendId)).isEmpty();
+        assertThat(farm.getBackends(backendId)).isEmpty();
     }
 
     @Test
     public void delBackendWithNullBackendPoolAtFarm() {
         farm.delBackend(backendIdJson2);
-        assertThat(farm.getBackend(backendId2)).isEmpty();
+        assertThat(farm.getBackends(backendId2)).isEmpty();
     }
 
     @Test

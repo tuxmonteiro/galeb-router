@@ -6,4 +6,6 @@ public class Rule extends Entity {
 
     public static final String PROP_TARGET_ID = "targetId";
 
+    public static final String PROP_MATCH     = "match";
+
 }

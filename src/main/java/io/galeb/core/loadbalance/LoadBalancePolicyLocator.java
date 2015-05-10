@@ -9,6 +9,7 @@ import io.galeb.core.loadbalance.impl.IPHashPolicy;
 import io.galeb.core.loadbalance.impl.LeastConnPolicy;
 import io.galeb.core.loadbalance.impl.RandomPolicy;
 import io.galeb.core.loadbalance.impl.RoundRobinPolicy;
+import io.galeb.core.model.BackendPool;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class LoadBalancePolicyLocator {
 
     public synchronized LoadBalancePolicyLocator setParams(final Map<String, Object> params) {
         if (params!=null) {
-            String myLoadBalanceAlgorithm = (String) params.get(LoadBalancePolicy.LOADBALANCE_POLICY_FIELD);
+            String myLoadBalanceAlgorithm = (String) params.get(BackendPool.PROP_LOADBALANCE_POLICY);
             loadBalanceAlgorithm = myLoadBalanceAlgorithm==null ?
                     loadBalanceAlgorithm = DEFAULT_ALGORITHM.toString() : myLoadBalanceAlgorithm;
         }

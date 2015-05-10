@@ -43,8 +43,6 @@ public abstract class LoadBalancePolicy {
         return ALGORITHM_MAP.containsKey(algorithmStr);
     }
 
-    public static final String LOADBALANCE_POLICY_FIELD = "loadBalancePolicy";
-
     public static final String SOURCE_IP_CRITERION      = "SourceIP";
 
     protected final Map<String, Object> loadBalancePolicyCriteria = new HashMap<>();

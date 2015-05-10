@@ -41,7 +41,7 @@ public class BackendUpdaterJob extends AbstractJob {
 
         for (Entry<String, Integer> entry: backEndMap.entrySet()) {
             String backendId = entry.getKey();
-            for (Backend backend: farm.getBackend(backendId)) {
+            for (Backend backend: farm.getBackends(backendId)) {
                 backend.setConnections(entry.getValue());
                 eventBus.publishEntity(backend, entityType, Action.CHANGE);
             }

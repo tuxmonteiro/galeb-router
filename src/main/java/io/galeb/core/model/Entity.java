@@ -1,12 +1,12 @@
 package io.galeb.core.model;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.annotations.Expose;
 
-public class Entity implements Serializable {
+public class Entity implements Serializable, Comparable<Entity> {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,7 +26,7 @@ public class Entity implements Serializable {
     @Expose private Long                       modifiedAt    = System.currentTimeMillis();
 
     /** The properties. */
-    @Expose private final Map<String, Object>  properties    = new HashMap<>();
+    @Expose private final Map<String, Object>  properties    = new ConcurrentHashMap<>(16, 0.9f, 1);
 
     /** The entity type. */
     @Expose private String                     entityType    = this.getClass().getSimpleName().toLowerCase();
@@ -85,6 +85,19 @@ public class Entity implements Serializable {
         return this;
     }
 
+    public final Entity putProperty(String key, Object value) {
+        properties.put(key, value);
+        return this;
+    }
+
+    public Object getProperty(String key) {
+        return properties.get(key);
+    }
+
+    public void clearProperties() {
+        properties.clear();
+    }
+
     public String getEntityType() {
         return entityType;
     }
@@ -116,6 +129,11 @@ public class Entity implements Serializable {
     public boolean equals(Object obj) {
         return obj instanceof Entity
                && ((Entity) obj).getId().equals(getId());
+    }
+
+    @Override
+    public int compareTo(Entity o) {
+        return getId().compareTo(o.getId());
     }
 
 }
