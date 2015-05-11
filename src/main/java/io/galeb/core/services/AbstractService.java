@@ -1,5 +1,22 @@
+/*
+ * Copyright (c) 2014-2015 Globo.com - ATeam
+ * All rights reserved.
+ *
+ * This source is subject to the Apache License, Version 2.0.
+ * Please see the LICENSE file for more information.
+ *
+ * Authors: See AUTHORS file
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.galeb.core.services;
 
+import static io.galeb.core.util.Constants.SysProp.PROP_SCHEDULER_INTERVAL;
 import io.galeb.core.controller.BackendController;
 import io.galeb.core.controller.BackendPoolController;
 import io.galeb.core.controller.EntityController;
@@ -17,7 +34,6 @@ import io.galeb.core.model.Farm;
 import io.galeb.core.sched.BackendPoolUpdaterJob;
 import io.galeb.core.sched.BackendUpdaterJob;
 import io.galeb.core.sched.QuartzScheduler;
-import io.galeb.core.util.Constants;
 
 import java.util.Map;
 
@@ -68,7 +84,7 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     }
 
     protected void startSchedulers() throws SchedulerException {
-        final long interval = Long.parseLong(System.getProperty(Constants.PROP_SCHEDULER_INTERVAL));
+        final long interval = Long.parseLong(System.getProperty(PROP_SCHEDULER_INTERVAL.toString(), PROP_SCHEDULER_INTERVAL.def()));
         scheduler = new QuartzScheduler(farm, eventbus, logger)
                         .startPeriodicJob(BackendPoolUpdaterJob.class, interval)
                         .startPeriodicJob(BackendUpdaterJob.class, interval);

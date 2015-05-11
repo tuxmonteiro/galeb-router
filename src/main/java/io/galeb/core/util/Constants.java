@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2014-2015 Globo.com - ATeam
+ * All rights reserved.
+ *
+ * This source is subject to the Apache License, Version 2.0.
+ * Please see the LICENSE file for more information.
+ *
+ * Authors: See AUTHORS file
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.galeb.core.util;
 
 public final class Constants {
@@ -6,21 +22,26 @@ public final class Constants {
 
     public static final String FALSE = Boolean.toString(false);
 
-    public static final String PROP_ENABLE_ACCESSLOG   = "io.galeb.accesslog";
+    public enum SysProp {
+        PROP_ENABLE_ACCESSLOG  ("io.galeb.accesslog"        , FALSE),
+        PROP_MAXCONN           ("io.galeb.maxConn"          , String.valueOf(1000)),
+        PROP_SCHEDULER_INTERVAL("io.galeb.schedulerInterval", String.valueOf(1000));
 
-    public static final String PROP_MAXCONN            = "io.galeb.maxConn";
+        private final String name;
+        private final String defaultStr;
 
-    public static final String PROP_SCHEDULER_INTERVAL = "io.galeb.schedulerInterval";
-
-    static {
-        if (System.getProperty(PROP_ENABLE_ACCESSLOG)==null) {
-            System.setProperty(PROP_ENABLE_ACCESSLOG, FALSE);
+        SysProp(String name, String defaultStr) {
+            this.name = name;
+            this.defaultStr = defaultStr;
         }
-        if (System.getProperty(PROP_MAXCONN)==null) {
-            System.setProperty(PROP_MAXCONN, String.valueOf(1000));
+
+        @Override
+        public String toString() {
+            return name;
         }
-        if (System.getProperty(PROP_SCHEDULER_INTERVAL)==null) {
-            System.setProperty(PROP_SCHEDULER_INTERVAL, String.valueOf(1000L));
+
+        public String def() {
+            return defaultStr;
         }
     }
 
