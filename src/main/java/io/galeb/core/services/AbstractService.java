@@ -21,7 +21,6 @@ import io.galeb.core.controller.BackendController;
 import io.galeb.core.controller.BackendPoolController;
 import io.galeb.core.controller.EntityController;
 import io.galeb.core.controller.EntityController.Action;
-import io.galeb.core.controller.ListenerController;
 import io.galeb.core.controller.RuleController;
 import io.galeb.core.controller.VirtualHostController;
 import io.galeb.core.eventbus.Event;
@@ -41,7 +40,7 @@ import javax.inject.Inject;
 
 import org.quartz.SchedulerException;
 
-public abstract class AbstractService implements ListenerController, EventBusListener {
+public abstract class AbstractService implements EventBusListener {
 
     @Inject
     protected Farm farm;
@@ -73,13 +72,13 @@ public abstract class AbstractService implements ListenerController, EventBusLis
         final Map<String, EntityController> entityMap = farm.getEntityMap();
 
         entityMap.put(getControllerName(BackendController.class),
-                new BackendController(farm).registerListenerController(this));
+                new BackendController(farm));
         entityMap.put(getControllerName(BackendPoolController.class),
-                new BackendPoolController(farm).registerListenerController(this));
+                new BackendPoolController(farm));
         entityMap.put(getControllerName(RuleController.class),
-                new RuleController(farm).registerListenerController(this));
+                new RuleController(farm));
         entityMap.put(getControllerName(VirtualHostController.class),
-                new VirtualHostController(farm).registerListenerController(this));
+                new VirtualHostController(farm));
 
     }
 
@@ -101,11 +100,6 @@ public abstract class AbstractService implements ListenerController, EventBusLis
     @Override
     public IEventBus getEventBus() {
         return eventbus;
-    }
-
-    @Override
-    public void handleController(JsonObject json, EntityController.Action action) {
-        throw new UnsupportedOperationException(toString());
     }
 
     @Override

@@ -29,16 +29,6 @@ public interface EntityController {
     }
 
     public static final EntityController NULL = new EntityController() {
-        @Override
-        public EntityController registerListenerController(
-                ListenerController listenerController) {
-            return this;
-        }
-
-        @Override
-        public void notifyListeners(JsonObject json, Action action) {
-            return;
-        }
 
         @Override
         public String get(String id) {
@@ -75,9 +65,5 @@ public interface EntityController {
     public EntityController change(JsonObject json) throws Exception;
 
     public String get(String id);
-
-    public EntityController registerListenerController(final ListenerController listenerController);
-
-    public void notifyListeners(final JsonObject json, Action action);
 
 }

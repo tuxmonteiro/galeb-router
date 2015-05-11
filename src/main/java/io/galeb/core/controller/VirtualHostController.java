@@ -20,14 +20,9 @@ import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Farm;
 import io.galeb.core.model.VirtualHost;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class VirtualHostController implements EntityController {
 
     private final Farm farm;
-
-    private final Set<ListenerController> listeners = new HashSet<>();
 
     public VirtualHostController(final Farm farm) {
         this.farm = farm;
@@ -36,14 +31,12 @@ public class VirtualHostController implements EntityController {
     @Override
     public EntityController add(JsonObject json) throws Exception{
         farm.addVirtualHost(json);
-        notifyListeners(json, Action.ADD);
         return this;
     }
 
     @Override
     public EntityController del(JsonObject json) throws Exception {
         farm.delVirtualHost(json);
-        notifyListeners(json, Action.DEL);
         return this;
     }
 
@@ -59,7 +52,6 @@ public class VirtualHostController implements EntityController {
     public EntityController change(JsonObject json) throws Exception {
         farm.delVirtualHost(json);
         farm.addVirtualHost(json);
-        notifyListeners(json, Action.CHANGE);
         return this;
     }
 
@@ -69,20 +61,6 @@ public class VirtualHostController implements EntityController {
             return JsonObject.toJsonString(farm.getVirtualHost(id));
         } else {
             return JsonObject.toJsonString(farm.getVirtualHosts());
-        }
-    }
-
-    @Override
-    public EntityController registerListenerController(
-            ListenerController listenerController) {
-        listeners.add(listenerController);
-        return this;
-    }
-
-    @Override
-    public void notifyListeners(final JsonObject json, Action action) {
-        for (final ListenerController listener: listeners) {
-            listener.handleController(json, action);
         }
     }
 

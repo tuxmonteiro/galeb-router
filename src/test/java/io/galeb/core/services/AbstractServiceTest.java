@@ -226,11 +226,6 @@ public class AbstractServiceTest {
         assertThat(anEntityInstance).isInstanceOf(RuleController.class);
     }
 
-    @Test(expected=UnsupportedOperationException.class)
-    public void handleControllerAtAbstractServiceRaiseException(){
-        serviceImplemented.handleController(null, null);
-    }
-
     private Event makeEvent(Action action, Entity entity) {
         final String id = entity.getClass().getSimpleName().toLowerCase()+"Test";
 
