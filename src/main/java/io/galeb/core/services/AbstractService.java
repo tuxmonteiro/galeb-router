@@ -135,6 +135,9 @@ public abstract class AbstractService implements ListenerController, EventBusLis
                     case DEL:
                         entityController.del(json);
                         break;
+                    case DEL_ALL:
+                        entityController.delAll();
+                        break;
                     case CHANGE:
                         entityController.change(json);
                         break;

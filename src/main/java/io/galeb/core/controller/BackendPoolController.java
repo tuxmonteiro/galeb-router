@@ -50,6 +50,14 @@ public class BackendPoolController implements EntityController {
     }
 
     @Override
+    public EntityController delAll() throws Exception {
+        for (BackendPool backendPool: farm.getBackendPools()) {
+            del(JsonObject.toJsonObject(backendPool));
+        }
+        return null;
+    }
+
+    @Override
     public EntityController change(JsonObject json) throws Exception {
         BackendPool backendPoolWithChanges = (BackendPool) JsonObject.fromJson(json.toString(), BackendPool.class);
         BackendPool backendPoolOriginal = farm.getBackendPool(json);

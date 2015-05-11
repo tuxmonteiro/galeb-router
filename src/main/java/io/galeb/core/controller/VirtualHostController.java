@@ -18,6 +18,7 @@ package io.galeb.core.controller;
 
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Farm;
+import io.galeb.core.model.VirtualHost;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,6 +44,14 @@ public class VirtualHostController implements EntityController {
     public EntityController del(JsonObject json) throws Exception {
         farm.delVirtualHost(json);
         notifyListeners(json, Action.DEL);
+        return this;
+    }
+
+    @Override
+    public EntityController delAll() throws Exception {
+        for (VirtualHost virtualHost: farm.getVirtualHosts()) {
+            del(JsonObject.toJsonObject(virtualHost));
+        }
         return this;
     }
 

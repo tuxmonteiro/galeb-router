@@ -18,6 +18,7 @@ package io.galeb.core.controller;
 
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Farm;
+import io.galeb.core.model.Rule;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,6 +44,14 @@ public class RuleController implements EntityController {
     public EntityController del(JsonObject json) throws Exception {
         farm.delRule(json);
         notifyListeners(json, Action.DEL);
+        return this;
+    }
+
+    @Override
+    public EntityController delAll() throws Exception {
+        for (Rule rule: farm.getRules()) {
+            del(JsonObject.toJsonObject(rule));
+        };
         return this;
     }
 

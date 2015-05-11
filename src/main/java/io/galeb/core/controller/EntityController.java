@@ -23,6 +23,7 @@ public interface EntityController {
     public enum Action {
         ADD,
         DEL,
+        DEL_ALL,
         CHANGE,
         UNKNOWN
     }
@@ -50,6 +51,11 @@ public interface EntityController {
         }
 
         @Override
+        public EntityController delAll() {
+            return this;
+        }
+
+        @Override
         public EntityController change(JsonObject json) {
             return this;
         }
@@ -63,6 +69,8 @@ public interface EntityController {
     public EntityController add(JsonObject json) throws Exception;
 
     public EntityController del(JsonObject json) throws Exception;
+
+    public EntityController delAll() throws Exception;
 
     public EntityController change(JsonObject json) throws Exception;
 

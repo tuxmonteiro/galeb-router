@@ -50,6 +50,14 @@ public class BackendController implements EntityController {
     }
 
     @Override
+    public EntityController delAll() throws Exception {
+        for (Backend backend: farm.getBackends()) {
+            del(JsonObject.toJsonObject(backend));
+        }
+        return null;
+    }
+
+    @Override
     public EntityController change(JsonObject json) throws Exception {
         Backend backendWithChanges = (Backend) JsonObject.fromJson(json.toString(), Backend.class);
         for (Backend backendOriginal: farm.getBackends(backendWithChanges.getId())) {
