@@ -32,8 +32,6 @@ public class Router extends AbstractService {
 
     private static final String PROP_ROUTER_IOTHREADS = PROP_ROUTER_PREFIX+"iothread";
 
-    private static final String PROP_ROUTER_MAXCONN   = PROP_ROUTER_PREFIX+"maxConn";
-
     public static final int     DEFAULT_PORT          = 8080;
 
     static {
@@ -42,9 +40,6 @@ public class Router extends AbstractService {
         }
         if (System.getProperty(PROP_ROUTER_IOTHREADS)==null) {
             System.setProperty(PROP_ROUTER_IOTHREADS, String.valueOf(Runtime.getRuntime().availableProcessors()));
-        }
-        if (System.getProperty(PROP_ROUTER_MAXCONN)==null) {
-            System.setProperty(PROP_ROUTER_MAXCONN, Integer.toString(100));
         }
     }
 
