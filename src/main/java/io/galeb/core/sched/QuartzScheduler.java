@@ -96,18 +96,18 @@ public class QuartzScheduler implements JobListener {
 
     @Override
     public void jobToBeExecuted(JobExecutionContext context) {
-        logger.debug(context.getJobDetail().getKey().getName()+" to be executed");
+        logger.trace(context.getJobDetail().getKey().getName()+" to be executed");
     }
 
     @Override
     public void jobExecutionVetoed(JobExecutionContext context) {
-        logger.debug(context.getJobDetail().getKey().getName()+" vetoed");
+        logger.trace(context.getJobDetail().getKey().getName()+" vetoed");
     }
 
     @Override
     public void jobWasExecuted(JobExecutionContext context,
             JobExecutionException jobException) {
-        logger.debug(context.getJobDetail().getKey().getName()+" was executed");
+        logger.trace(context.getJobDetail().getKey().getName()+" was executed");
     }
 
 }
