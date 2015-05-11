@@ -39,6 +39,7 @@ public class Metrics extends Entity {
     }
 
     public Metrics(Metrics metrics) {
+        this();
         final String metricsStr = JsonObject.toJsonString(metrics);
         final Metrics newMetrics = (Metrics) JsonObject.fromJson(metricsStr, Metrics.class);
 
@@ -46,6 +47,43 @@ public class Metrics extends Entity {
         setParentId(newMetrics.getParentId());
         setProperties(newMetrics.getProperties());
         updateHash();
+    }
+
+    public enum Operation {
+        SUM,
+        AVG
+    }
+
+    public Metrics aggregationProperty(final Metrics metrics, String propName, Operation oper) {
+
+        final Object propValue = metrics.getProperty(propName);
+        final Object myPropValue = getProperty(propName);
+        Integer valueInt = 0;
+
+        if (propValue!=null) {
+            if (myPropValue==null) {
+                putProperty(propName, propValue);
+                return this;
+            }
+
+            try {
+                switch (oper) {
+                    case SUM:
+                        valueInt = (Integer) myPropValue;
+                        valueInt += (Integer) propValue;
+                        break;
+                    case AVG:
+                        valueInt = (Integer) myPropValue;
+                        valueInt = (valueInt + (Integer) propValue) / 2;
+                    default:
+                        break;
+                }
+                putProperty(propName, valueInt);
+            } catch (final ClassCastException ignore) {
+                // ignore aggregation
+            }
+        }
+        return this;
     }
 
 }
