@@ -35,11 +35,11 @@ public class BackendPoolUpdaterJob extends AbstractJob {
 
         setEnvironment(context.getJobDetail().getJobDataMap());
 
-        for (BackendPool backendPool: farm.getBackendPools()) {
+        for (final BackendPool backendPool: farm.getBackendPools()) {
             if (backendPool.getBackends().isEmpty()) {
                 continue;
             }
-            Backend backendWithLeastConn = Collections.min(backendPool.getBackends(),
+            final Backend backendWithLeastConn = Collections.min(backendPool.getBackends(),
                     new Comparator<Backend>() {
                         @Override
                         public int compare(Backend backend1, Backend backend2) {
@@ -47,11 +47,25 @@ public class BackendPoolUpdaterJob extends AbstractJob {
                         }
                     });
 
-            BackendPool newBackendPool = new BackendPool(backendPool);
-            newBackendPool.setBackendWithLeastConn(backendWithLeastConn);
+            if (backendWithLeastConn !=null) {
 
-            eventBus.publishEntity(newBackendPool,
-                    BackendPool.class.getSimpleName().toLowerCase(), Action.CHANGE);
+                final Backend backendWithLeastConnOrig = backendPool.getBackendWithLeastConn();
+                boolean hasChange = false;
+                if (backendWithLeastConnOrig==null) {
+                    hasChange = true;
+                } else {
+                    if (!backendWithLeastConnOrig.equals(backendWithLeastConn)) {
+                        hasChange = true;
+                    }
+                }
+                if (hasChange) {
+                    final BackendPool newBackendPool = new BackendPool(backendPool);
+                    newBackendPool.setBackendWithLeastConn(backendWithLeastConn);
+
+                    eventBus.publishEntity(newBackendPool,
+                            BackendPool.class.getSimpleName().toLowerCase(), Action.CHANGE);
+                }
+            }
         }
 
         logger.debug(String.format("Job %s done.", this.getClass().getSimpleName()));
