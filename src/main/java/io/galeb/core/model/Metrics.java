@@ -60,11 +60,11 @@ public class Metrics extends Entity {
         }
 
         final Object propValue = metrics.getProperty(propName);
-        final Object myPropValue = getProperty(propName);
+        final Object valueAggregated = getProperty(propAggregated);
         Integer valueInt = 0;
 
         if (propValue!=null) {
-            if (myPropValue==null) {
+            if (valueAggregated==null) {
                 putProperty(propAggregated, propValue);
                 return this;
             }
@@ -72,12 +72,13 @@ public class Metrics extends Entity {
             try {
                 switch (oper) {
                     case SUM:
-                        valueInt = (Integer) myPropValue;
+                        valueInt = (Integer) valueAggregated;
                         valueInt += (Integer) propValue;
                         break;
                     case AVG:
-                        valueInt = (Integer) myPropValue;
+                        valueInt = (Integer) valueAggregated;
                         valueInt = (valueInt + (Integer) propValue) / 2;
+                        break;
                     default:
                         break;
                 }
