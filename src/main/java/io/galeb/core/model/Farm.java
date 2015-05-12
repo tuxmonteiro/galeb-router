@@ -38,6 +38,8 @@ public class Farm extends Entity {
 
     private static final long serialVersionUID = 1L;
 
+    @Expose private String version = "0";
+
     @Expose private final Set<VirtualHost> virtualHosts = new CopyOnWriteArraySet<>();
 
     @Expose private final Set<BackendPool> backendPools = new CopyOnWriteArraySet<>();
@@ -57,6 +59,15 @@ public class Farm extends Entity {
 
     public Map<String, EntityController> getEntityMap() {
         return entityMap;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public Farm setVersion(String version) {
+        this.version = version;
+        return this;
     }
 
     public VirtualHost getVirtualHost(String virtualHostId) {
