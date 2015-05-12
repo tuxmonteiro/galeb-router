@@ -54,7 +54,10 @@ public class Metrics extends Entity {
         AVG
     }
 
-    public Metrics aggregationProperty(final Metrics metrics, String propName, Operation oper) {
+    public Metrics aggregationProperty(final Metrics metrics, String propName, String propAggregated, Operation oper) {
+        if (!equals(metrics)) {
+            return this;
+        }
 
         final Object propValue = metrics.getProperty(propName);
         final Object myPropValue = getProperty(propName);
@@ -62,7 +65,7 @@ public class Metrics extends Entity {
 
         if (propValue!=null) {
             if (myPropValue==null) {
-                putProperty(propName, propValue);
+                putProperty(propAggregated, propValue);
                 return this;
             }
 
@@ -78,7 +81,7 @@ public class Metrics extends Entity {
                     default:
                         break;
                 }
-                putProperty(propName, valueInt);
+                putProperty(propAggregated, valueInt);
             } catch (final ClassCastException ignore) {
                 // ignore aggregation
             }
