@@ -132,7 +132,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <outputFile>target/galeb-${project.version}-uber.jar</outputFile>
+              <outputFile>target/galeb-router-${project.version}-uber.jar</outputFile>
             </configuration>
           </execution>
         </executions>
@@ -168,7 +168,7 @@
             <argument>-Dio.galeb.services.router.port=8080</argument>
             <argument>-Dio.galeb.maxConn=300</argument>
             <argument>-jar</argument>
-            <argument>target/galeb-${project.version}-uber.jar</argument>
+            <argument>target/galeb-router-${project.version}-uber.jar</argument>
           </arguments>
         </configuration>
       </plugin>
