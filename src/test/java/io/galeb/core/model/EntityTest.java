@@ -58,6 +58,11 @@ public class EntityTest {
     }
 
     @Test
+    public void defaultVersionIsZero() {
+        assertThat(entity.getVersion()).isEqualTo(0);
+    }
+
+    @Test
     public void hashUpdatedInNotEmpty() {
         entity.updateHash();
         assertThat(entity.getHash()).isNotEmpty();

@@ -60,7 +60,7 @@ public class BackendPoolController implements EntityController {
 
             properties.putAll(backendPoolOriginal.getProperties());
             properties.putAll(backendPoolWithChanges.getProperties());
-            backendPoolOriginal.setModifiedAt(System.currentTimeMillis());
+            backendPoolOriginal.updateModifiedAt();
             backendPoolOriginal.setProperties(properties);
             backendPoolOriginal.updateHash();
 

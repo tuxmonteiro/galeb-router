@@ -48,12 +48,10 @@ public class Entity implements Serializable, Comparable<Entity> {
     @Expose private String                     entityType    = this.getClass().getSimpleName().toLowerCase();
 
     /** The hash. */
-    @Expose private String                     hash          = "";
+    @Expose private String                     hash          = "0";
 
-    public Entity updateHash() {
-        hash = "0";
-        return this;
-    }
+    /** The version */
+    @Expose private Integer                    version       = 0;
 
     public int getPk() {
         return pk;
@@ -86,8 +84,8 @@ public class Entity implements Serializable, Comparable<Entity> {
         return modifiedAt;
     }
 
-    public final Entity setModifiedAt(Long modifiedAt) {
-        this.modifiedAt = modifiedAt;
+    public final Entity updateModifiedAt() {
+        modifiedAt = System.currentTimeMillis();
         return this;
     }
 
@@ -134,6 +132,20 @@ public class Entity implements Serializable, Comparable<Entity> {
 
     public Long getCreatedAt() {
         return createdAt;
+    }
+
+    public final Entity updateHash() {
+        hash = "0";
+        return this;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public final Entity setVersion(int version) {
+        this.version = version;
+        return this;
     }
 
     @Override

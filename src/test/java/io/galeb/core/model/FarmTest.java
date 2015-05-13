@@ -73,11 +73,6 @@ public class FarmTest {
     }
 
     @Test
-    public void defaultVersionIsZero() {
-        assertThat(farm.getVersion()).isEqualTo("0");
-    }
-
-    @Test
     public void optionsDefaultIsEmptyAtFarm() {
         assertThat(farm.options.isEmpty()).isTrue();
     }

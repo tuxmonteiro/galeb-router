@@ -59,7 +59,7 @@ public class BackendController implements EntityController {
 
             properties.putAll(backendOriginal.getProperties());
             properties.putAll(backendWithChanges.getProperties());
-            backendOriginal.setModifiedAt(System.currentTimeMillis());
+            backendOriginal.updateModifiedAt();
             backendOriginal.setProperties(properties);
             backendOriginal.updateHash();
 
