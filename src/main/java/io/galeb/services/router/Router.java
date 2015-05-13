@@ -44,7 +44,7 @@ public class Router extends AbstractService {
     }
 
     @PostConstruct
-    protected void init() {
+    public void init() {
 
         super.prelaunch();
 
