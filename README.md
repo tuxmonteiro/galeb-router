@@ -1,6 +1,5 @@
-Galeb - Router as a Service
+Galeb - Router Service
 ===========================
-<h1>Galeb - Router Service</h1>
 
 Galeb is a dynamic software router built on JBOSS Undertow and XNIO.<br/>
 It's a massively parallel routing system running a shared-nothing architecture.
