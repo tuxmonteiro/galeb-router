@@ -91,6 +91,11 @@ public class AbstractServiceTest {
         }
 
         @Override
+        public void stop() {
+            // NULL
+        }
+
+        @Override
         public MapReduce getMapReduce() {
             return NullEventBus.NULL_MAP_REDUCE;
         }

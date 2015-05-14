@@ -85,6 +85,11 @@ public class BackendPoolUpdaterJobTest {
         }
 
         @Override
+        public void stop() {
+            // Fake
+        }
+
+        @Override
         public MapReduce getMapReduce() {
             return NullEventBus.NULL_MAP_REDUCE;
         }

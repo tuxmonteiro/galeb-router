@@ -65,6 +65,13 @@ public abstract class AbstractService implements EventBusListener {
         } catch (final SchedulerException e) {
             logger.error(e);
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                eventbus.stop();
+            }
+        });
     }
 
     protected void registerControllers() {

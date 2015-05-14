@@ -36,6 +36,8 @@ public interface IEventBus {
 
     public void start();
 
+    public void stop();
+
     public MapReduce getMapReduce();
 
     public QueueManager getQueueManager();

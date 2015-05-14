@@ -56,6 +56,11 @@ public class NullEventBus implements IEventBus {
     }
 
     @Override
+    public void stop() {
+        // NULL
+    }
+
+    @Override
     public MapReduce getMapReduce() {
         return NULL_MAP_REDUCE;
     }
