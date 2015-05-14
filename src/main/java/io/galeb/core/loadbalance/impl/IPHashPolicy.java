@@ -44,9 +44,17 @@ public class IPHashPolicy extends LoadBalancePolicy {
 
     private volatile String sourceIP = "127.0.0.1";
 
+    private void reloadPos() {
+        listPos.clear();
+        for (final URI uri: uris) {
+            listPos.add(uris.indexOf(uri));
+        }
+    }
+
     @Override
     public int getChoice() {
         if (isReseted()) {
+            reloadPos();
             consistentHash.rebuild(hashAlgorithm, numReplicas, listPos);
             rebuilt();
         }
@@ -66,12 +74,7 @@ public class IPHashPolicy extends LoadBalancePolicy {
             numReplicas = Integer.valueOf(numReplicaStr);
         }
         sourceIP = (String) criteria.get(SOURCE_IP_CRITERION);
-
-        listPos.clear();
-        for (final URI uri: uris) {
-            listPos.add(uris.indexOf(uri));
-        }
-
+        reloadPos();
         return this;
     }
 
