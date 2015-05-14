@@ -67,8 +67,8 @@ public class IPHashPolicy extends LoadBalancePolicy {
         }
         sourceIP = (String) criteria.get(SOURCE_IP_CRITERION);
 
+        listPos.clear();
         for (final URI uri: uris) {
-            listPos.clear();
             listPos.add(uris.indexOf(uri));
         }
 
