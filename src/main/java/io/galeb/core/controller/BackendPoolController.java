@@ -34,18 +34,20 @@ public class BackendPoolController implements EntityController {
     @Override
     public EntityController add(JsonObject json) throws Exception {
         farm.addBackendPool(json);
+        farm.setVersion(((BackendPool)json.instanceOf(BackendPool.class)).getVersion());
         return this;
     }
 
     @Override
     public EntityController del(JsonObject json) throws Exception {
         farm.delBackendPool(json);
+        farm.setVersion(((BackendPool)json.instanceOf(BackendPool.class)).getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        for (BackendPool backendPool: farm.getBackendPools()) {
+        for (final BackendPool backendPool: farm.getBackendPools()) {
             del(JsonObject.toJsonObject(backendPool));
         }
         return null;
@@ -53,10 +55,10 @@ public class BackendPoolController implements EntityController {
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
-        BackendPool backendPoolWithChanges = (BackendPool) JsonObject.fromJson(json.toString(), BackendPool.class);
-        BackendPool backendPoolOriginal = farm.getBackendPool(json);
+        final BackendPool backendPoolWithChanges = (BackendPool) JsonObject.fromJson(json.toString(), BackendPool.class);
+        final BackendPool backendPoolOriginal = farm.getBackendPool(json);
         if (backendPoolOriginal!=null) {
-            Map<String, Object> properties = new HashMap<>();
+            final Map<String, Object> properties = new HashMap<>();
 
             properties.putAll(backendPoolOriginal.getProperties());
             properties.putAll(backendPoolWithChanges.getProperties());
@@ -66,6 +68,7 @@ public class BackendPoolController implements EntityController {
 
             farm.changeBackendPool(JsonObject.toJsonObject(backendPoolOriginal));
         }
+        farm.setVersion(backendPoolWithChanges.getVersion());
         return this;
     }
 

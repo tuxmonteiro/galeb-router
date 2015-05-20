@@ -37,8 +37,8 @@ public class BackendUpdaterJob extends AbstractJob {
     private final String entityType = Backend.class.getSimpleName().toLowerCase();
 
     private void cleanUpConnectionsInfo() {
-        for (Backend backendWithTTL: farm.getBackends()) {
-            long now = System.currentTimeMillis();
+        for (final Backend backendWithTTL: farm.getBackends()) {
+            final long now = System.currentTimeMillis();
             if (backendWithTTL.getConnections()>0 &&  backendWithTTL.getModifiedAt()<(now-TTL)) {
                 backendWithTTL.setConnections(0);
                 eventBus.publishEntity(backendWithTTL, entityType, Action.CHANGE);
@@ -53,17 +53,17 @@ public class BackendUpdaterJob extends AbstractJob {
         cleanUpConnectionsInfo();
 
         mapReduce = eventBus.getMapReduce();
-        Map<String, Integer> backEndMap = mapReduce.reduce();
+        final Map<String, Integer> backEndMap = mapReduce.reduce();
 
-        for (Entry<String, Integer> entry: backEndMap.entrySet()) {
-            String backendId = entry.getKey();
-            for (Backend backend: farm.getBackends(backendId)) {
+        for (final Entry<String, Integer> entry: backEndMap.entrySet()) {
+            final String backendId = entry.getKey();
+            for (final Backend backend: farm.getBackends(backendId)) {
                 backend.setConnections(entry.getValue());
                 eventBus.publishEntity(backend, entityType, Action.CHANGE);
             }
         }
 
-        logger.debug(String.format("Job %s done.", this.getClass().getSimpleName()));
+        logger.trace(String.format("Job %s done.", this.getClass().getSimpleName()));
     }
 
 }

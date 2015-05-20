@@ -31,18 +31,20 @@ public class RuleController implements EntityController {
     @Override
     public EntityController add(JsonObject json) throws Exception {
         farm.addRule(json);
+        farm.setVersion(((Rule) json.instanceOf(Rule.class)).getVersion());
         return this;
     }
 
     @Override
     public EntityController del(JsonObject json) throws Exception {
         farm.delRule(json);
+        farm.setVersion(((Rule) json.instanceOf(Rule.class)).getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        for (Rule rule: farm.getRules()) {
+        for (final Rule rule: farm.getRules()) {
             del(JsonObject.toJsonObject(rule));
         };
         return this;

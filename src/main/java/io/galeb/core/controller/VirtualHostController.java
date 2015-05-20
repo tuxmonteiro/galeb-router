@@ -31,18 +31,20 @@ public class VirtualHostController implements EntityController {
     @Override
     public EntityController add(JsonObject json) throws Exception{
         farm.addVirtualHost(json);
+        farm.setVersion(((VirtualHost) json.instanceOf(VirtualHost.class)).getVersion());
         return this;
     }
 
     @Override
     public EntityController del(JsonObject json) throws Exception {
         farm.delVirtualHost(json);
+        farm.setVersion(((VirtualHost) json.instanceOf(VirtualHost.class)).getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        for (VirtualHost virtualHost: farm.getVirtualHosts()) {
+        for (final VirtualHost virtualHost: farm.getVirtualHosts()) {
             del(JsonObject.toJsonObject(virtualHost));
         }
         return this;

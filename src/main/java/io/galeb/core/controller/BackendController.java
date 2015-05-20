@@ -34,18 +34,20 @@ public class BackendController implements EntityController {
     @Override
     public EntityController add(JsonObject json) throws Exception {
         farm.addBackend(json);
+        farm.setVersion(((Backend) json.instanceOf(Backend.class)).getVersion());
         return this;
     }
 
     @Override
     public EntityController del(JsonObject json) throws Exception {
         farm.delBackend(json);
+        farm.setVersion(((Backend) json.instanceOf(Backend.class)).getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        for (Backend backend: farm.getBackends()) {
+        for (final Backend backend: farm.getBackends()) {
             del(JsonObject.toJsonObject(backend));
         }
         return null;
@@ -53,9 +55,9 @@ public class BackendController implements EntityController {
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
-        Backend backendWithChanges = (Backend) JsonObject.fromJson(json.toString(), Backend.class);
-        for (Backend backendOriginal: farm.getBackends(backendWithChanges.getId())) {
-            Map<String, Object> properties = new HashMap<>();
+        final Backend backendWithChanges = (Backend) json.instanceOf(Backend.class);
+        for (final Backend backendOriginal: farm.getBackends(backendWithChanges.getId())) {
+            final Map<String, Object> properties = new HashMap<>();
 
             properties.putAll(backendOriginal.getProperties());
             properties.putAll(backendWithChanges.getProperties());
@@ -65,6 +67,7 @@ public class BackendController implements EntityController {
 
             farm.changeBackend(JsonObject.toJsonObject(backendOriginal));
         }
+        farm.setVersion(backendWithChanges.getVersion());
         return this;
     }
 

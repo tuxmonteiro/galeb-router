@@ -184,9 +184,9 @@ public class AbstractServiceTest {
     }
 
     @Test
-    public void entityMapHasFourEntitiesAfterAbstractServicePreLaunch() {
+    public void entityMapHasFiveEntitiesAfterAbstractServicePreLaunch() {
         serviceImplemented.prelaunch();
-        assertThat(serviceImplemented.getFarm().getEntityMap()).hasSize(4);
+        assertThat(serviceImplemented.getFarm().getEntityMap()).hasSize(5);
     }
 
     private String getKeyNameFrom(Class<?> klass) {

@@ -16,9 +16,15 @@
 
 package io.galeb.core.eventbus;
 
+import io.galeb.core.logging.Logger;
+import io.galeb.core.logging.NullLogger;
+
 public interface EventBusListener {
 
     public static final EventBusListener NULL = new EventBusListener() {
+
+        private final Logger NULL_LOGGER = new NullLogger();
+
         @Override
         public void onEvent(Event event) {
             return;
@@ -28,10 +34,17 @@ public interface EventBusListener {
         public IEventBus getEventBus() {
             return IEventBus.NULL;
         }
+
+        @Override
+        public Logger getLogger() {
+            return NULL_LOGGER;
+        };
     };
 
     public void onEvent(final Event event);
 
     public IEventBus getEventBus();
+
+    public Logger getLogger();
 
 }

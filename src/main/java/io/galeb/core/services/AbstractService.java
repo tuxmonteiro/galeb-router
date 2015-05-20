@@ -20,6 +20,7 @@ import static io.galeb.core.util.Constants.SysProp.PROP_SCHEDULER_INTERVAL;
 import io.galeb.core.controller.BackendController;
 import io.galeb.core.controller.BackendPoolController;
 import io.galeb.core.controller.EntityController;
+import io.galeb.core.controller.FarmController;
 import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.controller.RuleController;
 import io.galeb.core.controller.VirtualHostController;
@@ -86,6 +87,8 @@ public abstract class AbstractService implements EventBusListener {
                 new RuleController(farm));
         entityMap.put(getControllerName(VirtualHostController.class),
                 new VirtualHostController(farm));
+        entityMap.put(getControllerName(FarmController.class),
+                new FarmController(farm));
 
     }
 
@@ -107,6 +110,11 @@ public abstract class AbstractService implements EventBusListener {
     @Override
     public IEventBus getEventBus() {
         return eventbus;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;
     }
 
     @Override

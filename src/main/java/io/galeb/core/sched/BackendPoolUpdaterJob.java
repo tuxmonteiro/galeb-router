@@ -68,7 +68,7 @@ public class BackendPoolUpdaterJob extends AbstractJob {
             }
         }
 
-        logger.debug(String.format("Job %s done.", this.getClass().getSimpleName()));
+        logger.trace(String.format("Job %s done.", this.getClass().getSimpleName()));
     }
 
 }
