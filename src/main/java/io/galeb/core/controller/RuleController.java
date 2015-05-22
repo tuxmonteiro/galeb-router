@@ -19,50 +19,55 @@ package io.galeb.core.controller;
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Farm;
 import io.galeb.core.model.Rule;
+import io.galeb.core.model.collections.RuleCollection;
 
 public class RuleController implements EntityController {
 
     private final Farm farm;
 
+    private final RuleCollection ruleCollection;
+
     public RuleController(final Farm farm) {
         this.farm = farm;
+        this.ruleCollection = (RuleCollection) farm.getRules();
     }
 
     @Override
     public EntityController add(JsonObject json) throws Exception {
-        farm.addRule(json);
-        farm.setVersion(((Rule) json.instanceOf(Rule.class)).getVersion());
+        final Rule rule = (Rule) json.instanceOf(Rule.class);
+        ruleCollection.add(rule);
+        farm.setVersion(rule.getVersion());
         return this;
     }
 
     @Override
     public EntityController del(JsonObject json) throws Exception {
-        farm.delRule(json);
-        farm.setVersion(((Rule) json.instanceOf(Rule.class)).getVersion());
+        final Rule rule = (Rule) json.instanceOf(Rule.class);
+        ruleCollection.remove(rule);
+        farm.setVersion(rule.getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        for (final Rule rule: farm.getRules()) {
-            del(JsonObject.toJsonObject(rule));
-        };
+        ruleCollection.clear();
         return this;
     }
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
-        farm.delRule(json);
-        farm.addRule(json);
+        final Rule rule = (Rule) json.instanceOf(Rule.class);
+        ruleCollection.change(rule);
         return this;
     }
 
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(farm.getRules(id));
+            return JsonObject.toJsonString(ruleCollection.stream()
+                        .filter(rule -> rule.getId().equals(id)));
         } else {
-            return JsonObject.toJsonString(farm.getRules());
+            return JsonObject.toJsonString(ruleCollection);
         }
     }
 

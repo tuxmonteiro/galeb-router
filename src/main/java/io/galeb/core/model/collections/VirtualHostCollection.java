@@ -60,4 +60,9 @@ public class VirtualHostCollection extends CopyOnWriteArraySet<VirtualHost> impl
         return this;
     }
 
+    @Override
+    public void clear() {
+        stream().forEach(virtualhost -> this.remove(virtualhost));
+    }
+
 }

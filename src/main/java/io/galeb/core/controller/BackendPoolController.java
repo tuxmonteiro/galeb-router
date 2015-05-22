@@ -19,65 +19,56 @@ package io.galeb.core.controller;
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Farm;
-
-import java.util.HashMap;
-import java.util.Map;
+import io.galeb.core.model.collections.BackendPoolCollection;
 
 public class BackendPoolController implements EntityController {
 
     private final Farm farm;
 
+    private final BackendPoolCollection backendPoolCollection;
+
     public BackendPoolController(final Farm farm) {
         this.farm = farm;
+        this.backendPoolCollection = (BackendPoolCollection) farm.getBackendPools();
     }
 
     @Override
     public EntityController add(JsonObject json) throws Exception {
-        farm.addBackendPool(json);
-        farm.setVersion(((BackendPool)json.instanceOf(BackendPool.class)).getVersion());
+        final BackendPool backendPool = (BackendPool) json.instanceOf(BackendPool.class);
+        backendPoolCollection.add(backendPool);
+        farm.setVersion(backendPool.getVersion());
         return this;
     }
 
     @Override
     public EntityController del(JsonObject json) throws Exception {
-        farm.delBackendPool(json);
-        farm.setVersion(((BackendPool)json.instanceOf(BackendPool.class)).getVersion());
+        final BackendPool backendPool = (BackendPool) json.instanceOf(BackendPool.class);
+        backendPoolCollection.remove(backendPool);
+        farm.setVersion(backendPool.getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        for (final BackendPool backendPool: farm.getBackendPools()) {
-            del(JsonObject.toJsonObject(backendPool));
-        }
+        backendPoolCollection.clear();
         return null;
     }
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
-        final BackendPool backendPoolWithChanges = (BackendPool) JsonObject.fromJson(json.toString(), BackendPool.class);
-        final BackendPool backendPoolOriginal = farm.getBackendPool(json);
-        if (backendPoolOriginal!=null) {
-            final Map<String, Object> properties = new HashMap<>();
-
-            properties.putAll(backendPoolOriginal.getProperties());
-            properties.putAll(backendPoolWithChanges.getProperties());
-            backendPoolOriginal.updateModifiedAt();
-            backendPoolOriginal.setProperties(properties);
-            backendPoolOriginal.updateHash();
-
-            farm.changeBackendPool(JsonObject.toJsonObject(backendPoolOriginal));
-        }
-        farm.setVersion(backendPoolWithChanges.getVersion());
+        final BackendPool backendPool = (BackendPool) json.instanceOf(BackendPool.class);
+        backendPoolCollection.change(backendPool);
+        farm.setVersion(backendPool.getVersion());
         return this;
     }
 
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(farm.getBackendPool(id));
+            return JsonObject.toJsonString(backendPoolCollection.stream()
+                    .filter(backendPool -> backendPool.getId().equals(id)));
         } else {
-            return JsonObject.toJsonString(farm.getBackendPools());
+            return JsonObject.toJsonString(backendPoolCollection);
         }
     }
 

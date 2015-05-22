@@ -23,6 +23,7 @@ import io.galeb.core.loadbalance.LoadBalancePolicyLocator;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Farm;
+import io.galeb.core.model.collections.BackendPoolCollection;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -41,10 +42,15 @@ public class LeastConnPolicyTest {
     private final String backendPoolId = "pool1";
     private Farm farm;
 
+    private BackendPoolCollection backendPoolCollection;
+
+
     @Before
     public void setUp() {
         final BackendPool backendPool = (BackendPool) new BackendPool().setId(backendPoolId);
-        farm = new Farm().addBackendPool(backendPool);
+        farm = new Farm();
+        backendPoolCollection = (BackendPoolCollection) farm.getBackendPools();
+        backendPoolCollection.add(backendPool);
 
         final Map<String, Object> criteria = new HashMap<>();
         criteria.put(BackendPool.class.getSimpleName(), backendPool.getId());
@@ -60,7 +66,8 @@ public class LeastConnPolicyTest {
         final int numBackends = 10;
         final int maxConn = 1000;
         int minConn = maxConn;
-        final BackendPool backendPool = farm.getBackendPool(backendPoolId);
+
+        final BackendPool backendPool = backendPoolCollection.getListByID(backendPoolId).get(0);
         final List<URI> uris = new LinkedList<>();
 
         for (int pos=0; pos<=numBackends;pos++) {

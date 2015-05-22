@@ -19,50 +19,55 @@ package io.galeb.core.controller;
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Farm;
 import io.galeb.core.model.VirtualHost;
+import io.galeb.core.model.collections.VirtualHostCollection;
 
 public class VirtualHostController implements EntityController {
 
     private final Farm farm;
 
+    private final VirtualHostCollection virtualHostCollection;
+
     public VirtualHostController(final Farm farm) {
         this.farm = farm;
+        this.virtualHostCollection = (VirtualHostCollection) farm.getVirtualHosts();
     }
 
     @Override
     public EntityController add(JsonObject json) throws Exception{
-        farm.addVirtualHost(json);
-        farm.setVersion(((VirtualHost) json.instanceOf(VirtualHost.class)).getVersion());
+        final VirtualHost virtualHost = (VirtualHost) json.instanceOf(VirtualHost.class);
+        virtualHostCollection.add(virtualHost);
+        farm.setVersion(virtualHost.getVersion());
         return this;
     }
 
     @Override
     public EntityController del(JsonObject json) throws Exception {
-        farm.delVirtualHost(json);
-        farm.setVersion(((VirtualHost) json.instanceOf(VirtualHost.class)).getVersion());
+        final VirtualHost virtualHost = (VirtualHost) json.instanceOf(VirtualHost.class);
+        virtualHostCollection.remove(virtualHost);
+        farm.setVersion(virtualHost.getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        for (final VirtualHost virtualHost: farm.getVirtualHosts()) {
-            del(JsonObject.toJsonObject(virtualHost));
-        }
+        virtualHostCollection.clear();
         return this;
     }
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
-        farm.delVirtualHost(json);
-        farm.addVirtualHost(json);
+        final VirtualHost virtualHost = (VirtualHost) json.instanceOf(VirtualHost.class);
+        virtualHostCollection.change(virtualHost);
         return this;
     }
 
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(farm.getVirtualHost(id));
+            return JsonObject.toJsonString(virtualHostCollection.stream()
+                    .filter(virtualHost -> virtualHost.getId().equals(id)));
         } else {
-            return JsonObject.toJsonString(farm.getVirtualHosts());
+            return JsonObject.toJsonString(virtualHostCollection);
         }
     }
 

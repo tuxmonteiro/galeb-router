@@ -81,4 +81,9 @@ public class BackendCollection extends CopyOnWriteArraySet<Backend> implements C
         return this;
     }
 
+    @Override
+    public void clear() {
+        stream().forEach(backend -> this.remove(backend));
+    }
+
 }

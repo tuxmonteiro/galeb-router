@@ -82,4 +82,9 @@ public class RuleCollection extends CopyOnWriteArraySet<Rule> implements Collect
         return this;
     }
 
+    @Override
+    public void clear() {
+        stream().forEach(rule -> this.remove(rule));
+    }
+
 }

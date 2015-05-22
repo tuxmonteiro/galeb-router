@@ -77,4 +77,9 @@ public class BackendPoolCollection extends CopyOnWriteArraySet<BackendPool> impl
         return properties;
     }
 
+    @Override
+    public void clear() {
+        stream().forEach(backendPool -> this.remove(backendPool));
+    }
+
 }

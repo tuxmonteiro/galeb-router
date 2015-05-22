@@ -36,6 +36,8 @@ import io.galeb.core.model.Farm;
 import io.galeb.core.model.Metrics;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
+import io.galeb.core.model.collections.BackendPoolCollection;
+import io.galeb.core.model.collections.VirtualHostCollection;
 import io.galeb.core.queue.QueueManager;
 
 import java.util.Collections;
@@ -158,8 +160,8 @@ public class AbstractServiceTest {
     @Before
     public void setUp() {
         farm = serviceImplemented.getFarm();
-        farm.clearBackendPool();
-        farm.clearVirtualHosts();
+        ((BackendPoolCollection) farm.getBackendPools()).clear();
+        ((VirtualHostCollection) farm.getVirtualHosts()).clear();
     }
 
     @After

@@ -20,9 +20,6 @@ import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -52,16 +49,15 @@ public class BackendUpdaterJob extends AbstractJob {
         setEnvironment(context.getJobDetail().getJobDataMap());
         cleanUpConnectionsInfo();
 
-        mapReduce = eventBus.getMapReduce();
-        final Map<String, Integer> backEndMap = mapReduce.reduce();
-
-        for (final Entry<String, Integer> entry: backEndMap.entrySet()) {
-            final String backendId = entry.getKey();
-            for (final Backend backend: farm.getBackends(backendId)) {
-                backend.setConnections(entry.getValue());
-                eventBus.publishEntity(backend, entityType, Action.CHANGE);
-            }
-        }
+        eventBus.getMapReduce().reduce().forEach((key, value) -> {
+            final String backendId = key;
+            farm.getBackends().stream()
+                .filter(backend -> backend.getId().equals(backendId))
+                .forEach(backend -> {
+                    backend.setConnections(value);
+                    eventBus.publishEntity(backend, entityType, Action.CHANGE);
+                });
+        });
 
         logger.trace(String.format("Job %s done.", this.getClass().getSimpleName()));
     }

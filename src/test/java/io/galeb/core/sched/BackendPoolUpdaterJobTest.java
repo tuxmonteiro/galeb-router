@@ -34,6 +34,7 @@ import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 import io.galeb.core.model.Metrics;
+import io.galeb.core.model.collections.BackendPoolCollection;
 import io.galeb.core.queue.QueueManager;
 
 import java.util.UUID;
@@ -50,6 +51,8 @@ public class BackendPoolUpdaterJobTest {
     private final JobExecutionContext jobExecutionContext = mock(JobExecutionContext.class);
 
     private final Farm farm = new Farm();
+
+    private BackendPoolCollection backendPoolCollection;
 
     private class FakeEventBus implements IEventBus {
         @Override
@@ -109,6 +112,7 @@ public class BackendPoolUpdaterJobTest {
     public void setUp() {
         final Logger logger = mock(Logger.class);
         final IEventBus eventBus = new FakeEventBus();
+        backendPoolCollection = (BackendPoolCollection) farm.getBackendPools();
         doNothing().when(logger).error(any(Throwable.class));
         doNothing().when(logger).debug(any(Throwable.class));
 
@@ -129,7 +133,7 @@ public class BackendPoolUpdaterJobTest {
         final int maxConn = 1000;
         int minConn = maxConn;
 
-        farm.addBackendPool(((BackendPool)new BackendPool().setId(backendPoolId)));
+        backendPoolCollection.add((BackendPool)new BackendPool().setId(backendPoolId));
 
         for (int x=0; x<=numBackends;x++) {
             final int numConn = (int) (Math.random() * (maxConn - Float.MIN_VALUE));
@@ -138,11 +142,11 @@ public class BackendPoolUpdaterJobTest {
             final Backend backend = (Backend)new Backend().setConnections(numConn)
                                                     .setParentId(backendPoolId)
                                                     .setId(UUID.randomUUID().toString());
-            farm.addBackend(backend);
+            farm.getBackends().add(backend);
         }
 
         new BackendPoolUpdaterJob().execute(jobExecutionContext);
-        final BackendPool backendPool = farm.getBackendPool(backendPoolId);
+        final BackendPool backendPool = backendPoolCollection.getListByID(backendPoolId).get(0);
         final Backend backendWithLeastConn = backendPool.getBackendWithLeastConn();
 
         assertThat(backendWithLeastConn.getConnections()).isEqualTo(minConn);
