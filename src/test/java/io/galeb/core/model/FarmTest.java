@@ -148,14 +148,6 @@ public class FarmTest {
         assertThat(farm.getVirtualHosts()).isEmpty();
     }
 
-    @Test(expected=NullPointerException.class)
-    public void delNullVirtualHostAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        assertThat(farm.getVirtualHosts()).hasSize(1);
-        farm.delVirtualHost(virtualhostNull);
-        assertThat(farm.getVirtualHosts()).hasSize(1);
-    }
-
     @Test
     public void getBackendPoolsAtFarm() {
         assertThat(farm.getBackendPools()).isEmpty();
@@ -214,14 +206,6 @@ public class FarmTest {
         assertThat(farm.getBackendPools()).isEmpty();
     }
 
-    @Test(expected=NullPointerException.class)
-    public void delNullBackendPoolAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        assertThat(farm.getBackendPools()).hasSize(1);
-        farm.delBackendPool(backendPoolNull);
-        assertThat(farm.getBackendPools()).hasSize(1);
-    }
-
     @Test
     public void getBackendsAtFarm() {
         assertThat(farm.getBackends()).isEmpty();
@@ -277,7 +261,7 @@ public class FarmTest {
 
     @Test
     public void getSingleRuleWithoutVirtualHostAtFarm() {
-        assertThat(farm.getRule(virtualHostId)).isEmpty();
+        assertThat(farm.getRules(virtualHostId)).isEmpty();
     }
 
     @Test
@@ -285,31 +269,31 @@ public class FarmTest {
         farm.addVirtualHost(virtualHostIdJson);
         farm.addRule(ruleIdJson);
         farm.addRule(ruleIdJson2);
-        assertThat(farm.getRule(ruleId)).hasSize(1);
+        assertThat(farm.getRules(ruleId)).hasSize(1);
     }
 
     @Test
     public void delRuleAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         farm.addRule(ruleIdJson);
-        assertThat(farm.getRule(ruleId)).hasSize(1);
+        assertThat(farm.getRules(ruleId)).hasSize(1);
         farm.delRule(ruleIdJson);
-        assertThat(farm.getRule(ruleId)).isEmpty();
+        assertThat(farm.getRules(ruleId)).isEmpty();
     }
 
     @Test
     public void delRuleWithObjectAtFarm() {
         farm.addVirtualHost(virtualHostIdJson);
         farm.addRule(ruleIdJson);
-        assertThat(farm.getRule(ruleId)).hasSize(1);
+        assertThat(farm.getRules(ruleId)).hasSize(1);
         farm.delRule((Rule) new Rule().setId(ruleId).setParentId(virtualHostId));
-        assertThat(farm.getRule(ruleId)).isEmpty();
+        assertThat(farm.getRules(ruleId)).isEmpty();
     }
 
     @Test
     public void delRuleWithNullVirtualHostAtFarm() {
         farm.addRule(ruleIdJson2);
-        assertThat(farm.getRule(ruleId)).isEmpty();
+        assertThat(farm.getRules(ruleId)).isEmpty();
     }
 
     @Test

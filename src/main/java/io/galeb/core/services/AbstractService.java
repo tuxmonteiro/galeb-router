@@ -154,7 +154,7 @@ public abstract class AbstractService implements EventBusListener {
                         throw new RuntimeException("Action unknown");
                 }
             } catch (final Exception e) {
-                logger.debug(e);
+                logger.error(e);
             }
         }
 
