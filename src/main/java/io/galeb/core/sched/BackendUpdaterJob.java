@@ -19,6 +19,7 @@ package io.galeb.core.sched;
 import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
+import io.galeb.core.model.Entity;
 
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -34,10 +35,10 @@ public class BackendUpdaterJob extends AbstractJob {
     private final String entityType = Backend.class.getSimpleName().toLowerCase();
 
     private void cleanUpConnectionsInfo() {
-        for (final Backend backendWithTTL: farm.getBackends()) {
+        for (final Entity backendWithTTL: farm.getCollection(Backend.class)) {
             final long now = System.currentTimeMillis();
-            if (backendWithTTL.getConnections()>0 &&  backendWithTTL.getModifiedAt()<(now-TTL)) {
-                backendWithTTL.setConnections(0);
+            if (((Backend) backendWithTTL).getConnections()>0 &&  backendWithTTL.getModifiedAt()<(now-TTL)) {
+                ((Backend) backendWithTTL).setConnections(0);
                 eventBus.publishEntity(backendWithTTL, entityType, Action.CHANGE);
             }
         }
@@ -51,10 +52,10 @@ public class BackendUpdaterJob extends AbstractJob {
 
         eventBus.getMapReduce().reduce().forEach((key, value) -> {
             final String backendId = key;
-            farm.getBackends().stream()
+            farm.getCollection(Backend.class).stream()
                 .filter(backend -> backend.getId().equals(backendId))
                 .forEach(backend -> {
-                    backend.setConnections(value);
+                    ((Backend) backend).setConnections(value);
                     eventBus.publishEntity(backend, entityType, Action.CHANGE);
                 });
         });

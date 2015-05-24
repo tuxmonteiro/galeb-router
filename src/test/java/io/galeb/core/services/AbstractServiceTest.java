@@ -36,8 +36,6 @@ import io.galeb.core.model.Farm;
 import io.galeb.core.model.Metrics;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
-import io.galeb.core.model.collections.BackendPoolCollection;
-import io.galeb.core.model.collections.VirtualHostCollection;
 import io.galeb.core.queue.QueueManager;
 
 import java.util.Collections;
@@ -160,8 +158,8 @@ public class AbstractServiceTest {
     @Before
     public void setUp() {
         farm = serviceImplemented.getFarm();
-        ((BackendPoolCollection) farm.getBackendPools()).clear();
-        ((VirtualHostCollection) farm.getVirtualHosts()).clear();
+        farm.clear(BackendPool.class);
+        farm.clear(VirtualHost.class);
     }
 
     @After
@@ -256,7 +254,7 @@ public class AbstractServiceTest {
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getBackends()).extracting("id").contains(entity.getId());
+        assertThat(farm.getCollection(Backend.class)).extracting("id").contains(entity.getId());
     }
 
     @Test
@@ -264,7 +262,7 @@ public class AbstractServiceTest {
         final Entity entity = new BackendPool();
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getBackendPools()).extracting("id").contains(entity.getId());
+        assertThat(farm.getCollection(BackendPool.class)).extracting("id").contains(entity.getId());
     }
 
     @Test
@@ -272,7 +270,7 @@ public class AbstractServiceTest {
         final Entity entity = new VirtualHost();
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getVirtualHosts()).extracting("id").contains(entity.getId());
+        assertThat(farm.getCollection(VirtualHost.class)).extracting("id").contains(entity.getId());
     }
 
     @Test
@@ -287,7 +285,7 @@ public class AbstractServiceTest {
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getRules()).extracting("id").contains(entity.getId());
+        assertThat(farm.getCollection(Rule.class)).extracting("id").contains(entity.getId());
     }
 
     @Test
@@ -302,7 +300,7 @@ public class AbstractServiceTest {
         serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
         serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getBackends()).extracting("id").doesNotContain(entity.getId());
+        assertThat(farm.getCollection(Backend.class)).extracting("id").doesNotContain(entity.getId());
 
     }
 
@@ -312,7 +310,7 @@ public class AbstractServiceTest {
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
         serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getBackendPools()).extracting("id").doesNotContain(entity.getId());
+        assertThat(farm.getCollection(BackendPool.class)).extracting("id").doesNotContain(entity.getId());
     }
 
     @Test
@@ -321,7 +319,7 @@ public class AbstractServiceTest {
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
         serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getVirtualHosts()).extracting("id").doesNotContain(entity.getId());
+        assertThat(farm.getCollection(VirtualHost.class)).extracting("id").doesNotContain(entity.getId());
     }
 
     @Test
@@ -336,7 +334,7 @@ public class AbstractServiceTest {
         serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
         serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getRules()).extracting("id").doesNotContain(entity.getId());
+        assertThat(farm.getCollection(Rule.class)).extracting("id").doesNotContain(entity.getId());
     }
 
 }

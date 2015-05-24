@@ -5,20 +5,21 @@ import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
-public class BackendCollection extends CopyOnWriteArraySet<Backend> implements Collection<Backend, BackendPool> {
+public class BackendCollection implements Collection<Backend, BackendPool> {
 
-    private static final long serialVersionUID = -3583562658521567597L;
+    private Set<Entity> backends = new CopyOnWriteArraySet<>();
 
-    private Set<BackendPool> backendPools;
+    private Collection<? extends Entity, ? extends Entity> backendPools;
 
     @Override
-    public Collection<Backend, BackendPool> defineSetOfRelatives(Set<BackendPool> relatives) {
-        this.backendPools = relatives;
+    public Collection<Backend, BackendPool> defineSetOfRelatives(Collection<? extends Entity, ? extends Entity> relatives) {
+        backendPools = relatives;
         return this;
     }
 
@@ -29,25 +30,25 @@ public class BackendCollection extends CopyOnWriteArraySet<Backend> implements C
     }
 
     @Override
-    public List<Backend> getListByID(String entityId) {
-        return stream().filter(entity -> entity.getId().equals(entityId))
+    public List<Entity> getListByID(String entityId) {
+        return backends.stream().filter(entity -> entity.getId().equals(entityId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Backend> getListByJson(JsonObject json) {
+    public List<Entity> getListByJson(JsonObject json) {
         final Entity entity = (Entity) json.instanceOf(Entity.class);
         return getListByID(entity.getId());
     }
 
     @Override
-    public boolean add(Backend backend) {
+    public boolean add(Entity backend) {
         final boolean result = false;
         if (!contains(backend)) {
             backendPools.stream()
                 .filter(backendPool -> backendPool.getId().equals(backend.getParentId()))
-                .forEach(backendPool -> addToParent(backendPool, backend));
-            super.add(backend);
+                .forEach(backendPool -> addToParent((BackendPool) backendPool, (Backend) backend));
+            backends.add(backend);
         }
         return result;
     }
@@ -56,22 +57,22 @@ public class BackendCollection extends CopyOnWriteArraySet<Backend> implements C
     public boolean remove(Object backend) {
         final String backendId = ((Entity) backend).getId();
         backendPools.stream()
-            .filter(backendPool -> backendPool.containBackend(backendId))
-            .forEach(backendPool -> backendPool.delBackend(backendId));
-        return super.remove(backend);
+            .filter(backendPool -> ((BackendPool) backendPool).containBackend(backendId))
+            .forEach(backendPool -> ((BackendPool) backendPool).delBackend(backendId));
+        return backends.remove(backend);
     }
 
     @Override
-    public Collection<Backend, BackendPool> change(Backend backend) {
+    public Collection<Backend, BackendPool> change(Entity backend) {
         if (contains(backend)) {
-            backendPools.stream().filter(backendPool -> backendPool.containBackend(backend.getId()))
+            backendPools.stream().filter(backendPool -> ((BackendPool) backendPool).containBackend(backend.getId()))
                 .forEach(backendPool -> {
-                    final Backend myBackend = backendPool.getBackend(backend.getId());
+                    final Backend myBackend = ((BackendPool) backendPool).getBackend(backend.getId());
                     myBackend.setProperties(backend.getProperties());
                     myBackend.updateHash();
                     myBackend.updateModifiedAt();
                 });
-            stream().filter(myBackend -> myBackend.equals(backend))
+            backends.stream().filter(myBackend -> myBackend.equals(backend))
                 .forEach(myBackend -> {
                     myBackend.setProperties(backend.getProperties());
                     myBackend.updateHash();
@@ -83,7 +84,57 @@ public class BackendCollection extends CopyOnWriteArraySet<Backend> implements C
 
     @Override
     public void clear() {
-        stream().forEach(backend -> this.remove(backend));
+        backends.stream().forEach(backend -> backends.remove(backend));
+    }
+
+    @Override
+    public int size() {
+        return backends.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return backends.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return backends.contains(o);
+    }
+
+    @Override
+    public Iterator<Entity> iterator() {
+        return backends.iterator();
+    }
+
+    @Override
+    public Object[] toArray() {
+        return backends.toArray();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return backends.toArray(a);
+    }
+
+    @Override
+    public boolean containsAll(java.util.Collection<?> c) {
+        return backends.containsAll(c);
+    }
+
+    @Override
+    public boolean addAll(java.util.Collection<? extends Entity> c) {
+        return backends.addAll(c);
+    }
+
+    @Override
+    public boolean retainAll(java.util.Collection<?> c) {
+        return backends.retainAll(c);
+    }
+
+    @Override
+    public boolean removeAll(java.util.Collection<?> c) {
+        return backends.removeAll(c);
     }
 
 }

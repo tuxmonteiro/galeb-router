@@ -19,6 +19,7 @@ package io.galeb.core.sched;
 import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
+import io.galeb.core.model.Entity;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,11 +36,11 @@ public class BackendPoolUpdaterJob extends AbstractJob {
 
         setEnvironment(context.getJobDetail().getJobDataMap());
 
-        for (final BackendPool backendPool: farm.getBackendPools()) {
-            if (backendPool.getBackends().isEmpty()) {
+        for (final Entity backendPool: farm.getCollection(BackendPool.class)) {
+            if (((BackendPool) backendPool).getBackends().isEmpty()) {
                 continue;
             }
-            final Backend backendWithLeastConn = Collections.min(backendPool.getBackends(),
+            final Backend backendWithLeastConn = Collections.min(((BackendPool) backendPool).getBackends(),
                     new Comparator<Backend>() {
                         @Override
                         public int compare(Backend backend1, Backend backend2) {
@@ -49,7 +50,7 @@ public class BackendPoolUpdaterJob extends AbstractJob {
 
             if (backendWithLeastConn !=null) {
 
-                final Backend backendWithLeastConnOrig = backendPool.getBackendWithLeastConn();
+                final Backend backendWithLeastConnOrig = ((BackendPool) backendPool).getBackendWithLeastConn();
                 boolean hasChange = false;
                 if (backendWithLeastConnOrig==null) {
                     hasChange = true;
@@ -59,7 +60,7 @@ public class BackendPoolUpdaterJob extends AbstractJob {
                     }
                 }
                 if (hasChange) {
-                    final BackendPool newBackendPool = new BackendPool(backendPool);
+                    final BackendPool newBackendPool = new BackendPool((BackendPool) backendPool);
                     newBackendPool.setBackendWithLeastConn(backendWithLeastConn);
 
                     eventBus.publishEntity(newBackendPool,

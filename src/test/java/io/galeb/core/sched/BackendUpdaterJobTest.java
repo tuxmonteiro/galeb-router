@@ -33,6 +33,7 @@ import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
+import io.galeb.core.model.VirtualHost;
 import io.galeb.core.model.collections.BackendPoolCollection;
 import io.galeb.core.model.collections.VirtualHostCollection;
 
@@ -87,10 +88,10 @@ public class BackendUpdaterJobTest {
 
     @Before
     public void setUp() {
-        backendPoolCollection = (BackendPoolCollection) farm.getBackendPools();
+        backendPoolCollection = (BackendPoolCollection) farm.getCollection(BackendPool.class);
         backendPoolCollection.clear();
 
-        virtualHostCollection = (VirtualHostCollection) farm.getVirtualHosts();
+        virtualHostCollection = (VirtualHostCollection) farm.getCollection(VirtualHost.class);
         virtualHostCollection.clear();
 
         final Logger logger = mock(Logger.class);
@@ -114,18 +115,18 @@ public class BackendUpdaterJobTest {
         final String backendPoolId = "pool1";
         final String backendTestedStr = "http://127.0.0.1:1";
 
-        backendPoolCollection.add((BackendPool)new BackendPool().setId(backendPoolId));
+        backendPoolCollection.add(new BackendPool().setId(backendPoolId));
 
         for (int count=1;count<=numBackends;count++) {
             final Backend backend = (Backend)new Backend().setConnections(0)
                                                     .setParentId(backendPoolId)
                                                     .setId(String.format("http://127.0.0.1:%s", count));
-            farm.getBackends().add(backend);
+            farm.add(backend);
         }
 
         new BackendUpdaterJob().execute(jobExecutionContext);
-        final BackendPool backendPool = backendPoolCollection.getListByID(backendPoolId).get(0);
-        final Backend backendTested = backendPool.getBackend(backendTestedStr);
+        final Entity backendPool = farm.getCollection(BackendPool.class).getListByID(backendPoolId).get(0);
+        final Backend backendTested = ((BackendPool) backendPool).getBackend(backendTestedStr);
 
         assertThat(backendTested.getConnections()).isGreaterThan(0);
     }

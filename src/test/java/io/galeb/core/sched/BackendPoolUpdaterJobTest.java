@@ -112,7 +112,7 @@ public class BackendPoolUpdaterJobTest {
     public void setUp() {
         final Logger logger = mock(Logger.class);
         final IEventBus eventBus = new FakeEventBus();
-        backendPoolCollection = (BackendPoolCollection) farm.getBackendPools();
+        backendPoolCollection = (BackendPoolCollection) farm.getCollection(BackendPool.class);
         doNothing().when(logger).error(any(Throwable.class));
         doNothing().when(logger).debug(any(Throwable.class));
 
@@ -133,7 +133,7 @@ public class BackendPoolUpdaterJobTest {
         final int maxConn = 1000;
         int minConn = maxConn;
 
-        backendPoolCollection.add((BackendPool)new BackendPool().setId(backendPoolId));
+        backendPoolCollection.add(new BackendPool().setId(backendPoolId));
 
         for (int x=0; x<=numBackends;x++) {
             final int numConn = (int) (Math.random() * (maxConn - Float.MIN_VALUE));
@@ -142,12 +142,12 @@ public class BackendPoolUpdaterJobTest {
             final Backend backend = (Backend)new Backend().setConnections(numConn)
                                                     .setParentId(backendPoolId)
                                                     .setId(UUID.randomUUID().toString());
-            farm.getBackends().add(backend);
+            farm.add(backend);
         }
 
         new BackendPoolUpdaterJob().execute(jobExecutionContext);
-        final BackendPool backendPool = backendPoolCollection.getListByID(backendPoolId).get(0);
-        final Backend backendWithLeastConn = backendPool.getBackendWithLeastConn();
+        final Entity backendPool = farm.getCollection(BackendPool.class).getListByID(backendPoolId).get(0);
+        final Backend backendWithLeastConn = ((BackendPool) backendPool).getBackendWithLeastConn();
 
         assertThat(backendWithLeastConn.getConnections()).isEqualTo(minConn);
     }

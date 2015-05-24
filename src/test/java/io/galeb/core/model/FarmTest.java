@@ -74,7 +74,7 @@ public class FarmTest {
 
     @Test
     public void optionsDefaultIsEmptyAtFarm() {
-        assertThat(farm.options.isEmpty()).isTrue();
+        assertThat(farm.getOptions().isEmpty()).isTrue();
     }
 
     @Test
@@ -82,7 +82,7 @@ public class FarmTest {
         final Map<String, String> newOptions = new HashMap<>();
         newOptions.put("key", "value");
         farm.setOptions(newOptions);
-        assertThat(farm.options.get("key")).isEqualTo("value");
+        assertThat(farm.getOptions().get("key")).isEqualTo("value");
     }
 
     @Test
@@ -92,22 +92,22 @@ public class FarmTest {
 
     @Test
     public void getVirtualHostsAtFarm() {
-        assertThat(farm.getVirtualHosts()).isEmpty();
+        assertThat(farm.getCollection(VirtualHost.class)).isEmpty();
     }
 
     @Test
     public void getBackendPoolsAtFarm() {
-        assertThat(farm.getBackendPools()).isEmpty();
+        assertThat(farm.getCollection(BackendPool.class)).isEmpty();
     }
 
     @Test
     public void getBackendsAtFarm() {
-        assertThat(farm.getBackends()).isEmpty();
+        assertThat(farm.getCollection(Backend.class)).isEmpty();
     }
 
     @Test
     public void getRulesAtFarm() {
-        assertThat(farm.getRules()).isEmpty();
+        assertThat(farm.getCollection(Rule.class)).isEmpty();
     }
 
     @Test
