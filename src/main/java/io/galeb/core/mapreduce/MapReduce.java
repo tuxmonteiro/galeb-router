@@ -16,20 +16,29 @@
 
 package io.galeb.core.mapreduce;
 
-import io.galeb.core.model.Metrics;
-
+import java.util.Collections;
 import java.util.Map;
 
 public interface MapReduce {
 
-    public MapReduce setTimeOut(Long timeOut);
+    public default MapReduce setTimeOut(Long timeOut) {
+        return this;
+    }
 
-    public Long getTimeOut();
+    public default Long getTimeOut() {
+        return -1L;
+    }
 
-    public void addMetrics(final Metrics metrics);
+    public default void addMetrics(String key, int value) {
+        // NULL
+    }
 
-    public boolean contains(String backendId);
+    public default boolean contains(String backendId) {
+        return false;
+    }
 
-    public Map<String, Integer> reduce();
+    public default Map<String, Integer> reduce() {
+        return Collections.emptyMap();
+    }
 
 }

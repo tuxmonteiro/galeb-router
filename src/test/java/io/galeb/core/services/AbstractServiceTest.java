@@ -24,21 +24,16 @@ import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.controller.RuleController;
 import io.galeb.core.controller.VirtualHostController;
 import io.galeb.core.eventbus.Event;
-import io.galeb.core.eventbus.EventBusListener;
 import io.galeb.core.eventbus.IEventBus;
-import io.galeb.core.eventbus.NullEventBus;
 import io.galeb.core.logging.impl.Log4j2Logger;
 import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
-import io.galeb.core.model.Metrics;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
-import io.galeb.core.queue.QueueManager;
 
-import java.util.Collections;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -65,77 +60,11 @@ public class AbstractServiceTest {
     }
 
     static class FakeEventBus implements IEventBus {
-        @Override
-        public void publishEntity(Entity entity, String entityType,
-                Action action) {
-        }
-
-        @Override
-        public void onRequestMetrics(Metrics metrics) {
-            // NULL
-        }
-
-        @Override
-        public void onConnectionsMetrics(Metrics metrics) {
-            // NULL
-        }
-
-        @Override
-        public IEventBus setEventBusListener(EventBusListener eventBusListener) {
-            return this;
-        }
-
-        @Override
-        public void start() {
-            // NULL
-        }
-
-        @Override
-        public void stop() {
-            // NULL
-        }
-
-        @Override
-        public MapReduce getMapReduce() {
-            return NullEventBus.NULL_MAP_REDUCE;
-        }
-
-        @Override
-        public QueueManager getQueueManager() {
-            return QueueManager.NULL;
-        }
-
-        @Override
-        public String getClusterId() {
-            return String.valueOf(null);
-        }
+        // Fake
     }
 
     static class FakeMapReduce implements MapReduce {
-        @Override
-        public MapReduce setTimeOut(Long timeOut) {
-            return this;
-        }
-
-        @Override
-        public Long getTimeOut() {
-            return -1L;
-        }
-
-        @Override
-        public void addMetrics(Metrics metrics) {
-            // NULL
-        }
-
-        @Override
-        public boolean contains(String backendId) {
-            return false;
-        }
-
-        @Override
-        public Map<String, Integer> reduce() {
-            return Collections.emptyMap();
-        }
+        // Fake
     }
 
     @Inject

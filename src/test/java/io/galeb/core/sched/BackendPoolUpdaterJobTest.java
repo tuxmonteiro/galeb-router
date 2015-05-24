@@ -23,19 +23,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import io.galeb.core.controller.BackendPoolController;
 import io.galeb.core.controller.EntityController.Action;
-import io.galeb.core.eventbus.EventBusListener;
 import io.galeb.core.eventbus.IEventBus;
-import io.galeb.core.eventbus.NullEventBus;
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.logging.Logger;
-import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
-import io.galeb.core.model.Metrics;
 import io.galeb.core.model.collections.BackendPoolCollection;
-import io.galeb.core.queue.QueueManager;
 
 import java.util.UUID;
 
@@ -64,47 +59,6 @@ public class BackendPoolUpdaterJobTest {
             } catch (final Exception e) {
                 e.printStackTrace();
             }
-        }
-
-        @Override
-        public void onRequestMetrics(Metrics metrics) {
-            // Fake
-        }
-
-        @Override
-        public void onConnectionsMetrics(Metrics metrics) {
-            // Fake
-        }
-
-        @Override
-        public IEventBus setEventBusListener(EventBusListener eventBusListener) {
-            // Fake
-            return this;
-        }
-
-        @Override
-        public void start() {
-            // Fake
-        }
-
-        @Override
-        public void stop() {
-            // Fake
-        }
-
-        @Override
-        public MapReduce getMapReduce() {
-            return NullEventBus.NULL_MAP_REDUCE;
-        }
-
-        @Override
-        public QueueManager getQueueManager() {
-            return QueueManager.NULL;
-        }
-
-        @Override
-        public String getClusterId() {
-            return String.valueOf(null);
         }
     }
 
