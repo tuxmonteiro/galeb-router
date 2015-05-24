@@ -20,9 +20,6 @@ import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.Farm;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class BackendController implements EntityController {
 
     private final Farm farm;
@@ -33,40 +30,30 @@ public class BackendController implements EntityController {
 
     @Override
     public EntityController add(JsonObject json) throws Exception {
-        farm.addBackend(json);
-        farm.setVersion(((Backend) json.instanceOf(Backend.class)).getVersion());
+        final Backend backend = (Backend) json.instanceOf(Backend.class);
+        farm.add(backend);
+        farm.setVersion((backend).getVersion());
         return this;
     }
 
     @Override
     public EntityController del(JsonObject json) throws Exception {
-        farm.delBackend(json);
-        farm.setVersion(((Backend) json.instanceOf(Backend.class)).getVersion());
+        final Backend backend = (Backend) json.instanceOf(Backend.class);
+        farm.del(backend);
+        farm.setVersion((backend).getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        for (final Backend backend: farm.getBackends()) {
-            del(JsonObject.toJsonObject(backend));
-        }
+        farm.clear(Backend.class);
         return null;
     }
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
         final Backend backendWithChanges = (Backend) json.instanceOf(Backend.class);
-        for (final Backend backendOriginal: farm.getBackends(backendWithChanges.getId())) {
-            final Map<String, Object> properties = new HashMap<>();
-
-            properties.putAll(backendOriginal.getProperties());
-            properties.putAll(backendWithChanges.getProperties());
-            backendOriginal.updateModifiedAt();
-            backendOriginal.setProperties(properties);
-            backendOriginal.updateHash();
-
-            farm.changeBackend(JsonObject.toJsonObject(backendOriginal));
-        }
+        farm.change(backendWithChanges);
         farm.setVersion(backendWithChanges.getVersion());
         return this;
     }
@@ -74,9 +61,10 @@ public class BackendController implements EntityController {
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(farm.getBackends(id));
+            return JsonObject.toJsonString(farm.getCollection(Backend.class).stream()
+                        .filter(backend -> backend.getId().equals(id)));
         } else {
-            return JsonObject.toJsonString(farm.getBackends());
+            return JsonObject.toJsonString(farm.getCollection(Backend.class));
         }
     }
 

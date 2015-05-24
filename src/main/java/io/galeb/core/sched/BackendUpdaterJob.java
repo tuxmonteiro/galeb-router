@@ -17,11 +17,8 @@
 package io.galeb.core.sched;
 
 import io.galeb.core.controller.EntityController.Action;
-import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
-
-import java.util.Map;
-import java.util.Map.Entry;
+import io.galeb.core.model.Entity;
 
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -32,15 +29,14 @@ public class BackendUpdaterJob extends AbstractJob {
 
     private static final long TTL = 10000L;
 
-    private MapReduce mapReduce;
-
     private final String entityType = Backend.class.getSimpleName().toLowerCase();
 
     private void cleanUpConnectionsInfo() {
-        for (final Backend backendWithTTL: farm.getBackends()) {
+        for (final Entity backendWithTTL: farm.getCollection(Backend.class)) {
             final long now = System.currentTimeMillis();
-            if (backendWithTTL.getConnections()>0 &&  backendWithTTL.getModifiedAt()<(now-TTL)) {
-                backendWithTTL.setConnections(0);
+            if (((Backend) backendWithTTL).getConnections()>0 &&  backendWithTTL.getModifiedAt()<(now-TTL)) {
+                ((Backend) backendWithTTL).setConnections(0);
+                backendWithTTL.setVersion(farm.getVersion());
                 eventBus.publishEntity(backendWithTTL, entityType, Action.CHANGE);
             }
         }
@@ -52,16 +48,16 @@ public class BackendUpdaterJob extends AbstractJob {
         setEnvironment(context.getJobDetail().getJobDataMap());
         cleanUpConnectionsInfo();
 
-        mapReduce = eventBus.getMapReduce();
-        final Map<String, Integer> backEndMap = mapReduce.reduce();
-
-        for (final Entry<String, Integer> entry: backEndMap.entrySet()) {
-            final String backendId = entry.getKey();
-            for (final Backend backend: farm.getBackends(backendId)) {
-                backend.setConnections(entry.getValue());
-                eventBus.publishEntity(backend, entityType, Action.CHANGE);
-            }
-        }
+        eventBus.getMapReduce().reduce().forEach((key, value) -> {
+            final String backendId = key;
+            farm.getCollection(Backend.class).stream()
+                .filter(backend -> backend.getId().equals(backendId))
+                .forEach(backend -> {
+                    ((Backend) backend).setConnections(value);
+                    backend.setVersion(farm.getVersion());
+                    eventBus.publishEntity(backend, entityType, Action.CHANGE);
+                });
+        });
 
         logger.trace(String.format("Job %s done.", this.getClass().getSimpleName()));
     }

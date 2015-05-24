@@ -33,6 +33,9 @@ import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
+import io.galeb.core.model.VirtualHost;
+import io.galeb.core.model.collections.BackendPoolCollection;
+import io.galeb.core.model.collections.VirtualHostCollection;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,9 +51,12 @@ public class BackendUpdaterJobTest {
 
     private static Farm farm = new Farm();
 
+    private BackendPoolCollection backendPoolCollection;
+    private VirtualHostCollection virtualHostCollection;
+
     private static int numBackends = 10;
 
-    private JobExecutionContext jobExecutionContext = mock(JobExecutionContext.class);
+    private final JobExecutionContext jobExecutionContext = mock(JobExecutionContext.class);
 
     private static class FakeMapReduce extends NullMapReduce {
         @Override
@@ -66,11 +72,11 @@ public class BackendUpdaterJobTest {
     private static class FakeEventBus extends NullEventBus {
         @Override
         public void publishEntity(Entity entity, String entityType, Action action) {
-            BackendController backendController = new BackendController(farm);
-            Backend backend = ((Backend)entity);
+            final BackendController backendController = new BackendController(farm);
+            final Backend backend = ((Backend)entity);
             try {
                 backendController.change(JsonObject.toJsonObject(backend));
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
             }
         }
@@ -82,18 +88,21 @@ public class BackendUpdaterJobTest {
 
     @Before
     public void setUp() {
-        farm.clearBackendPool();
-        farm.clearVirtualHosts();
+        backendPoolCollection = (BackendPoolCollection) farm.getCollection(BackendPool.class);
+        backendPoolCollection.clear();
 
-        Logger logger = mock(Logger.class);
-        IEventBus eventBus = new FakeEventBus();
+        virtualHostCollection = (VirtualHostCollection) farm.getCollection(VirtualHost.class);
+        virtualHostCollection.clear();
+
+        final Logger logger = mock(Logger.class);
+        final IEventBus eventBus = new FakeEventBus();
         doNothing().when(logger).error(any(Throwable.class));
         doNothing().when(logger).debug(any(Throwable.class));
 
-        JobDetail jobDetail = mock(JobDetail.class);
+        final JobDetail jobDetail = mock(JobDetail.class);
         when(jobExecutionContext.getJobDetail()).thenReturn(jobDetail);
 
-        JobDataMap jobdataMap = new JobDataMap();
+        final JobDataMap jobdataMap = new JobDataMap();
         jobdataMap.put(QuartzScheduler.FARM, farm);
         jobdataMap.put(QuartzScheduler.LOGGER, logger);
         jobdataMap.put(QuartzScheduler.EVENTBUS, eventBus);
@@ -104,20 +113,20 @@ public class BackendUpdaterJobTest {
     @Test
     public void executeTest() throws JobExecutionException {
         final String backendPoolId = "pool1";
-        String backendTestedStr = "http://127.0.0.1:1";
+        final String backendTestedStr = "http://127.0.0.1:1";
 
-        farm.addBackendPool(((BackendPool)new BackendPool().setId(backendPoolId)));
+        backendPoolCollection.add(new BackendPool().setId(backendPoolId));
 
         for (int count=1;count<=numBackends;count++) {
-            Backend backend = (Backend)new Backend().setConnections(0)
+            final Backend backend = (Backend)new Backend().setConnections(0)
                                                     .setParentId(backendPoolId)
                                                     .setId(String.format("http://127.0.0.1:%s", count));
-            farm.addBackend(backend);
+            farm.add(backend);
         }
 
         new BackendUpdaterJob().execute(jobExecutionContext);
-        BackendPool backendPool = farm.getBackendPool(backendPoolId);
-        Backend backendTested = backendPool.getBackend(backendTestedStr);
+        final Entity backendPool = farm.getCollection(BackendPool.class).getListByID(backendPoolId).get(0);
+        final Backend backendTested = ((BackendPool) backendPool).getBackend(backendTestedStr);
 
         assertThat(backendTested.getConnections()).isGreaterThan(0);
     }

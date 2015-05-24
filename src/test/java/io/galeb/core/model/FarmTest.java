@@ -74,7 +74,7 @@ public class FarmTest {
 
     @Test
     public void optionsDefaultIsEmptyAtFarm() {
-        assertThat(farm.options.isEmpty()).isTrue();
+        assertThat(farm.getOptions().isEmpty()).isTrue();
     }
 
     @Test
@@ -82,7 +82,7 @@ public class FarmTest {
         final Map<String, String> newOptions = new HashMap<>();
         newOptions.put("key", "value");
         farm.setOptions(newOptions);
-        assertThat(farm.options.get("key")).isEqualTo("value");
+        assertThat(farm.getOptions().get("key")).isEqualTo("value");
     }
 
     @Test
@@ -92,208 +92,22 @@ public class FarmTest {
 
     @Test
     public void getVirtualHostsAtFarm() {
-        assertThat(farm.getVirtualHosts()).isEmpty();
-    }
-
-    @Test
-    public void containVirtualHostIsFalseInDefaultVirtualHostsAtFalse() {
-        assertThat(farm.containVirtualHost(virtualHostIdJson)).isFalse();
-    }
-
-    @Test
-    public void containVirtualHostWithStringIsFalseInDefaultVirtualHostsAtFalse() {
-        assertThat(farm.containVirtualHost(virtualHostId)).isFalse();
-    }
-
-    @Test
-    public void containVirtualHostIsTrueAfterAddVirtualHostAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        assertThat(farm.containVirtualHost(virtualHostIdJson)).isTrue();
-    }
-
-    @Test
-    public void containVirtualHostWithStringIsTrueAfterAddVirtualHostAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        assertThat(farm.containVirtualHost(virtualHostId)).isTrue();
-    }
-
-    @Test
-    public void clearVirtualHostAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        assertThat(farm.getVirtualHosts()).hasSize(1);
-        farm.clearVirtualHosts();
-        assertThat(farm.getVirtualHosts()).isEmpty();
-    }
-
-    @Test
-    public void getSingleVirtualHostAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        farm.addVirtualHost(virtualHostIdJson2);
-        assertThat(farm.getVirtualHost(virtualHostIdJson)).isInstanceOf(VirtualHost.class);
-    }
-
-    @Test
-    public void delVirtualHostAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        assertThat(farm.getVirtualHosts()).hasSize(1);
-        farm.delVirtualHost(virtualHostIdJson);
-        assertThat(farm.getVirtualHosts()).isEmpty();
-    }
-
-    @Test
-    public void delVirtualHostWithStringAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        assertThat(farm.getVirtualHosts()).hasSize(1);
-        farm.delVirtualHost(virtualHostId);
-        assertThat(farm.getVirtualHosts()).isEmpty();
+        assertThat(farm.getCollection(VirtualHost.class)).isEmpty();
     }
 
     @Test
     public void getBackendPoolsAtFarm() {
-        assertThat(farm.getBackendPools()).isEmpty();
-    }
-
-    @Test
-    public void containBackendPoolIsFalseInDefaultBackendPoolsAtFalse() {
-        assertThat(farm.containBackendPool(backendPoolIdJson)).isFalse();
-    }
-
-    @Test
-    public void containBackendPoolWithStringIsFalseInDefaultBackendPoolsAtFalse() {
-        assertThat(farm.containBackendPool(backendPoolId)).isFalse();
-    }
-
-    @Test
-    public void containBackendPoolIsTrueAfterAddBackendPoolAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        assertThat(farm.containBackendPool(backendPoolIdJson)).isTrue();
-    }
-
-    @Test
-    public void containBackendPoolWithStringIsTrueAfterAddBackendPoolAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        assertThat(farm.containBackendPool(backendPoolId)).isTrue();
-    }
-
-    @Test
-    public void clearBackendPoolAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        assertThat(farm.getBackendPools()).hasSize(1);
-        farm.clearBackendPool();
-        assertThat(farm.getBackendPools()).isEmpty();
-    }
-
-    @Test
-    public void getSingleBackendPoolAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        farm.addBackendPool(backendPoolIdJson2);
-        assertThat(farm.getBackendPool(backendPoolIdJson)).isInstanceOf(BackendPool.class);
-    }
-
-    @Test
-    public void delBackendPoolAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        assertThat(farm.getBackendPools()).hasSize(1);
-        farm.delBackendPool(backendPoolIdJson);
-        assertThat(farm.getBackendPools()).isEmpty();
-    }
-
-    @Test
-    public void delBackendPoolWithStringAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        assertThat(farm.getBackendPools()).hasSize(1);
-        farm.delBackendPool(backendPoolId);
-        assertThat(farm.getBackendPools()).isEmpty();
+        assertThat(farm.getCollection(BackendPool.class)).isEmpty();
     }
 
     @Test
     public void getBackendsAtFarm() {
-        assertThat(farm.getBackends()).isEmpty();
-    }
-
-    @Test
-    public void getBackendsAfterAddBackendsAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        farm.addBackend(backendIdJson);
-        assertThat(farm.getBackends()).hasSize(1);
-    }
-
-    @Test
-    public void getSingleBackendWithoutBackendAtFarm() {
-        assertThat(farm.getBackends(backendId)).isEmpty();
-    }
-
-    @Test
-    public void getSingleBackendAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        farm.addBackend(backendIdJson);
-        assertThat(farm.getBackends(backendId)).hasSize(1);
-        farm.addBackend(backendIdJson2);
-        assertThat(farm.getBackends(backendId)).hasSize(1);
-    }
-
-    @Test
-    public void delBackendAtFarm() {
-        farm.addBackendPool(backendPoolIdJson);
-        farm.addBackend(backendIdJson);
-        assertThat(farm.getBackends(backendId)).hasSize(1);
-        farm.delBackend(backendIdJson);
-        assertThat(farm.getBackends(backendId)).isEmpty();
-    }
-
-    @Test
-    public void delBackendWithNullBackendPoolAtFarm() {
-        farm.delBackend(backendIdJson2);
-        assertThat(farm.getBackends(backendId2)).isEmpty();
+        assertThat(farm.getCollection(Backend.class)).isEmpty();
     }
 
     @Test
     public void getRulesAtFarm() {
-        assertThat(farm.getRules()).isEmpty();
-    }
-
-    @Test
-    public void getRulesAfterAddRulesAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        farm.addRule(ruleIdJson);
-        assertThat(farm.getRules()).hasSize(1);
-    }
-
-    @Test
-    public void getSingleRuleWithoutVirtualHostAtFarm() {
-        assertThat(farm.getRules(virtualHostId)).isEmpty();
-    }
-
-    @Test
-    public void getSingleRuleAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        farm.addRule(ruleIdJson);
-        farm.addRule(ruleIdJson2);
-        assertThat(farm.getRules(ruleId)).hasSize(1);
-    }
-
-    @Test
-    public void delRuleAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        farm.addRule(ruleIdJson);
-        assertThat(farm.getRules(ruleId)).hasSize(1);
-        farm.delRule(ruleIdJson);
-        assertThat(farm.getRules(ruleId)).isEmpty();
-    }
-
-    @Test
-    public void delRuleWithObjectAtFarm() {
-        farm.addVirtualHost(virtualHostIdJson);
-        farm.addRule(ruleIdJson);
-        assertThat(farm.getRules(ruleId)).hasSize(1);
-        farm.delRule((Rule) new Rule().setId(ruleId).setParentId(virtualHostId));
-        assertThat(farm.getRules(ruleId)).isEmpty();
-    }
-
-    @Test
-    public void delRuleWithNullVirtualHostAtFarm() {
-        farm.addRule(ruleIdJson2);
-        assertThat(farm.getRules(ruleId)).isEmpty();
+        assertThat(farm.getCollection(Rule.class)).isEmpty();
     }
 
     @Test

@@ -30,39 +30,40 @@ public class RuleController implements EntityController {
 
     @Override
     public EntityController add(JsonObject json) throws Exception {
-        farm.addRule(json);
-        farm.setVersion(((Rule) json.instanceOf(Rule.class)).getVersion());
+        final Rule rule = (Rule) json.instanceOf(Rule.class);
+        farm.add(rule);
+        farm.setVersion(rule.getVersion());
         return this;
     }
 
     @Override
     public EntityController del(JsonObject json) throws Exception {
-        farm.delRule(json);
-        farm.setVersion(((Rule) json.instanceOf(Rule.class)).getVersion());
+        final Rule rule = (Rule) json.instanceOf(Rule.class);
+        farm.del(rule);
+        farm.setVersion(rule.getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        for (final Rule rule: farm.getRules()) {
-            del(JsonObject.toJsonObject(rule));
-        };
+        farm.clear(Rule.class);
         return this;
     }
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
-        farm.delRule(json);
-        farm.addRule(json);
+        final Rule rule = (Rule) json.instanceOf(Rule.class);
+        farm.change(rule);
         return this;
     }
 
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(farm.getRules(id));
+            return JsonObject.toJsonString(farm.getCollection(Rule.class).stream()
+                        .filter(rule -> rule.getId().equals(id)));
         } else {
-            return JsonObject.toJsonString(farm.getRules());
+            return JsonObject.toJsonString(farm.getCollection(Rule.class));
         }
     }
 
