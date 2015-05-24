@@ -62,7 +62,7 @@ public class BackendPoolUpdaterJob extends AbstractJob {
                 if (hasChange) {
                     final BackendPool newBackendPool = new BackendPool((BackendPool) backendPool);
                     newBackendPool.setBackendWithLeastConn(backendWithLeastConn);
-
+                    newBackendPool.setVersion(farm.getVersion());
                     eventBus.publishEntity(newBackendPool,
                             BackendPool.class.getSimpleName().toLowerCase(), Action.CHANGE);
                 }

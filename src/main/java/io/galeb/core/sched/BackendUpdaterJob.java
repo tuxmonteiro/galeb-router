@@ -17,7 +17,6 @@
 package io.galeb.core.sched;
 
 import io.galeb.core.controller.EntityController.Action;
-import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.Entity;
 
@@ -30,8 +29,6 @@ public class BackendUpdaterJob extends AbstractJob {
 
     private static final long TTL = 10000L;
 
-    private MapReduce mapReduce;
-
     private final String entityType = Backend.class.getSimpleName().toLowerCase();
 
     private void cleanUpConnectionsInfo() {
@@ -39,6 +36,7 @@ public class BackendUpdaterJob extends AbstractJob {
             final long now = System.currentTimeMillis();
             if (((Backend) backendWithTTL).getConnections()>0 &&  backendWithTTL.getModifiedAt()<(now-TTL)) {
                 ((Backend) backendWithTTL).setConnections(0);
+                backendWithTTL.setVersion(farm.getVersion());
                 eventBus.publishEntity(backendWithTTL, entityType, Action.CHANGE);
             }
         }
@@ -56,6 +54,7 @@ public class BackendUpdaterJob extends AbstractJob {
                 .filter(backend -> backend.getId().equals(backendId))
                 .forEach(backend -> {
                     ((Backend) backend).setConnections(value);
+                    backend.setVersion(farm.getVersion());
                     eventBus.publishEntity(backend, entityType, Action.CHANGE);
                 });
         });
