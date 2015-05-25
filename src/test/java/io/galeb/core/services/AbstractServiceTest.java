@@ -24,23 +24,16 @@ import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.controller.RuleController;
 import io.galeb.core.controller.VirtualHostController;
 import io.galeb.core.eventbus.Event;
-import io.galeb.core.eventbus.EventBusListener;
 import io.galeb.core.eventbus.IEventBus;
-import io.galeb.core.eventbus.NullEventBus;
 import io.galeb.core.logging.impl.Log4j2Logger;
 import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
-import io.galeb.core.model.Metrics;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
-import io.galeb.core.model.collections.BackendPoolCollection;
-import io.galeb.core.model.collections.VirtualHostCollection;
-import io.galeb.core.queue.QueueManager;
 
-import java.util.Collections;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -67,77 +60,11 @@ public class AbstractServiceTest {
     }
 
     static class FakeEventBus implements IEventBus {
-        @Override
-        public void publishEntity(Entity entity, String entityType,
-                Action action) {
-        }
-
-        @Override
-        public void onRequestMetrics(Metrics metrics) {
-            // NULL
-        }
-
-        @Override
-        public void onConnectionsMetrics(Metrics metrics) {
-            // NULL
-        }
-
-        @Override
-        public IEventBus setEventBusListener(EventBusListener eventBusListener) {
-            return this;
-        }
-
-        @Override
-        public void start() {
-            // NULL
-        }
-
-        @Override
-        public void stop() {
-            // NULL
-        }
-
-        @Override
-        public MapReduce getMapReduce() {
-            return NullEventBus.NULL_MAP_REDUCE;
-        }
-
-        @Override
-        public QueueManager getQueueManager() {
-            return QueueManager.NULL;
-        }
-
-        @Override
-        public String getClusterId() {
-            return String.valueOf(null);
-        }
+        // Fake
     }
 
     static class FakeMapReduce implements MapReduce {
-        @Override
-        public MapReduce setTimeOut(Long timeOut) {
-            return this;
-        }
-
-        @Override
-        public Long getTimeOut() {
-            return -1L;
-        }
-
-        @Override
-        public void addMetrics(Metrics metrics) {
-            // NULL
-        }
-
-        @Override
-        public boolean contains(String backendId) {
-            return false;
-        }
-
-        @Override
-        public Map<String, Integer> reduce() {
-            return Collections.emptyMap();
-        }
+        // Fake
     }
 
     @Inject
@@ -160,8 +87,8 @@ public class AbstractServiceTest {
     @Before
     public void setUp() {
         farm = serviceImplemented.getFarm();
-        ((BackendPoolCollection) farm.getBackendPools()).clear();
-        ((VirtualHostCollection) farm.getVirtualHosts()).clear();
+        farm.clear(BackendPool.class);
+        farm.clear(VirtualHost.class);
     }
 
     @After
@@ -256,7 +183,7 @@ public class AbstractServiceTest {
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getBackends()).extracting("id").contains(entity.getId());
+        assertThat(farm.getCollection(Backend.class)).extracting("id").contains(entity.getId());
     }
 
     @Test
@@ -264,7 +191,7 @@ public class AbstractServiceTest {
         final Entity entity = new BackendPool();
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getBackendPools()).extracting("id").contains(entity.getId());
+        assertThat(farm.getCollection(BackendPool.class)).extracting("id").contains(entity.getId());
     }
 
     @Test
@@ -272,7 +199,7 @@ public class AbstractServiceTest {
         final Entity entity = new VirtualHost();
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getVirtualHosts()).extracting("id").contains(entity.getId());
+        assertThat(farm.getCollection(VirtualHost.class)).extracting("id").contains(entity.getId());
     }
 
     @Test
@@ -287,7 +214,7 @@ public class AbstractServiceTest {
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getRules()).extracting("id").contains(entity.getId());
+        assertThat(farm.getCollection(Rule.class)).extracting("id").contains(entity.getId());
     }
 
     @Test
@@ -302,7 +229,7 @@ public class AbstractServiceTest {
         serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
         serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getBackends()).extracting("id").doesNotContain(entity.getId());
+        assertThat(farm.getCollection(Backend.class)).extracting("id").doesNotContain(entity.getId());
 
     }
 
@@ -312,7 +239,7 @@ public class AbstractServiceTest {
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
         serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getBackendPools()).extracting("id").doesNotContain(entity.getId());
+        assertThat(farm.getCollection(BackendPool.class)).extracting("id").doesNotContain(entity.getId());
     }
 
     @Test
@@ -321,7 +248,7 @@ public class AbstractServiceTest {
 
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
         serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getVirtualHosts()).extracting("id").doesNotContain(entity.getId());
+        assertThat(farm.getCollection(VirtualHost.class)).extracting("id").doesNotContain(entity.getId());
     }
 
     @Test
@@ -336,7 +263,7 @@ public class AbstractServiceTest {
         serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
         serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
         serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getRules()).extracting("id").doesNotContain(entity.getId());
+        assertThat(farm.getCollection(Rule.class)).extracting("id").doesNotContain(entity.getId());
     }
 
 }

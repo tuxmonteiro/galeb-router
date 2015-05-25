@@ -19,23 +19,19 @@ package io.galeb.core.controller;
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Farm;
 import io.galeb.core.model.Rule;
-import io.galeb.core.model.collections.RuleCollection;
 
 public class RuleController implements EntityController {
 
     private final Farm farm;
 
-    private final RuleCollection ruleCollection;
-
     public RuleController(final Farm farm) {
         this.farm = farm;
-        this.ruleCollection = (RuleCollection) farm.getRules();
     }
 
     @Override
     public EntityController add(JsonObject json) throws Exception {
         final Rule rule = (Rule) json.instanceOf(Rule.class);
-        ruleCollection.add(rule);
+        farm.add(rule);
         farm.setVersion(rule.getVersion());
         return this;
     }
@@ -43,31 +39,31 @@ public class RuleController implements EntityController {
     @Override
     public EntityController del(JsonObject json) throws Exception {
         final Rule rule = (Rule) json.instanceOf(Rule.class);
-        ruleCollection.remove(rule);
+        farm.del(rule);
         farm.setVersion(rule.getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        ruleCollection.clear();
+        farm.clear(Rule.class);
         return this;
     }
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
         final Rule rule = (Rule) json.instanceOf(Rule.class);
-        ruleCollection.change(rule);
+        farm.change(rule);
         return this;
     }
 
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(ruleCollection.stream()
+            return JsonObject.toJsonString(farm.getCollection(Rule.class).stream()
                         .filter(rule -> rule.getId().equals(id)));
         } else {
-            return JsonObject.toJsonString(ruleCollection);
+            return JsonObject.toJsonString(farm.getCollection(Rule.class));
         }
     }
 

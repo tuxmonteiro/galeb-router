@@ -20,12 +20,14 @@ import io.galeb.core.controller.EntityController;
 import io.galeb.core.model.collections.BackendCollection;
 import io.galeb.core.model.collections.BackendPoolCollection;
 import io.galeb.core.model.collections.Collection;
+import io.galeb.core.model.collections.NullEntityCollection;
 import io.galeb.core.model.collections.RuleCollection;
 import io.galeb.core.model.collections.VirtualHostCollection;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.enterprise.inject.Alternative;
 
 import com.google.gson.annotations.Expose;
@@ -35,24 +37,31 @@ public class Farm extends Entity {
 
     private static final long serialVersionUID = 1L;
 
-    private final Set<Backend> backends = new BackendCollection();
-
-    private final Set<Rule> rules = new RuleCollection();
-
-    @Expose private final Set<VirtualHost> virtualHosts = new VirtualHostCollection();
-
-    @Expose private final Set<BackendPool> backendPools = new BackendPoolCollection();
+    @Expose private final Collection<VirtualHost, Rule> virtualHosts = new VirtualHostCollection();
+    @Expose private final Collection<BackendPool, Backend> backendPools = new BackendPoolCollection();
+    private final Collection<Backend, BackendPool> backends = new BackendCollection();
+    private final Collection<Rule, VirtualHost> rules = new RuleCollection();
 
     private final Map<String, EntityController> entityMap = new ConcurrentHashMap<>(16, 0.9f, 1);
-
-    protected final Map<String, String> options = new ConcurrentHashMap<>();
+    private final Map<String, String> options = new ConcurrentHashMap<>();
+    private final Map<Class<? extends Entity>, Collection<? extends Entity, ? extends Entity>> mapOfCollection = new HashMap<>();
 
     public Farm() {
         setEntityType(Farm.class.getSimpleName().toLowerCase());
-        getVirtualHostsAsCollection().defineSetOfRelatives(rules);
-        getBackendPoolsAsCollection().defineSetOfRelatives(backends);
-        getBackendsAsCollection().defineSetOfRelatives(backendPools);
-        getRulesAsCollection().defineSetOfRelatives(virtualHosts);
+
+        virtualHosts.defineSetOfRelatives(rules);
+        backendPools.defineSetOfRelatives(backends);
+        backends.defineSetOfRelatives(backendPools);
+        rules.defineSetOfRelatives(virtualHosts);
+
+        mapOfCollection.put(VirtualHost.class, virtualHosts);
+        mapOfCollection.put(BackendPool.class, backendPools);
+        mapOfCollection.put(Backend.class, backends);
+        mapOfCollection.put(Rule.class, rules);
+    }
+
+    public Map<String, String> getOptions() {
+        return options;
     }
 
     public Farm setOptions(Map<String, String> options) {
@@ -64,41 +73,28 @@ public class Farm extends Entity {
         return entityMap;
     }
 
-    public Set<VirtualHost> getVirtualHosts() {
-        return virtualHosts;
+    public Collection<? extends Entity, ? extends Entity> getCollection(Class<? extends Entity> entityClass) {
+        if (mapOfCollection.containsKey(entityClass)) {
+            return mapOfCollection.get(entityClass);
+        } else {
+            return new NullEntityCollection();
+        }
     }
 
-    @SuppressWarnings("unchecked")
-    public Collection<VirtualHost, Rule> getVirtualHostsAsCollection() {
-        return (Collection<VirtualHost, Rule>)virtualHosts;
+    public void add(Entity entity) {
+        getCollection(entity.getClass()).add(entity);
     }
 
-    public Set<BackendPool> getBackendPools() {
-        return backendPools;
+    public void del(Entity entity) {
+        getCollection(entity.getClass()).remove(entity);
     }
 
-    @SuppressWarnings("unchecked")
-    public Collection<BackendPool, Backend> getBackendPoolsAsCollection() {
-        return (Collection<BackendPool, Backend>) backendPools;
+    public void change(Entity entity) {
+        getCollection(entity.getClass()).change(entity);
     }
 
-
-    public Set<Backend> getBackends() {
-        return backends;
-    }
-
-    @SuppressWarnings("unchecked")
-    public Collection<Backend, BackendPool> getBackendsAsCollection() {
-        return (Collection<Backend, BackendPool>) backends;
-    }
-
-    public Set<Rule> getRules() {
-        return rules;
-    }
-
-    @SuppressWarnings("unchecked")
-    public Collection<Rule, VirtualHost> getRulesAsCollection() {
-        return (Collection<Rule, VirtualHost>) rules;
+    public void clear(Class<? extends Entity> entityClass) {
+        getCollection(entityClass).clear();
     }
 
     public Object getRootHandler() {

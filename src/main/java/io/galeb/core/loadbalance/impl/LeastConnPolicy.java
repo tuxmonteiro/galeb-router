@@ -19,8 +19,8 @@ package io.galeb.core.loadbalance.impl;
 import io.galeb.core.loadbalance.LoadBalancePolicy;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
+import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
-import io.galeb.core.model.collections.BackendPoolCollection;
 
 import java.net.URI;
 import java.util.List;
@@ -52,10 +52,10 @@ public class LeastConnPolicy extends LoadBalancePolicy {
         final Farm farm = (Farm) loadBalancePolicyCriteria.get(Farm.class.getSimpleName());
         final String backendPoolId =
                 (String) loadBalancePolicyCriteria.get(BackendPool.class.getSimpleName());
-        final List<BackendPool> backendPools =
-                ((BackendPoolCollection)farm.getBackendPools()).getListByID(backendPoolId);
+        final List<Entity> backendPools =
+                farm.getCollection(BackendPool.class).getListByID(backendPoolId);
         if (!backendPools.isEmpty()) {
-            backendPool = backendPools.get(0);
+            backendPool = (BackendPool) backendPools.get(0);
         }
         return this;
     }

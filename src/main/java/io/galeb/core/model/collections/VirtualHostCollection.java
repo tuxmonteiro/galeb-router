@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2014-2015 Globo.com - ATeam
+ * All rights reserved.
+ *
+ * This source is subject to the Apache License, Version 2.0.
+ * Please see the LICENSE file for more information.
+ *
+ * Authors: See AUTHORS file
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.galeb.core.model.collections;
 
 import io.galeb.core.json.JsonObject;
@@ -5,20 +21,21 @@ import io.galeb.core.model.Entity;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
-public class VirtualHostCollection extends CopyOnWriteArraySet<VirtualHost> implements Collection<VirtualHost, Rule> {
+public class VirtualHostCollection implements Collection<VirtualHost, Rule> {
 
-    private static final long serialVersionUID = -7921829559046430770L;
+    private Set<Entity> virtualhosts = new CopyOnWriteArraySet<Entity>();
 
-    private Set<Rule> rules;
+    private Collection<? extends Entity, ? extends Entity> rules;
 
     @Override
-    public Collection<VirtualHost, Rule> defineSetOfRelatives(final Set<Rule> relatives) {
-        this.rules = relatives;
+    public Collection<VirtualHost, Rule> defineSetOfRelatives(final Collection<? extends Entity, ? extends Entity> relatives) {
+        rules = relatives;
         return this;
     }
 
@@ -29,30 +46,35 @@ public class VirtualHostCollection extends CopyOnWriteArraySet<VirtualHost> impl
     }
 
     @Override
-    public List<VirtualHost> getListByID(String entityId) {
-        return stream().filter(entity -> entity.getId().equals(entityId))
+    public List<Entity> getListByID(String entityId) {
+        return virtualhosts.stream().filter(entity -> entity.getId().equals(entityId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<VirtualHost> getListByJson(JsonObject json) {
+    public List<Entity> getListByJson(JsonObject json) {
         final Entity entity = (Entity) json.instanceOf(Entity.class);
         return getListByID(entity.getId());
     }
 
     @Override
-    public boolean add(VirtualHost virtualhost) {
+    public boolean add(Entity virtualhost) {
         boolean result = false;
         if (!contains(virtualhost)) {
             rules.stream().filter(rule -> rule.getParentId().equals(virtualhost.getId()))
-                          .forEach(rule -> addChild(rule));
-            result = super.add(virtualhost);
+                          .forEach(rule -> addChild((Rule) rule));
+            result = virtualhosts.add(virtualhost);
         }
         return result;
     }
 
     @Override
-    public Collection<VirtualHost, Rule> change(VirtualHost virtualhost) {
+    public boolean remove(Object o) {
+        return virtualhosts.remove(o);
+    }
+
+    @Override
+    public Collection<VirtualHost, Rule> change(Entity virtualhost) {
         if (contains(virtualhost)) {
             remove(virtualhost);
             add(virtualhost);
@@ -62,7 +84,57 @@ public class VirtualHostCollection extends CopyOnWriteArraySet<VirtualHost> impl
 
     @Override
     public void clear() {
-        stream().forEach(virtualhost -> this.remove(virtualhost));
+        virtualhosts.stream().forEach(virtualhost -> remove(virtualhost));
+    }
+
+    @Override
+    public int size() {
+        return virtualhosts.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return virtualhosts.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return virtualhosts.contains(o);
+    }
+
+    @Override
+    public Iterator<Entity> iterator() {
+        return virtualhosts.iterator();
+    }
+
+    @Override
+    public Object[] toArray() {
+        return virtualhosts.toArray();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return virtualhosts.toArray(a);
+    }
+
+    @Override
+    public boolean containsAll(java.util.Collection<?> c) {
+        return virtualhosts.containsAll(c);
+    }
+
+    @Override
+    public boolean addAll(java.util.Collection<? extends Entity> c) {
+        return virtualhosts.addAll(c);
+    }
+
+    @Override
+    public boolean retainAll(java.util.Collection<?> c) {
+        return virtualhosts.retainAll(c);
+    }
+
+    @Override
+    public boolean removeAll(java.util.Collection<?> c) {
+        return virtualhosts.removeAll(c);
     }
 
 }

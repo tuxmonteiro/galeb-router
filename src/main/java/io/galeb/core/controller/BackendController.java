@@ -19,23 +19,19 @@ package io.galeb.core.controller;
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.Farm;
-import io.galeb.core.model.collections.BackendCollection;
 
 public class BackendController implements EntityController {
 
     private final Farm farm;
 
-    private final BackendCollection backendCollection;
-
     public BackendController(final Farm farm) {
         this.farm = farm;
-        this.backendCollection = (BackendCollection) farm.getBackends();
     }
 
     @Override
     public EntityController add(JsonObject json) throws Exception {
         final Backend backend = (Backend) json.instanceOf(Backend.class);
-        backendCollection.add(backend);
+        farm.add(backend);
         farm.setVersion((backend).getVersion());
         return this;
     }
@@ -43,21 +39,21 @@ public class BackendController implements EntityController {
     @Override
     public EntityController del(JsonObject json) throws Exception {
         final Backend backend = (Backend) json.instanceOf(Backend.class);
-        backendCollection.remove(backend);
+        farm.del(backend);
         farm.setVersion((backend).getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        backendCollection.clear();
+        farm.clear(Backend.class);
         return null;
     }
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
         final Backend backendWithChanges = (Backend) json.instanceOf(Backend.class);
-        backendCollection.change(backendWithChanges);
+        farm.change(backendWithChanges);
         farm.setVersion(backendWithChanges.getVersion());
         return this;
     }
@@ -65,10 +61,10 @@ public class BackendController implements EntityController {
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(backendCollection.stream()
-                    .filter(backend -> backend.getId().equals(id)));
+            return JsonObject.toJsonString(farm.getCollection(Backend.class).stream()
+                        .filter(backend -> backend.getId().equals(id)));
         } else {
-            return JsonObject.toJsonString(backendCollection);
+            return JsonObject.toJsonString(farm.getCollection(Backend.class));
         }
     }
 

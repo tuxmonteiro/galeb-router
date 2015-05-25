@@ -19,23 +19,19 @@ package io.galeb.core.controller;
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Farm;
-import io.galeb.core.model.collections.BackendPoolCollection;
 
 public class BackendPoolController implements EntityController {
 
     private final Farm farm;
 
-    private final BackendPoolCollection backendPoolCollection;
-
     public BackendPoolController(final Farm farm) {
         this.farm = farm;
-        this.backendPoolCollection = (BackendPoolCollection) farm.getBackendPools();
     }
 
     @Override
     public EntityController add(JsonObject json) throws Exception {
         final BackendPool backendPool = (BackendPool) json.instanceOf(BackendPool.class);
-        backendPoolCollection.add(backendPool);
+        farm.add(backendPool);
         farm.setVersion(backendPool.getVersion());
         return this;
     }
@@ -43,21 +39,21 @@ public class BackendPoolController implements EntityController {
     @Override
     public EntityController del(JsonObject json) throws Exception {
         final BackendPool backendPool = (BackendPool) json.instanceOf(BackendPool.class);
-        backendPoolCollection.remove(backendPool);
+        farm.del(backendPool);
         farm.setVersion(backendPool.getVersion());
         return this;
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        backendPoolCollection.clear();
+        farm.clear(BackendPool.class);
         return null;
     }
 
     @Override
     public EntityController change(JsonObject json) throws Exception {
         final BackendPool backendPool = (BackendPool) json.instanceOf(BackendPool.class);
-        backendPoolCollection.change(backendPool);
+        farm.change(backendPool);
         farm.setVersion(backendPool.getVersion());
         return this;
     }
@@ -65,10 +61,10 @@ public class BackendPoolController implements EntityController {
     @Override
     public String get(String id) {
         if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(backendPoolCollection.stream()
+            return JsonObject.toJsonString(farm.getCollection(BackendPool.class).stream()
                     .filter(backendPool -> backendPool.getId().equals(id)));
         } else {
-            return JsonObject.toJsonString(backendPoolCollection);
+            return JsonObject.toJsonString(farm.getCollection(BackendPool.class));
         }
     }
 
