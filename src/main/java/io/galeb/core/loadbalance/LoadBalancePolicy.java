@@ -30,10 +30,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class LoadBalancePolicy {
 
     public enum Algorithm {
-        ROUNDROBIN("RoundRobinPolicy"),
-        RANDOM("RandomPolicy"),
-        IPHASH("IPHashPolicy"),
-        LEASTCONN("LeastConnPolicy");
+        ROUNDROBIN("RoundRobin"),
+        RANDOM("Random"),
+        IPHASH("IPHash"),
+        LEASTCONN("LeastConn");
 
         private String algoNameStr = "";
 
