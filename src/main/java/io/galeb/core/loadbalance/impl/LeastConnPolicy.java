@@ -49,13 +49,16 @@ public class LeastConnPolicy extends LoadBalancePolicy {
     @Override
     public LoadBalancePolicy setCriteria(Map<String, Object> criteria) {
         super.setCriteria(criteria);
-        final Farm farm = (Farm) loadBalancePolicyCriteria.get(Farm.class.getSimpleName());
-        final String backendPoolId =
-                (String) loadBalancePolicyCriteria.get(BackendPool.class.getSimpleName());
-        final List<Entity> backendPools =
-                farm.getCollection(BackendPool.class).getListByID(backendPoolId);
-        if (!backendPools.isEmpty()) {
-            backendPool = (BackendPool) backendPools.get(0);
+        final Object farmObj = loadBalancePolicyCriteria.get(Farm.class.getSimpleName());
+        if (farmObj!=null && farmObj instanceof Farm) {
+            final Farm farm = (Farm)farmObj;
+            final String backendPoolId =
+                    (String) loadBalancePolicyCriteria.get(BackendPool.class.getSimpleName());
+            final List<Entity> backendPools =
+                    farm.getCollection(BackendPool.class).getListByID(backendPoolId);
+            if (!backendPools.isEmpty()) {
+                backendPool = (BackendPool) backendPools.get(0);
+            }
         }
         return this;
     }
