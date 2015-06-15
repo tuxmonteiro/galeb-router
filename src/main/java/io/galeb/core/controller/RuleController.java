@@ -54,6 +54,7 @@ public class RuleController implements EntityController {
     public EntityController change(JsonObject json) throws Exception {
         final Rule rule = (Rule) json.instanceOf(Rule.class);
         farm.change(rule);
+        farm.setVersion(rule.getVersion());
         return this;
     }
 

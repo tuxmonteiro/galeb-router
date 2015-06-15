@@ -54,6 +54,7 @@ public class VirtualHostController implements EntityController {
     public EntityController change(JsonObject json) throws Exception {
         final VirtualHost virtualHost = (VirtualHost) json.instanceOf(VirtualHost.class);
         farm.change(virtualHost);
+        farm.setVersion(virtualHost.getVersion());
         return this;
     }
 
