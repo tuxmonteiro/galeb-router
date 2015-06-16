@@ -28,7 +28,8 @@ public interface SourceIP {
 
     public static final String IGNORE_XFORWARDED_FOR_PROPERTY = "ignore_xforwarded_for";
     public static final Optional<String> IGNORE_XFORWARDED_FOR =
-            Optional.of(System.getProperty(SourceIP.class.getPackage().getName()+IGNORE_XFORWARDED_FOR_PROPERTY));
+            Optional.ofNullable(System.getProperty(SourceIP.class.getPackage().getName()+
+                    IGNORE_XFORWARDED_FOR_PROPERTY));
 
     public String getRealSourceIP();
 
