@@ -17,6 +17,7 @@
 package io.galeb.core.controller;
 
 import io.galeb.core.json.JsonObject;
+import io.galeb.core.model.Entity;
 
 public interface EntityController {
 
@@ -56,14 +57,29 @@ public interface EntityController {
         }
     };
 
+    @Deprecated
     public EntityController add(JsonObject json) throws Exception;
 
+    @Deprecated
     public EntityController del(JsonObject json) throws Exception;
 
     public EntityController delAll() throws Exception;
 
+    @Deprecated
     public EntityController change(JsonObject json) throws Exception;
 
     public String get(String id);
+
+    public default EntityController add(Entity entity) throws Exception {
+        return this;
+    }
+
+    public default EntityController del(Entity entity) throws Exception {
+        return this;
+    }
+
+    public default EntityController change(Entity entity) throws Exception {
+        return this;
+    }
 
 }

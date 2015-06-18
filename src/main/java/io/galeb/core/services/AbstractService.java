@@ -17,11 +17,13 @@
 package io.galeb.core.services;
 
 import static io.galeb.core.util.Constants.SysProp.PROP_SCHEDULER_INTERVAL;
+import io.galeb.core.cluster.DistributedMap;
+import io.galeb.core.cluster.DistributedMapListener;
 import io.galeb.core.controller.BackendController;
 import io.galeb.core.controller.BackendPoolController;
 import io.galeb.core.controller.EntityController;
-import io.galeb.core.controller.FarmController;
 import io.galeb.core.controller.EntityController.Action;
+import io.galeb.core.controller.FarmController;
 import io.galeb.core.controller.RuleController;
 import io.galeb.core.controller.VirtualHostController;
 import io.galeb.core.eventbus.Event;
@@ -29,22 +31,30 @@ import io.galeb.core.eventbus.EventBusListener;
 import io.galeb.core.eventbus.IEventBus;
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.logging.Logger;
+import io.galeb.core.model.Backend;
+import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
+import io.galeb.core.model.Rule;
+import io.galeb.core.model.VirtualHost;
 import io.galeb.core.sched.BackendPoolUpdaterJob;
 import io.galeb.core.sched.BackendUpdaterJob;
 import io.galeb.core.sched.QuartzScheduler;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
 import org.quartz.SchedulerException;
 
-public abstract class AbstractService implements EventBusListener {
+public abstract class AbstractService implements EventBusListener, DistributedMapListener {
 
     @Inject
     protected Farm farm;
+
+    @Inject
+    protected DistributedMap<String, Entity> distributedMap;
 
     @Inject
     protected IEventBus eventbus;
@@ -59,6 +69,12 @@ public abstract class AbstractService implements EventBusListener {
     }
 
     protected void prelaunch() {
+        distributedMap.getMap(Backend.class.getName());
+        distributedMap.getMap(BackendPool.class.getName());
+        distributedMap.getMap(Rule.class.getName());
+        distributedMap.getMap(VirtualHost.class.getName());
+        distributedMap.registerListener(this);
+
         eventbus.setEventBusListener(this).start();
         registerControllers();
         try {
@@ -158,6 +174,49 @@ public abstract class AbstractService implements EventBusListener {
             }
         }
 
+    }
+
+    @Override
+    public void entryAdded(Entry<String, Entity> entry) {
+        Entity entity = entry.getValue();
+        EntityController entityController = farm.getEntityMap().get(entity.getEntityType());
+        try {
+            entityController.add(entity);
+        } catch (Exception e) {
+            logger.error(e);
+        }
+    }
+
+    @Override
+    public void entryRemoved(Entry<String, Entity> entry) {
+        Entity entity = entry.getValue();
+        EntityController entityController = farm.getEntityMap().get(entity.getEntityType());
+        try {
+            entityController.del(entity);
+        } catch (Exception e) {
+            logger.error(e);
+        }
+    }
+
+    @Override
+    public void entryUpdated(Entry<String, Entity> entry) {
+        Entity entity = entry.getValue();
+        EntityController entityController = farm.getEntityMap().get(entity.getEntityType());
+        try {
+            entityController.change(entity);
+        } catch (Exception e) {
+            logger.error(e);
+        }
+    }
+
+    @Override
+    public void mapCleared(String mapName) {
+        EntityController entityController = farm.getEntityMap().get(mapName.toLowerCase());
+        try {
+            entityController.delAll();
+        } catch (Exception e) {
+            logger.error(e);
+        }
     }
 
 }

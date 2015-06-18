@@ -19,6 +19,7 @@ package io.galeb.core.eventbus;
 import io.galeb.core.logging.Logger;
 import io.galeb.core.logging.NullLogger;
 
+@Deprecated
 public interface EventBusListener {
 
     public static final EventBusListener NULL = new EventBusListener() {

@@ -23,6 +23,7 @@ import io.galeb.core.model.Entity;
 import io.galeb.core.model.Metrics;
 import io.galeb.core.queue.QueueManager;
 
+@Deprecated
 public interface IEventBus {
 
     public static final MapReduce NULL_MAP_REDUCE = new NullMapReduce();
