@@ -34,6 +34,8 @@ public class BackendPool extends Entity {
 
     public static final String PROP_HEALTHCHECK_PATH        = "hcPath";
 
+    public static final String PROP_HEALTHCHECK_HOST        = "hcHost";
+
     public static final String PROP_LOADBALANCE_POLICY      = "loadBalancePolicy";
 
     @Expose private final Set<Backend> backends = new CopyOnWriteArraySet<>();
