@@ -8,74 +8,100 @@ import io.galeb.core.model.Farm;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
 
-public class FarmController implements EntityController {
+import java.util.Map;
 
-    private final Farm farm;
+public class FarmController extends EntityController {
 
-    public FarmController(final Farm farm) {
-        this.farm = farm;
+    private final BackendController backendController;
+    private final BackendPoolController backendPoolController;
+    private final RuleController ruleController;
+    private final VirtualHostController virtualHostController;
+
+    public FarmController(final Farm farm, final Map<String, EntityController> entityControllerMap) {
+        super(farm);
+        backendController = (BackendController) entityControllerMap
+                .getOrDefault(getControllerName(BackendController.class), NULL);
+        backendPoolController = (BackendPoolController) entityControllerMap
+                .getOrDefault(getControllerName(BackendPoolController.class), NULL);
+        ruleController = (RuleController) entityControllerMap
+                .getOrDefault(getControllerName(RuleController.class), NULL);
+        virtualHostController = (VirtualHostController) entityControllerMap
+                .getOrDefault(getControllerName(VirtualHostController.class), NULL);
+    }
+
+    @Deprecated @Override
+    public EntityController add(JsonObject json) throws Exception {
+        final Farm farmAdded = (Farm) json.instanceOf(Farm.class);
+        return add(farmAdded);
     }
 
     @Override
-    public EntityController add(JsonObject json) throws Exception {
-        final Farm farmAdded = (Farm) json.instanceOf(Farm.class);
-
-        for (final Entity backendPool: farmAdded.getCollection(BackendPool.class)) {
-            farm.add(backendPool);
-            for (final Backend backend: ((BackendPool) backendPool).getBackends()) {
-                farm.add(backend);
+    public EntityController add(Entity entity) throws Exception {
+        for (Entity backendPool : ((Farm) entity).getCollection(BackendPool.class)) {
+            backendPoolController.add(backendPool.copy());
+            for (Entity backend : ((BackendPool) backendPool).getBackends()) {
+                backendController.add(backend.copy());
             }
-        }
-        for (final Entity virtualhost: farmAdded.getCollection(VirtualHost.class)) {
-            farm.add(virtualhost);
-            for (final Rule rule: ((VirtualHost) virtualhost).getRules()) {
-                farm.add(rule);
+        };
+        for (Entity virtualhost : ((Farm) entity).getCollection(VirtualHost.class)) {
+            virtualHostController.add(virtualhost.copy());
+            for (Entity rule : ((VirtualHost) virtualhost).getRules()) {
+                ruleController.add(rule.copy());
             }
-        }
-        farm.setVersion(farmAdded.getVersion());
+        };
+        setVersion(entity.getVersion());
         return this;
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController del(JsonObject json) throws Exception {
         delAll();
         return this;
     }
 
     @Override
-    public EntityController delAll() throws Exception {
-        farm.clear(Backend.class);
-        farm.clear(BackendPool.class);
-        farm.clear(Rule.class);
-        farm.clear(VirtualHost.class);
-        farm.setVersion(0);
+    public EntityController del(Entity entity) throws Exception {
+        delAll();
         return this;
     }
 
     @Override
+    public EntityController delAll() throws Exception {
+        delAll(Backend.class);
+        delAll(BackendPool.class);
+        delAll(Rule.class);
+        delAll(VirtualHost.class);
+        setVersion(0);
+        return this;
+    }
+
+    @Deprecated @Override
     public EntityController change(JsonObject json) throws Exception {
         final Farm farmChanged = (Farm) json.instanceOf(Farm.class);
+        return change(farmChanged);
+    }
 
-        for (final Entity backendPool: farmChanged.getCollection(BackendPool.class)) {
-            farm.add(backendPool);
+    @Override
+    public EntityController change(Entity entity) throws Exception {
+        for (final Entity backendPool: ((Farm) entity).getCollection(BackendPool.class)) {
+            backendPoolController.change(backendPool);
             for (final Backend backend: ((BackendPool) backendPool).getBackends()) {
-                farm.add(backend);
+                backendController.change(backend);
             }
         }
-
-        for (final Entity virtualhost: farmChanged.getCollection(VirtualHost.class)) {
-            farm.add(virtualhost);
+        for (final Entity virtualhost: ((Farm) entity).getCollection(VirtualHost.class)) {
+            virtualHostController.change(virtualhost);
             for (final Rule rule: ((VirtualHost) virtualhost).getRules()) {
-                farm.add(rule);
+                ruleController.change(rule);
             }
         }
-        farm.setVersion(farmChanged.getVersion());
+        setVersion(entity.getVersion());
         return this;
     }
 
     @Override
     public String get(String id) {
-        return JsonObject.toJsonString(farm);
+        return get(Farm.class, null);
     }
 
 }

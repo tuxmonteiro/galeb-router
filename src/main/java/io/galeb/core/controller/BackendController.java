@@ -20,52 +20,39 @@ import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.Farm;
 
-public class BackendController implements EntityController {
-
-    private final Farm farm;
+public class BackendController extends EntityController {
 
     public BackendController(final Farm farm) {
-        this.farm = farm;
+        super(farm);
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController add(JsonObject json) throws Exception {
         final Backend backend = (Backend) json.instanceOf(Backend.class);
-        farm.add(backend);
-        farm.setVersion((backend).getVersion());
-        return this;
+        return add(backend);
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController del(JsonObject json) throws Exception {
         final Backend backend = (Backend) json.instanceOf(Backend.class);
-        farm.del(backend);
-        farm.setVersion((backend).getVersion());
-        return this;
+        return del(backend);
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        farm.clear(Backend.class);
+        delAll(Backend.class);
         return null;
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController change(JsonObject json) throws Exception {
         final Backend backendWithChanges = (Backend) json.instanceOf(Backend.class);
-        farm.change(backendWithChanges);
-        farm.setVersion(backendWithChanges.getVersion());
-        return this;
+        return change(backendWithChanges);
     }
 
     @Override
     public String get(String id) {
-        if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(farm.getCollection(Backend.class).stream()
-                        .filter(backend -> backend.getId().equals(id)));
-        } else {
-            return JsonObject.toJsonString(farm.getCollection(Backend.class));
-        }
+        return get(Backend.class, id);
     }
 
 }

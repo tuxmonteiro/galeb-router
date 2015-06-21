@@ -20,52 +20,39 @@ import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Farm;
 import io.galeb.core.model.VirtualHost;
 
-public class VirtualHostController implements EntityController {
-
-    private final Farm farm;
+public class VirtualHostController extends EntityController {
 
     public VirtualHostController(final Farm farm) {
-        this.farm = farm;
+        super(farm);
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController add(JsonObject json) throws Exception{
         final VirtualHost virtualHost = (VirtualHost) json.instanceOf(VirtualHost.class);
-        farm.add(virtualHost);
-        farm.setVersion(virtualHost.getVersion());
-        return this;
+        return add(virtualHost);
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController del(JsonObject json) throws Exception {
         final VirtualHost virtualHost = (VirtualHost) json.instanceOf(VirtualHost.class);
-        farm.del(virtualHost);
-        farm.setVersion(virtualHost.getVersion());
-        return this;
+        return del(virtualHost);
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        farm.clear(VirtualHost.class);
+        delAll(VirtualHost.class);
         return this;
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController change(JsonObject json) throws Exception {
         final VirtualHost virtualHost = (VirtualHost) json.instanceOf(VirtualHost.class);
-        farm.change(virtualHost);
-        farm.setVersion(virtualHost.getVersion());
-        return this;
+        return change(virtualHost);
     }
 
     @Override
     public String get(String id) {
-        if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(farm.getCollection(VirtualHost.class).stream()
-                    .filter(virtualHost -> virtualHost.getId().equals(id)));
-        } else {
-            return JsonObject.toJsonString(farm.getCollection(VirtualHost.class));
-        }
+        return get(VirtualHost.class, id);
     }
 
 }

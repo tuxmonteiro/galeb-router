@@ -20,52 +20,39 @@ import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Farm;
 import io.galeb.core.model.Rule;
 
-public class RuleController implements EntityController {
-
-    private final Farm farm;
+public class RuleController extends EntityController {
 
     public RuleController(final Farm farm) {
-        this.farm = farm;
+        super(farm);
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController add(JsonObject json) throws Exception {
         final Rule rule = (Rule) json.instanceOf(Rule.class);
-        farm.add(rule);
-        farm.setVersion(rule.getVersion());
-        return this;
+        return add(rule);
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController del(JsonObject json) throws Exception {
         final Rule rule = (Rule) json.instanceOf(Rule.class);
-        farm.del(rule);
-        farm.setVersion(rule.getVersion());
-        return this;
+        return del(rule);
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        farm.clear(Rule.class);
+        delAll(Rule.class);
         return this;
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController change(JsonObject json) throws Exception {
         final Rule rule = (Rule) json.instanceOf(Rule.class);
-        farm.change(rule);
-        farm.setVersion(rule.getVersion());
-        return this;
+        return change(rule);
     }
 
     @Override
     public String get(String id) {
-        if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(farm.getCollection(Rule.class).stream()
-                        .filter(rule -> rule.getId().equals(id)));
-        } else {
-            return JsonObject.toJsonString(farm.getCollection(Rule.class));
-        }
+        return get(Rule.class, id);
     }
 
 }

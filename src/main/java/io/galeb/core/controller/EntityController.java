@@ -18,8 +18,11 @@ package io.galeb.core.controller;
 
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Entity;
+import io.galeb.core.model.Farm;
 
-public interface EntityController {
+public abstract class EntityController {
+
+    private final Farm farm;
 
     public enum Action {
         ADD,
@@ -29,7 +32,9 @@ public interface EntityController {
         UNKNOWN
     }
 
-    public static final EntityController NULL = new EntityController() {
+    private static final String CONTROLLER_NAME_SUFFIX = "controller";
+
+    public static final EntityController NULL = new EntityController(null) {
 
         @Override
         public String get(String id) {
@@ -57,29 +62,65 @@ public interface EntityController {
         }
     };
 
-    @Deprecated
-    public EntityController add(JsonObject json) throws Exception;
+    public EntityController(Farm farm) {
+        this.farm = farm;
+    }
+
+    public static String getControllerName(Class<?> clazz) {
+        return clazz.getSimpleName().toLowerCase().replace(CONTROLLER_NAME_SUFFIX, "");
+    }
 
     @Deprecated
-    public EntityController del(JsonObject json) throws Exception;
-
-    public EntityController delAll() throws Exception;
+    public abstract EntityController add(JsonObject json) throws Exception;
 
     @Deprecated
-    public EntityController change(JsonObject json) throws Exception;
+    public abstract EntityController del(JsonObject json) throws Exception;
 
-    public String get(String id);
+    public abstract EntityController delAll() throws Exception;
 
-    public default EntityController add(Entity entity) throws Exception {
+    @Deprecated
+    public abstract EntityController change(JsonObject json) throws Exception;
+
+    public EntityController add(Entity entity) throws Exception {
+        farm.add(entity);
+        farm.setVersion(entity.getVersion());
+        return this;    }
+
+    public EntityController del(Entity entity) throws Exception {
+        farm.del(entity);
+        farm.setVersion(entity.getVersion());
         return this;
     }
 
-    public default EntityController del(Entity entity) throws Exception {
+    public EntityController delAll(Class<? extends Entity> clazz) {
+        farm.clear(clazz);
         return this;
     }
 
-    public default EntityController change(Entity entity) throws Exception {
+    public EntityController change(Entity entity) throws Exception {
+        farm.change(entity);
+        farm.setVersion(entity.getVersion());
         return this;
+    }
+
+    public String get(String id) {
+        return JsonObject.NULL.toString();
+    }
+
+    public String get(Class<? extends Entity> clazz, String id) {
+        if (clazz.equals(Farm.class)) {
+            return JsonObject.toJsonString(farm);
+        }
+        if (id != null && !"".equals(id)) {
+            return JsonObject.toJsonString(farm.getCollection(clazz).stream()
+                        .filter(entity -> entity.getId().equals(id)));
+        } else {
+            return JsonObject.toJsonString(farm.getCollection(clazz));
+        }
+    }
+
+    void setVersion(int version) {
+        farm.setVersion(version);
     }
 
 }

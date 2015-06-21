@@ -20,52 +20,39 @@ import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Farm;
 
-public class BackendPoolController implements EntityController {
-
-    private final Farm farm;
+public class BackendPoolController extends EntityController {
 
     public BackendPoolController(final Farm farm) {
-        this.farm = farm;
+        super(farm);
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController add(JsonObject json) throws Exception {
         final BackendPool backendPool = (BackendPool) json.instanceOf(BackendPool.class);
-        farm.add(backendPool);
-        farm.setVersion(backendPool.getVersion());
-        return this;
+        return add(backendPool);
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController del(JsonObject json) throws Exception {
         final BackendPool backendPool = (BackendPool) json.instanceOf(BackendPool.class);
-        farm.del(backendPool);
-        farm.setVersion(backendPool.getVersion());
-        return this;
+        return del(backendPool);
     }
 
     @Override
     public EntityController delAll() throws Exception {
-        farm.clear(BackendPool.class);
+        delAll(BackendPool.class);
         return null;
     }
 
-    @Override
+    @Deprecated @Override
     public EntityController change(JsonObject json) throws Exception {
         final BackendPool backendPool = (BackendPool) json.instanceOf(BackendPool.class);
-        farm.change(backendPool);
-        farm.setVersion(backendPool.getVersion());
-        return this;
+        return change(backendPool);
     }
 
     @Override
     public String get(String id) {
-        if (id != null && !"".equals(id)) {
-            return JsonObject.toJsonString(farm.getCollection(BackendPool.class).stream()
-                    .filter(backendPool -> backendPool.getId().equals(id)));
-        } else {
-            return JsonObject.toJsonString(farm.getCollection(BackendPool.class));
-        }
+        return get(BackendPool.class, id);
     }
 
 }

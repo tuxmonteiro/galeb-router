@@ -95,16 +95,16 @@ public abstract class AbstractService implements EventBusListener, DistributedMa
 
         final Map<String, EntityController> entityMap = farm.getEntityMap();
 
-        entityMap.put(getControllerName(BackendController.class),
+        entityMap.put(EntityController.getControllerName(BackendController.class),
                 new BackendController(farm));
-        entityMap.put(getControllerName(BackendPoolController.class),
+        entityMap.put(EntityController.getControllerName(BackendPoolController.class),
                 new BackendPoolController(farm));
-        entityMap.put(getControllerName(RuleController.class),
+        entityMap.put(EntityController.getControllerName(RuleController.class),
                 new RuleController(farm));
-        entityMap.put(getControllerName(VirtualHostController.class),
+        entityMap.put(EntityController.getControllerName(VirtualHostController.class),
                 new VirtualHostController(farm));
-        entityMap.put(getControllerName(FarmController.class),
-                new FarmController(farm));
+        entityMap.put(EntityController.getControllerName(FarmController.class),
+                new FarmController(farm, entityMap));
 
     }
 
@@ -113,10 +113,6 @@ public abstract class AbstractService implements EventBusListener, DistributedMa
         scheduler = new QuartzScheduler(farm, eventbus, logger)
                         .startPeriodicJob(BackendPoolUpdaterJob.class, interval)
                         .startPeriodicJob(BackendUpdaterJob.class, interval);
-    }
-
-    private String getControllerName(Class<?> clazz) {
-        return clazz.getSimpleName().toLowerCase().replace("controller", "");
     }
 
     public Farm getFarm() {
@@ -181,7 +177,7 @@ public abstract class AbstractService implements EventBusListener, DistributedMa
         Entity entity = entry.getValue();
         EntityController entityController = farm.getEntityMap().get(entity.getEntityType());
         try {
-            entityController.add(entity);
+            entityController.add(entity.copy());
         } catch (Exception e) {
             logger.error(e);
         }
@@ -192,7 +188,7 @@ public abstract class AbstractService implements EventBusListener, DistributedMa
         Entity entity = entry.getValue();
         EntityController entityController = farm.getEntityMap().get(entity.getEntityType());
         try {
-            entityController.del(entity);
+            entityController.del(entity.copy());
         } catch (Exception e) {
             logger.error(e);
         }
@@ -203,7 +199,7 @@ public abstract class AbstractService implements EventBusListener, DistributedMa
         Entity entity = entry.getValue();
         EntityController entityController = farm.getEntityMap().get(entity.getEntityType());
         try {
-            entityController.change(entity);
+            entityController.change(entity.copy());
         } catch (Exception e) {
             logger.error(e);
         }
