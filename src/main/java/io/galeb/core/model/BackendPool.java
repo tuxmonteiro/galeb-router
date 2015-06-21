@@ -119,4 +119,9 @@ public class BackendPool extends Entity {
         backends.addAll(copyBackends);
     }
 
+    @Override
+    public Entity copy() {
+        return new BackendPool(this);
+    }
+
 }

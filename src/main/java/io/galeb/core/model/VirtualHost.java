@@ -18,6 +18,7 @@ package io.galeb.core.model;
 
 import io.galeb.core.json.JsonObject;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -28,6 +29,26 @@ public class VirtualHost extends Entity {
     private static final long serialVersionUID = 1L;
 
     @Expose private Set<Rule> rules = new CopyOnWriteArraySet<>();
+
+    public VirtualHost() {
+        super();
+    }
+
+    public VirtualHost(VirtualHost virtualhost) {
+        this();
+        setPk(virtualhost.getPk());
+        setId(virtualhost.getId());
+        setParentId(virtualhost.getParentId());
+        setProperties(virtualhost.getProperties());
+        setRules(virtualhost.getRules());
+        updateHash();
+    }
+
+    public void setRules(Set<Rule> arules) {
+        final Set<Rule> copyRules = new HashSet<>(arules);
+        rules.clear();
+        rules.addAll(copyRules);
+    }
 
     public Rule getRule(String ruleId) {
         Rule rule = null;
@@ -69,6 +90,11 @@ public class VirtualHost extends Entity {
 
     public Set<Rule> getRules() {
         return rules;
+    }
+
+    @Override
+    public Entity copy() {
+        return new VirtualHost(this);
     }
 
 }

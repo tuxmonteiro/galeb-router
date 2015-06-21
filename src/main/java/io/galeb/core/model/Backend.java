@@ -38,8 +38,9 @@ public class Backend extends Entity {
         return health;
     }
 
-    public final void setHealth(Health health) {
+    public final Backend setHealth(Health health) {
         this.health = health;
+        return this;
     }
 
     public int getConnections() {
@@ -49,6 +50,13 @@ public class Backend extends Entity {
     public Backend setConnections(int connections) {
         this.connections = connections;
         return this;
+    }
+
+    @Override
+    public Entity copy() {
+        Entity newEntity = super.copy();
+        ((Backend) newEntity).setHealth(getHealth()).setConnections(getConnections());
+        return newEntity;
     }
 
 }

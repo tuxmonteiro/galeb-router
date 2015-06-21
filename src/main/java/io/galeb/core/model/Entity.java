@@ -148,6 +148,17 @@ public class Entity implements Serializable, Comparable<Entity> {
         return this;
     }
 
+    public Entity copy() {
+        Entity newEntity = new Entity().setId(getId())
+                                       .setParentId(getParentId())
+                                       .setEntityType(getEntityType())
+                                       .setHash(getHash())
+                                       .setPk(getPk())
+                                       .setProperties(getProperties())
+                                       .setVersion(getVersion());
+        return newEntity;
+    }
+
     @Override
     public int hashCode() {
         return getId().hashCode();
