@@ -172,6 +172,10 @@ public abstract class AbstractService implements EventBusListener, DistributedMa
 
     }
 
+    public DistributedMap<String, Entity> getDistributedMap() {
+        return distributedMap;
+    }
+
     @Override
     public void entryAdded(Entry<String, Entity> entry) {
         Entity entity = entry.getValue();
