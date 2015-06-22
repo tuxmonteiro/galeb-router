@@ -138,4 +138,9 @@ public class Log4j2Logger implements Logger {
         log(levelName, getStackTrace(throwable));
     }
 
+    @Override
+    public boolean isDebugEnabled() {
+        return logger.isDebugEnabled();
+    }
+
 }

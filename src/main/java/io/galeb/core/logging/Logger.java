@@ -50,5 +50,8 @@ public interface Logger {
 
     public void log(String levelName, Throwable throwable);
 
+    public default boolean isDebugEnabled() {
+        return false;
+    }
 
 }
