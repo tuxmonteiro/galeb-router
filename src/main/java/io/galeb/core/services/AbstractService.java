@@ -17,8 +17,11 @@
 package io.galeb.core.services;
 
 import static io.galeb.core.util.Constants.SysProp.PROP_SCHEDULER_INTERVAL;
+import io.galeb.core.cluster.ClusterEvents;
+import io.galeb.core.cluster.ClusterListener;
 import io.galeb.core.cluster.DistributedMap;
 import io.galeb.core.cluster.DistributedMapListener;
+import io.galeb.core.cluster.DistributedMapStats;
 import io.galeb.core.controller.BackendController;
 import io.galeb.core.controller.BackendPoolController;
 import io.galeb.core.controller.EntityController;
@@ -41,14 +44,17 @@ import io.galeb.core.sched.BackendPoolUpdaterJob;
 import io.galeb.core.sched.BackendUpdaterJob;
 import io.galeb.core.sched.QuartzScheduler;
 
+import java.util.Arrays;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 
 import org.quartz.SchedulerException;
 
-public abstract class AbstractService implements EventBusListener, DistributedMapListener {
+public abstract class AbstractService implements EventBusListener,
+                                                 DistributedMapListener,
+                                                 ClusterListener {
 
     @Inject
     protected Farm farm;
@@ -62,21 +68,41 @@ public abstract class AbstractService implements EventBusListener, DistributedMa
     @Inject
     protected Logger logger;
 
+    @Inject
+    protected DistributedMapStats distributedMapStats;
+
+    @Inject
+    protected ClusterEvents clusterEvents;
+
     protected QuartzScheduler scheduler;
+
+    private boolean clusterListenerRegistered = false;
 
     public AbstractService() {
         super();
     }
 
+    private void entityAdd(Entity entity) {
+        EntityController entityController = farm.getEntityMap().get(entity.getEntityType());
+        try {
+            entityController.add(entity.copy());
+        } catch (Exception e) {
+            logger.error(e);
+        }
+    }
+
+    private void registerCluster() {
+        clusterEvents.registerListener(this);
+        if (clusterEvents.isReady() && !clusterListenerRegistered) {
+            onClusterReady();
+        }
+    }
+
     protected void prelaunch() {
-        distributedMap.getMap(Backend.class.getName());
-        distributedMap.getMap(BackendPool.class.getName());
-        distributedMap.getMap(Rule.class.getName());
-        distributedMap.getMap(VirtualHost.class.getName());
-        distributedMap.registerListener(this);
+        registerControllers();
+        registerCluster();
 
         eventbus.setEventBusListener(this).start();
-        registerControllers();
         try {
             startSchedulers();
         } catch (final SchedulerException e) {
@@ -177,46 +203,82 @@ public abstract class AbstractService implements EventBusListener, DistributedMa
     }
 
     @Override
-    public void entryAdded(Entry<String, Entity> entry) {
-        Entity entity = entry.getValue();
-        EntityController entityController = farm.getEntityMap().get(entity.getEntityType());
-        try {
-            entityController.add(entity.copy());
-        } catch (Exception e) {
-            logger.error(e);
-        }
+    public void entryAdded(Entity entity) {
+        logger.debug("entryAdded: "+entity.getId()+" ("+entity.getEntityType()+")");
+        entityAdd(entity);
+        showStatistic(distributedMapStats);
     }
 
     @Override
-    public void entryRemoved(Entry<String, Entity> entry) {
-        Entity entity = entry.getValue();
+    public void entryRemoved(Entity entity) {
+        logger.debug("entryRemoved: "+entity.getId()+" ("+entity.getEntityType()+")");
         EntityController entityController = farm.getEntityMap().get(entity.getEntityType());
         try {
             entityController.del(entity.copy());
         } catch (Exception e) {
             logger.error(e);
         }
+        showStatistic(distributedMapStats);
     }
 
     @Override
-    public void entryUpdated(Entry<String, Entity> entry) {
-        Entity entity = entry.getValue();
+    public void entryUpdated(Entity entity) {
+        logger.debug("entryUpdated: "+entity.getId()+" ("+entity.getEntityType()+")");
         EntityController entityController = farm.getEntityMap().get(entity.getEntityType());
         try {
             entityController.change(entity.copy());
         } catch (Exception e) {
             logger.error(e);
         }
+        showStatistic(distributedMapStats);
     }
 
     @Override
     public void mapCleared(String mapName) {
+        logger.debug("mapCleared: "+mapName);
         EntityController entityController = farm.getEntityMap().get(mapName.toLowerCase());
         try {
             entityController.delAll();
         } catch (Exception e) {
             logger.error(e);
         }
+        showStatistic(distributedMapStats);
+    }
+
+    @Override
+    public void entryEvicted(Entity entity) {
+        logger.debug("entryEvicted: "+entity.getId()+" ("+entity.getEntityType()+")");
+        entryRemoved(entity);
+        showStatistic(distributedMapStats);
+    }
+
+    @Override
+    public void mapEvicted(String mapName) {
+        logger.debug("mapEvicted: "+mapName);
+        mapCleared(mapName);
+        showStatistic(distributedMapStats);
+    }
+
+    @Override
+    public void showStatistic(DistributedMapStats distributedMapStats) {
+        if (distributedMapStats!=null) {
+            logger.debug(distributedMapStats.toString());
+        }
+    }
+
+    @Override
+    public void onClusterReady() {
+        logger.info("== Cluster ready");
+        distributedMap.registerListener(this);
+        Arrays.asList(Backend.class, BackendPool.class, Rule.class, VirtualHost.class).stream()
+            .forEach(clazz -> {
+                ConcurrentMap<String, Entity> map = distributedMap.getMap(clazz.getName());
+                System.out.println(map);
+                map.forEach( (key, entity) -> {
+                    entityAdd(entity);
+                });
+            });
+        clusterListenerRegistered = true;
     }
 
 }

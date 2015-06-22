@@ -8,6 +8,10 @@ public interface DistributedMap<K, V> {
         throw new UnsupportedOperationException();
     }
 
+    default void remove(String key) {
+        throw new UnsupportedOperationException();
+    }
+
     default void registerListener(final DistributedMapListener distributedMapListener) {
         throw new UnsupportedOperationException();
     }

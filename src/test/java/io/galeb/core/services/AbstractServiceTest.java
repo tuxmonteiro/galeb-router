@@ -17,8 +17,10 @@
 package io.galeb.core.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import io.galeb.core.cluster.ClusterEvents;
 import io.galeb.core.cluster.DistributedMap;
 import io.galeb.core.cluster.DistributedMapListener;
+import io.galeb.core.cluster.DistributedMapStats;
 import io.galeb.core.controller.BackendController;
 import io.galeb.core.controller.BackendPoolController;
 import io.galeb.core.controller.EntityController;
@@ -84,6 +86,22 @@ public class AbstractServiceTest {
         }
     }
 
+    static class FakeDistributedMapStats implements DistributedMapStats {
+        @Override
+        public String getStats() {
+            return this.getClass().getName();
+        }
+
+        @Override
+        public String toString() {
+            return getStats();
+        }
+    }
+
+    static class FakeClusterEvents implements ClusterEvents {
+
+    }
+
     @Inject
     private AbstractService serviceImplemented;
 
@@ -98,7 +116,9 @@ public class AbstractServiceTest {
                                  FakeEventBus.class,
                                  FakeFarm.class,
                                  FakeMapReduce.class,
-                                 FakeDistributedMap.class)
+                                 FakeDistributedMap.class,
+                                 FakeDistributedMapStats.class,
+                                 FakeClusterEvents.class)
                          .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 

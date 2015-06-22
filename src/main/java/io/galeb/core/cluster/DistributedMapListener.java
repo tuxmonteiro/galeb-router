@@ -2,8 +2,6 @@ package io.galeb.core.cluster;
 
 import io.galeb.core.model.Entity;
 
-import java.util.Map.Entry;
-
 public interface DistributedMapListener {
 
     default void mapCleared(String mapName) {
@@ -14,20 +12,24 @@ public interface DistributedMapListener {
         throw new UnsupportedOperationException();
     }
 
-    default void entryEvicted(Entry<String, Entity> entry) {
+    default void entryEvicted(Entity entity) {
         throw new UnsupportedOperationException();
     }
 
-    default void entryUpdated(Entry<String, Entity> entry) {
+    default void entryUpdated(Entity entity) {
         throw new UnsupportedOperationException();
     }
 
-    default void entryRemoved(Entry<String, Entity> entry) {
+    default void entryRemoved(Entity entity) {
         throw new UnsupportedOperationException();
     }
 
-    default void entryAdded(Entry<String, Entity> entry) {
+    default void entryAdded(Entity entity) {
         throw new UnsupportedOperationException();
+    }
+
+    default void showStatistic(DistributedMapStats distributedMapStats) {
+        //
     }
 
 }
