@@ -273,7 +273,6 @@ public abstract class AbstractService implements EventBusListener,
         Arrays.asList(Backend.class, BackendPool.class, Rule.class, VirtualHost.class).stream()
             .forEach(clazz -> {
                 ConcurrentMap<String, Entity> map = distributedMap.getMap(clazz.getName());
-                System.out.println(map);
                 map.forEach( (key, entity) -> {
                     entityAdd(entity);
                 });
