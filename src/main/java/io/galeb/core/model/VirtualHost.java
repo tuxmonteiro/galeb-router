@@ -35,11 +35,7 @@ public class VirtualHost extends Entity {
     }
 
     public VirtualHost(VirtualHost virtualhost) {
-        this();
-        setPk(virtualhost.getPk());
-        setId(virtualhost.getId());
-        setParentId(virtualhost.getParentId());
-        setProperties(virtualhost.getProperties());
+        super(virtualhost);
         setRules(virtualhost.getRules());
         updateHash();
     }

@@ -24,4 +24,17 @@ public class Rule extends Entity {
 
     public static final String PROP_MATCH     = "match";
 
+    public Rule() {
+        super();
+    }
+
+    public Rule(Rule rule) {
+        super(rule);
+        updateHash();
+    }
+
+    @Override
+    public Entity copy() {
+        return new Rule(this);
+    }
 }

@@ -59,11 +59,7 @@ public class BackendPool extends Entity {
     }
 
     public BackendPool(BackendPool backendPool) {
-        this();
-        setPk(backendPool.getPk());
-        setId(backendPool.getId());
-        setParentId(backendPool.getParentId());
-        setProperties(backendPool.getProperties());
+        super(backendPool);
         setBackends(backendPool.getBackends());
         updateHash();
     }

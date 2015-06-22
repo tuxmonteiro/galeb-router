@@ -34,6 +34,17 @@ public class Backend extends Entity {
 
     @Expose private int connections = 0;
 
+    public Backend() {
+        super();
+    }
+
+    public Backend(Backend backend) {
+        super(backend);
+        setHealth(backend.getHealth());
+        setConnections(backend.getConnections());
+        updateHash();
+    }
+
     public Health getHealth() {
         return health;
     }
@@ -54,9 +65,7 @@ public class Backend extends Entity {
 
     @Override
     public Entity copy() {
-        Entity newEntity = super.copy();
-        ((Backend) newEntity).setHealth(getHealth()).setConnections(getConnections());
-        return newEntity;
+        return new Backend(this);
     }
 
 }

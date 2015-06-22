@@ -53,6 +53,20 @@ public class Entity implements Serializable, Comparable<Entity> {
     /** The version */
     @Expose private Integer                    version       = 0;
 
+    public Entity() {
+        // default
+    }
+
+    public Entity(Entity entity) {
+        this();
+        setId(entity.getId());
+        setParentId(entity.getParentId());
+        setEntityType(entity.getEntityType());
+        setPk(entity.getPk());
+        setProperties(entity.getProperties());
+        setVersion(entity.getVersion());
+    }
+
     public int getPk() {
         return pk;
     }
@@ -149,14 +163,7 @@ public class Entity implements Serializable, Comparable<Entity> {
     }
 
     public Entity copy() {
-        Entity newEntity = new Entity().setId(getId())
-                                       .setParentId(getParentId())
-                                       .setEntityType(getEntityType())
-                                       .setHash(getHash())
-                                       .setPk(getPk())
-                                       .setProperties(getProperties())
-                                       .setVersion(getVersion());
-        return newEntity;
+        return new Entity(this);
     }
 
     @Override
