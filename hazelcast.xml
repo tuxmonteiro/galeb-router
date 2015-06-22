@@ -137,4 +137,7 @@
 
     </map>
 
+    <listeners>
+        <listener>io.galeb.hazelcast.NodeLifecycleListener</listener>
+    </listeners>
 </hazelcast>
