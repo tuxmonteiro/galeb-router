@@ -136,7 +136,7 @@ public abstract class AbstractService implements EventBusListener,
 
     protected void startSchedulers() throws SchedulerException {
         final long interval = Long.parseLong(System.getProperty(PROP_SCHEDULER_INTERVAL.toString(), PROP_SCHEDULER_INTERVAL.def()));
-        scheduler = new QuartzScheduler(farm, eventbus, logger)
+        scheduler = new QuartzScheduler(farm, eventbus, distributedMap, logger)
                         .startPeriodicJob(BackendPoolUpdaterJob.class, interval)
                         .startPeriodicJob(BackendUpdaterJob.class, interval);
     }

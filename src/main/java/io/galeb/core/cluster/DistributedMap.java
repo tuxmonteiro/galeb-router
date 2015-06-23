@@ -4,6 +4,8 @@ import java.util.concurrent.ConcurrentMap;
 
 public interface DistributedMap<K, V> {
 
+    public static final String BACKEND_CONNECTIONS = "backendConnections";
+
     default ConcurrentMap<K, V> getMap(String key) {
         throw new UnsupportedOperationException();
     }

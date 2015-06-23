@@ -16,7 +16,6 @@
 
 package io.galeb.core.sched;
 
-import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.Entity;
 
@@ -29,17 +28,17 @@ public class BackendUpdaterJob extends AbstractJob {
 
     private static final long TTL = 10000L;
 
-    private final String entityType = Backend.class.getSimpleName().toLowerCase();
+    private void changeConnections(Entity backend, int conn) {
+        ((Backend) backend).setConnections(conn);
+        backend.setVersion(farm.getVersion());
+        distributedMap.getMap(Backend.class.getName()).put(backend.getId(), backend);
+    }
 
     private void cleanUpConnectionsInfo() {
-        for (final Entity backendWithTTL: farm.getCollection(Backend.class)) {
-            final long now = System.currentTimeMillis();
-            if (((Backend) backendWithTTL).getConnections()>0 &&  backendWithTTL.getModifiedAt()<(now-TTL)) {
-                ((Backend) backendWithTTL).setConnections(0);
-                backendWithTTL.setVersion(farm.getVersion());
-                eventBus.publishEntity(backendWithTTL, entityType, Action.CHANGE);
-            }
-        }
+        farm.getCollection(Backend.class).stream()
+            .filter(backendWithTTL -> ((Backend) backendWithTTL).getConnections()>0 &&
+                    backendWithTTL.getModifiedAt()<(System.currentTimeMillis()-TTL))
+            .forEach(backendWithTTL -> changeConnections(backendWithTTL, 0));
     }
 
     @Override
@@ -49,17 +48,14 @@ public class BackendUpdaterJob extends AbstractJob {
         cleanUpConnectionsInfo();
 
         eventBus.getMapReduce().reduce().forEach((key, value) -> {
-            final String backendId = key;
             farm.getCollection(Backend.class).stream()
-                .filter(backend -> backend.getId().equals(backendId))
-                .forEach(backend -> {
-                    ((Backend) backend).setConnections(value);
-                    backend.setVersion(farm.getVersion());
-                    eventBus.publishEntity(backend, entityType, Action.CHANGE);
-                });
+                .filter(backend -> backend.getId().equals(key))
+                .forEach(backend -> changeConnections(backend, value));
         });
 
         logger.trace(String.format("Job %s done.", this.getClass().getSimpleName()));
     }
+
+
 
 }

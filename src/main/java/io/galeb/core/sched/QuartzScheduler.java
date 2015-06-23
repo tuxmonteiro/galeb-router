@@ -19,8 +19,10 @@ package io.galeb.core.sched;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
+import io.galeb.core.cluster.DistributedMap;
 import io.galeb.core.eventbus.IEventBus;
 import io.galeb.core.logging.Logger;
+import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 
 import java.util.UUID;
@@ -41,17 +43,20 @@ public class QuartzScheduler implements JobListener {
     public static final String LOGGER   = "logger";
     public static final String FARM     = "farm";
     public static final String EVENTBUS = "eventbus";
+    public static final String DISTRIBUTEDMAP = "distributedMap";
 
     private final Farm farm;
     private final IEventBus eventBus;
+    private final DistributedMap<String, Entity> distributedMap;
     private final Logger logger;
     private final Scheduler scheduler;
     private boolean started = false;
 
-    public QuartzScheduler(Farm farm, IEventBus eventBus, Logger logger) throws SchedulerException {
+    public QuartzScheduler(Farm farm, IEventBus eventBus, DistributedMap<String, Entity> distributedMap, Logger logger) throws SchedulerException {
         this.farm = farm;
         this.eventBus = eventBus;
         this.logger = logger;
+        this.distributedMap = distributedMap;
         scheduler = new StdSchedulerFactory().getScheduler();
         scheduler.getListenerManager().addJobListener(this);
         scheduler.start();
@@ -75,6 +80,7 @@ public class QuartzScheduler implements JobListener {
                 jobdataMap.put(FARM, farm);
                 jobdataMap.put(LOGGER, logger);
                 jobdataMap.put(EVENTBUS, eventBus);
+                jobdataMap.put(DISTRIBUTEDMAP, distributedMap);
 
                 JobDetail job = newJob(jobClass).withIdentity(jobClass.getSimpleName()+this)
                                                 .setJobData(jobdataMap)

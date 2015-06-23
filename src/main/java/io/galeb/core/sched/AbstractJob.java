@@ -16,8 +16,10 @@
 
 package io.galeb.core.sched;
 
+import io.galeb.core.cluster.DistributedMap;
 import io.galeb.core.eventbus.IEventBus;
 import io.galeb.core.logging.Logger;
+import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 
 import org.quartz.Job;
@@ -28,7 +30,9 @@ public abstract class AbstractJob implements Job {
     protected Logger logger;
     protected Farm farm;
     protected IEventBus eventBus;
+    protected DistributedMap<String, Entity> distributedMap;
 
+    @SuppressWarnings("unchecked")
     protected void setEnvironment(final JobDataMap jobDataMap) {
         if (logger==null) {
             logger = (Logger) jobDataMap.get(QuartzScheduler.LOGGER);
@@ -38,6 +42,9 @@ public abstract class AbstractJob implements Job {
         }
         if (eventBus==null) {
             eventBus = (IEventBus) jobDataMap.get(QuartzScheduler.EVENTBUS);
+        }
+        if (distributedMap==null) {
+            distributedMap = (DistributedMap<String, Entity>) jobDataMap.get(QuartzScheduler.DISTRIBUTEDMAP);
         }
     }
 }

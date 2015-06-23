@@ -21,6 +21,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import io.galeb.core.cluster.DistributedMap;
 import io.galeb.core.controller.BackendController;
 import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.eventbus.IEventBus;
@@ -39,6 +40,8 @@ import io.galeb.core.model.collections.VirtualHostCollection;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -96,6 +99,12 @@ public class BackendUpdaterJobTest {
 
         final Logger logger = mock(Logger.class);
         final IEventBus eventBus = new FakeEventBus();
+        final DistributedMap<String, Entity> distributedMap = new DistributedMap<String, Entity>() {
+            @Override
+            public ConcurrentMap<String, Entity> getMap(String key) {
+                return new ConcurrentHashMap<String, Entity>();
+            }
+        };
         doNothing().when(logger).error(any(Throwable.class));
         doNothing().when(logger).debug(any(Throwable.class));
 
@@ -106,6 +115,7 @@ public class BackendUpdaterJobTest {
         jobdataMap.put(QuartzScheduler.FARM, farm);
         jobdataMap.put(QuartzScheduler.LOGGER, logger);
         jobdataMap.put(QuartzScheduler.EVENTBUS, eventBus);
+        jobdataMap.put(QuartzScheduler.DISTRIBUTEDMAP, distributedMap);
 
         when(jobDetail.getJobDataMap()).thenReturn(jobdataMap);
     }
