@@ -16,45 +16,124 @@
 
 package io.galeb.core.statsd;
 
-
 public interface StatsdClient {
 
-    public StatsdClient server(String server);
+    static final String STATSD_HOST   = "host";
+    static final String STATSD_PORT   = "port";
+    static final String STATSD_PREFIX = "prefix";
 
-    public StatsdClient port(int port);
+    static final String PREFIX = StatsdClient.class.getPackage().getName();
 
-    public StatsdClient prefix(String prefix);
+    static void setup() {
+        if (System.getProperty(PREFIX + "." + STATSD_HOST)==null) {
+            System.setProperty(PREFIX + "." + STATSD_HOST, "127.0.0.1");
+        }
+        if (System.getProperty(PREFIX + "." + STATSD_PORT)==null) {
+            System.setProperty(PREFIX + "." + STATSD_PORT, "8125");
+        }
+        if (System.getProperty(PREFIX + "." + STATSD_PREFIX)==null) {
+            System.setProperty(PREFIX + "." + STATSD_PREFIX, "galeb");
+        }
+    }
 
-    public void incr(String metricName);
+    static String getHost() {
+        setup();
+        return System.getProperty(PREFIX + "." + STATSD_HOST);
+    }
 
-    public void incr(String metricName, int step);
+    static String getPort() {
+        setup();
+        return System.getProperty(PREFIX + "." + STATSD_PORT);
+    }
 
-    public void incr(String metricName, int step, double rate);
+    static String getPrefix() {
+        setup();
+        return System.getProperty(PREFIX + "." + STATSD_PREFIX);
+    }
 
-    public void incr(String metricName, double rate);
+    static String cleanUpKey(String key) {
+        return key.replaceAll("http://", "").replaceAll("[.:]", "_");
+    }
 
-    public void decr(String metricName);
+    public static final String PROP_STATUSCODE = "status";
+    public static final String PROP_HTTPCODE_PREFIX = "httpCode";
+    public static final String PROP_REQUESTTIME = "requestTime";
+    public static final String PROP_REQUESTTIME_AVG = "requestTimeAvg";
 
-    public void decr(String metricName, int step);
+    public default StatsdClient host(String server) {
+        return this;
+    }
 
-    public void decr(String metricName, int step, double rate);
+    public default StatsdClient port(int port) {
+        return this;
+    }
 
-    public void decr(String metricName, double rate);
+    public default StatsdClient prefix(String prefix) {
+        return this;
+    }
 
-    public void count(String metricName, int value);
+    public default void incr(String metricName) {
+        // default
+    }
 
-    public void count(String metricName, int value, double rate);
+    public default void incr(String metricName, int step) {
+        // default
+    }
 
-    public void gauge(String metricName, double value);
+    public default void incr(String metricName, int step, double rate) {
+        // default
+    }
 
-    public void gauge(String metricName, double value, double rate);
+    public default void incr(String metricName, double rate) {
+        // default
+    }
 
-    public void set(String metricName, String value);
+    public default void decr(String metricName) {
+        // default
+    }
 
-    public void set(String metricName, String value, double rate);
+    public default void decr(String metricName, int step) {
+        // default
+    }
 
-    public void timing(String metricName, long value);
+    public default void decr(String metricName, int step, double rate) {
+        // default
+    }
 
-    public void timing(String metricName, long value, double rate);
+    public default void decr(String metricName, double rate) {
+        // default
+    }
+
+    public default void count(String metricName, int value) {
+        // default
+    }
+
+    public default void count(String metricName, int value, double rate) {
+        // default
+    }
+
+    public default void gauge(String metricName, double value) {
+        // default
+    }
+
+    public default void gauge(String metricName, double value, double rate) {
+        // default
+    }
+
+    public default void set(String metricName, String value) {
+        // default
+    }
+
+    public default void set(String metricName, String value, double rate) {
+        // default
+    }
+
+    public default void timing(String metricName, long value) {
+        // default
+    }
+
+    public default void timing(String metricName, long value, double rate) {
+        // default
+    }
 
 }
