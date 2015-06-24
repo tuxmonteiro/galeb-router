@@ -62,6 +62,11 @@
       <artifactId>galeb-hazelcast</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.galeb</groupId>
+      <artifactId>galeb-statsd</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.mortbay.jetty.alpn</groupId>
