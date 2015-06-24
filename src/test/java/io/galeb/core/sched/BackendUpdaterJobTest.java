@@ -21,6 +21,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import io.galeb.core.cluster.ClusterEvents;
 import io.galeb.core.cluster.DistributedMap;
 import io.galeb.core.logging.Logger;
 import io.galeb.core.mapreduce.MapReduce;
@@ -78,6 +79,9 @@ public class BackendUpdaterJobTest {
 
         final Logger logger = mock(Logger.class);
         final StatsdClient statsd = mock(StatsdClient.class);
+        final ClusterEvents clusterEvents = mock(ClusterEvents.class);
+        when(clusterEvents.isReady()).thenReturn(true);
+
         final DistributedMap<String, Entity> distributedMap = new DistributedMap<String, Entity>() {
             @Override
             public ConcurrentMap<String, Entity> getMap(String key) {
@@ -99,6 +103,7 @@ public class BackendUpdaterJobTest {
         jobdataMap.put(QuartzScheduler.FARM, farm);
         jobdataMap.put(QuartzScheduler.LOGGER, logger);
         jobdataMap.put(QuartzScheduler.STATSD, statsd);
+        jobdataMap.put(QuartzScheduler.CLUSTER_EVENTS, clusterEvents);
         jobdataMap.put(QuartzScheduler.DISTRIBUTEDMAP, distributedMap);
 
         when(jobDetail.getJobDataMap()).thenReturn(jobdataMap);

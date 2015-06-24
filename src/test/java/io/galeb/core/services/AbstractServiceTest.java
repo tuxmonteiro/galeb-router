@@ -35,6 +35,7 @@ import io.galeb.core.model.VirtualHost;
 import io.galeb.core.statsd.StatsdClient;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
@@ -81,7 +82,7 @@ public class AbstractServiceTest {
 
         @Override
         public ConcurrentMap<String, Entity> getMap(String key) {
-            return null;
+            return new ConcurrentHashMap<>();
         }
 
         @Override
@@ -101,7 +102,10 @@ public class AbstractServiceTest {
     }
 
     static class FakeClusterEvents implements ClusterEvents {
-        // Fake
+        @Override
+        public boolean isReady() {
+            return true;
+        }
     }
 
     static class FakeStatsdClient implements StatsdClient {

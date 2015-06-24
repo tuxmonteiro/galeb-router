@@ -124,7 +124,7 @@ public abstract class AbstractService implements DistributedMapListener,
             return;
         }
         final long interval = Long.parseLong(System.getProperty(PROP_SCHEDULER_INTERVAL.toString(), PROP_SCHEDULER_INTERVAL.def()));
-        scheduler = new QuartzScheduler(farm, statsdClient, distributedMap, logger)
+        scheduler = new QuartzScheduler(farm, statsdClient, distributedMap, clusterEvents, logger)
                         .startPeriodicJob(BackendPoolUpdaterJob.class, interval)
                         .startPeriodicJob(BackendUpdaterJob.class, interval);
         logger.info("scheduler started");

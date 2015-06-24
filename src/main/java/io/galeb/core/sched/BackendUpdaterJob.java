@@ -59,8 +59,12 @@ public class BackendUpdaterJob extends AbstractJob {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-
         setEnvironment(context.getJobDetail().getJobDataMap());
+
+        if (!clusterEvents.isReady()) {
+            return;
+        }
+
         cleanUpConnectionsInfo();
 
         mapReduce.reduce().forEach((key, value) -> {

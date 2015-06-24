@@ -19,6 +19,7 @@ package io.galeb.core.sched;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
+import io.galeb.core.cluster.ClusterEvents;
 import io.galeb.core.cluster.DistributedMap;
 import io.galeb.core.logging.Logger;
 import io.galeb.core.model.Entity;
@@ -40,15 +41,16 @@ import org.quartz.impl.StdSchedulerFactory;
 
 public class QuartzScheduler implements JobListener {
 
-    public static final String LOGGER   = "logger";
-    public static final String FARM     = "farm";
-    public static final String DISTRIBUTEDMAP = "distributedMap";
-    public static final String STATSD   = "statsd";
-    public static final String MAPREDUCE = "mapReduce";
+    public static final String LOGGER          = "logger";
+    public static final String FARM            = "farm";
+    public static final String DISTRIBUTEDMAP  = "distributedMap";
+    public static final String STATSD          = "statsd";
+    public static final String CLUSTER_EVENTS  = "clusterEvents";
 
     private final Farm farm;
     private final StatsdClient statsd;
     private final DistributedMap<String, Entity> distributedMap;
+    private final ClusterEvents clusterEvents;
     private final Logger logger;
     private final Scheduler scheduler;
     private boolean started = false;
@@ -56,11 +58,13 @@ public class QuartzScheduler implements JobListener {
     public QuartzScheduler(Farm farm,
                            StatsdClient statsd,
                            DistributedMap<String, Entity> distributedMap,
+                           ClusterEvents clusterEvents,
                            Logger logger) throws SchedulerException {
         this.farm = farm;
         this.statsd = statsd;
         this.logger = logger;
         this.distributedMap = distributedMap;
+        this.clusterEvents = clusterEvents;
         scheduler = new StdSchedulerFactory().getScheduler();
         scheduler.getListenerManager().addJobListener(this);
         scheduler.start();
@@ -85,6 +89,7 @@ public class QuartzScheduler implements JobListener {
                 jobdataMap.put(LOGGER, logger);
                 jobdataMap.put(DISTRIBUTEDMAP, distributedMap);
                 jobdataMap.put(STATSD, statsd);
+                jobdataMap.put(CLUSTER_EVENTS, clusterEvents);
 
                 JobDetail job = newJob(jobClass).withIdentity(jobClass.getSimpleName()+this)
                                                 .setJobData(jobdataMap)

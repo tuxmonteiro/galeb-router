@@ -32,8 +32,11 @@ public class BackendPoolUpdaterJob extends AbstractJob {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-
         setEnvironment(context.getJobDetail().getJobDataMap());
+
+        if (!clusterEvents.isReady()) {
+            return;
+        }
 
         for (final Entity backendPool: farm.getCollection(BackendPool.class)) {
             if (((BackendPool) backendPool).getBackends().isEmpty()) {
