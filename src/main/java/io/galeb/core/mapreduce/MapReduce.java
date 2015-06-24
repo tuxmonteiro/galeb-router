@@ -29,7 +29,7 @@ public interface MapReduce {
         return -1L;
     }
 
-    public default void addMetrics(String key, int value) {
+    public default void put(String key, int value) {
         // NULL
     }
 

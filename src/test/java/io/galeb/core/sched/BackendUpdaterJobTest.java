@@ -22,11 +22,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import io.galeb.core.cluster.DistributedMap;
-import io.galeb.core.controller.BackendController;
-import io.galeb.core.controller.EntityController.Action;
-import io.galeb.core.eventbus.IEventBus;
-import io.galeb.core.eventbus.NullEventBus;
-import io.galeb.core.json.JsonObject;
 import io.galeb.core.logging.Logger;
 import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.mapreduce.NullMapReduce;
@@ -37,6 +32,7 @@ import io.galeb.core.model.Farm;
 import io.galeb.core.model.VirtualHost;
 import io.galeb.core.model.collections.BackendPoolCollection;
 import io.galeb.core.model.collections.VirtualHostCollection;
+import io.galeb.core.statsd.StatsdClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -72,23 +68,6 @@ public class BackendUpdaterJobTest {
         }
     }
 
-    private static class FakeEventBus extends NullEventBus {
-        @Override
-        public void publishEntity(Entity entity, String entityType, Action action) {
-            final BackendController backendController = new BackendController(farm);
-            final Backend backend = ((Backend)entity);
-            try {
-                backendController.change(JsonObject.toJsonObject(backend));
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }
-        @Override
-        public MapReduce getMapReduce() {
-            return new FakeMapReduce();
-        }
-    }
-
     @Before
     public void setUp() {
         backendPoolCollection = (BackendPoolCollection) farm.getCollection(BackendPool.class);
@@ -98,11 +77,16 @@ public class BackendUpdaterJobTest {
         virtualHostCollection.clear();
 
         final Logger logger = mock(Logger.class);
-        final IEventBus eventBus = new FakeEventBus();
+        final StatsdClient statsd = mock(StatsdClient.class);
         final DistributedMap<String, Entity> distributedMap = new DistributedMap<String, Entity>() {
             @Override
             public ConcurrentMap<String, Entity> getMap(String key) {
                 return new ConcurrentHashMap<String, Entity>();
+            }
+
+            @Override
+            public MapReduce getMapReduce() {
+                return new FakeMapReduce();
             }
         };
         doNothing().when(logger).error(any(Throwable.class));
@@ -114,7 +98,7 @@ public class BackendUpdaterJobTest {
         final JobDataMap jobdataMap = new JobDataMap();
         jobdataMap.put(QuartzScheduler.FARM, farm);
         jobdataMap.put(QuartzScheduler.LOGGER, logger);
-        jobdataMap.put(QuartzScheduler.EVENTBUS, eventBus);
+        jobdataMap.put(QuartzScheduler.STATSD, statsd);
         jobdataMap.put(QuartzScheduler.DISTRIBUTEDMAP, distributedMap);
 
         when(jobDetail.getJobDataMap()).thenReturn(jobdataMap);

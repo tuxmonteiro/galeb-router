@@ -20,10 +20,10 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 import io.galeb.core.cluster.DistributedMap;
-import io.galeb.core.eventbus.IEventBus;
 import io.galeb.core.logging.Logger;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
+import io.galeb.core.statsd.StatsdClient;
 
 import java.util.UUID;
 
@@ -42,19 +42,23 @@ public class QuartzScheduler implements JobListener {
 
     public static final String LOGGER   = "logger";
     public static final String FARM     = "farm";
-    public static final String EVENTBUS = "eventbus";
     public static final String DISTRIBUTEDMAP = "distributedMap";
+    public static final String STATSD   = "statsd";
+    public static final String MAPREDUCE = "mapReduce";
 
     private final Farm farm;
-    private final IEventBus eventBus;
+    private final StatsdClient statsd;
     private final DistributedMap<String, Entity> distributedMap;
     private final Logger logger;
     private final Scheduler scheduler;
     private boolean started = false;
 
-    public QuartzScheduler(Farm farm, IEventBus eventBus, DistributedMap<String, Entity> distributedMap, Logger logger) throws SchedulerException {
+    public QuartzScheduler(Farm farm,
+                           StatsdClient statsd,
+                           DistributedMap<String, Entity> distributedMap,
+                           Logger logger) throws SchedulerException {
         this.farm = farm;
-        this.eventBus = eventBus;
+        this.statsd = statsd;
         this.logger = logger;
         this.distributedMap = distributedMap;
         scheduler = new StdSchedulerFactory().getScheduler();
@@ -79,8 +83,8 @@ public class QuartzScheduler implements JobListener {
                 JobDataMap jobdataMap = new JobDataMap();
                 jobdataMap.put(FARM, farm);
                 jobdataMap.put(LOGGER, logger);
-                jobdataMap.put(EVENTBUS, eventBus);
                 jobdataMap.put(DISTRIBUTEDMAP, distributedMap);
+                jobdataMap.put(STATSD, statsd);
 
                 JobDetail job = newJob(jobClass).withIdentity(jobClass.getSimpleName()+this)
                                                 .setJobData(jobdataMap)

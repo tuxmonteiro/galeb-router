@@ -25,8 +25,10 @@ import io.galeb.core.model.collections.RuleCollection;
 import io.galeb.core.model.collections.VirtualHostCollection;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.enterprise.inject.Alternative;
 
@@ -99,5 +101,21 @@ public class Farm extends Entity {
 
     public Object getRootHandler() {
         return null;
+    }
+
+    public List<Entity> virtualhostsUsingBackend(final String backendId) {
+        return getCollection(VirtualHost.class).stream()
+            .filter(virtualhost ->
+               getCollection(Rule.class).stream()
+                   .anyMatch(rule ->
+                       rule.getParentId().equals(virtualhost.getId()) &&
+                       getCollection(Backend.class).stream()
+                           .anyMatch(backend ->
+                               backend.getId().equals(backendId) &&
+                               backend.getParentId().equals(rule.getProperty(Rule.PROP_TARGET_ID))
+                           )
+                   )
+            )
+            .collect(Collectors.toList());
     }
 }

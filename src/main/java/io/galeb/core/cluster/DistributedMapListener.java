@@ -28,7 +28,7 @@ public interface DistributedMapListener {
         throw new UnsupportedOperationException();
     }
 
-    default void showStatistic(DistributedMapStats distributedMapStats) {
+    default void showStatistic() {
         //
     }
 

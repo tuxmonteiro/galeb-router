@@ -21,18 +21,12 @@ import io.galeb.core.cluster.ClusterEvents;
 import io.galeb.core.cluster.ClusterListener;
 import io.galeb.core.cluster.DistributedMap;
 import io.galeb.core.cluster.DistributedMapListener;
-import io.galeb.core.cluster.DistributedMapStats;
 import io.galeb.core.controller.BackendController;
 import io.galeb.core.controller.BackendPoolController;
 import io.galeb.core.controller.EntityController;
-import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.controller.FarmController;
 import io.galeb.core.controller.RuleController;
 import io.galeb.core.controller.VirtualHostController;
-import io.galeb.core.eventbus.Event;
-import io.galeb.core.eventbus.EventBusListener;
-import io.galeb.core.eventbus.IEventBus;
-import io.galeb.core.json.JsonObject;
 import io.galeb.core.logging.Logger;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
@@ -43,6 +37,7 @@ import io.galeb.core.model.VirtualHost;
 import io.galeb.core.sched.BackendPoolUpdaterJob;
 import io.galeb.core.sched.BackendUpdaterJob;
 import io.galeb.core.sched.QuartzScheduler;
+import io.galeb.core.statsd.StatsdClient;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -52,8 +47,7 @@ import javax.inject.Inject;
 
 import org.quartz.SchedulerException;
 
-public abstract class AbstractService implements EventBusListener,
-                                                 DistributedMapListener,
+public abstract class AbstractService implements DistributedMapListener,
                                                  ClusterListener {
 
     @Inject
@@ -63,20 +57,19 @@ public abstract class AbstractService implements EventBusListener,
     protected DistributedMap<String, Entity> distributedMap;
 
     @Inject
-    protected IEventBus eventbus;
-
-    @Inject
     protected Logger logger;
-
-    @Inject
-    protected DistributedMapStats distributedMapStats;
 
     @Inject
     protected ClusterEvents clusterEvents;
 
+    @Inject
+    protected StatsdClient statsdClient;
+
     protected QuartzScheduler scheduler;
 
     private boolean clusterListenerRegistered = false;
+
+    private boolean schedulerStarted = false;
 
     public AbstractService() {
         super();
@@ -102,19 +95,11 @@ public abstract class AbstractService implements EventBusListener,
         registerControllers();
         registerCluster();
 
-        eventbus.setEventBusListener(this).start();
         try {
             startSchedulers();
         } catch (final SchedulerException e) {
             logger.error(e);
         }
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                eventbus.stop();
-            }
-        });
     }
 
     protected void registerControllers() {
@@ -135,67 +120,23 @@ public abstract class AbstractService implements EventBusListener,
     }
 
     protected void startSchedulers() throws SchedulerException {
+        if (schedulerStarted) {
+            return;
+        }
         final long interval = Long.parseLong(System.getProperty(PROP_SCHEDULER_INTERVAL.toString(), PROP_SCHEDULER_INTERVAL.def()));
-        scheduler = new QuartzScheduler(farm, eventbus, distributedMap, logger)
+        scheduler = new QuartzScheduler(farm, statsdClient, distributedMap, logger)
                         .startPeriodicJob(BackendPoolUpdaterJob.class, interval)
                         .startPeriodicJob(BackendUpdaterJob.class, interval);
+        logger.info("scheduler started");
+        schedulerStarted = true;
     }
 
     public Farm getFarm() {
         return farm;
     }
 
-    @Override
-    public IEventBus getEventBus() {
-        return eventbus;
-    }
-
-    @Override
     public Logger getLogger() {
         return logger;
-    }
-
-    @Override
-    public void onEvent(Event event) throws RuntimeException {
-
-        final JsonObject json = event.getData();
-
-        final Entity entity = (Entity) json.instanceOf(Entity.class);
-        final String entityType = entity.getEntityType();
-
-        EntityController entityController = farm.getEntityMap().get(entityType);
-        if (entityController==null) {
-            entityController = EntityController.NULL;
-            logger.error("EntityController is NULL");
-        }
-
-        final Object eventType = event.getType();
-
-        if (eventType instanceof Action) {
-            final Action action = (Action) eventType;
-
-            try {
-                switch (action) {
-                    case ADD:
-                        entityController.add(json);
-                        break;
-                    case DEL:
-                        entityController.del(json);
-                        break;
-                    case DEL_ALL:
-                        entityController.delAll();
-                        break;
-                    case CHANGE:
-                        entityController.change(json);
-                        break;
-                    default:
-                        throw new RuntimeException("Action unknown");
-                }
-            } catch (final Exception e) {
-                logger.error(e);
-            }
-        }
-
     }
 
     public DistributedMap<String, Entity> getDistributedMap() {
@@ -206,7 +147,7 @@ public abstract class AbstractService implements EventBusListener,
     public void entryAdded(Entity entity) {
         logger.debug("entryAdded: "+entity.getId()+" ("+entity.getEntityType()+")");
         entityAdd(entity);
-        showStatistic(distributedMapStats);
+        showStatistic();
     }
 
     @Override
@@ -218,7 +159,7 @@ public abstract class AbstractService implements EventBusListener,
         } catch (Exception e) {
             logger.error(e);
         }
-        showStatistic(distributedMapStats);
+        showStatistic();
     }
 
     @Override
@@ -230,7 +171,7 @@ public abstract class AbstractService implements EventBusListener,
         } catch (Exception e) {
             logger.error(e);
         }
-        showStatistic(distributedMapStats);
+        showStatistic();
     }
 
     @Override
@@ -242,27 +183,27 @@ public abstract class AbstractService implements EventBusListener,
         } catch (Exception e) {
             logger.error(e);
         }
-        showStatistic(distributedMapStats);
+        showStatistic();
     }
 
     @Override
     public void entryEvicted(Entity entity) {
         logger.debug("entryEvicted: "+entity.getId()+" ("+entity.getEntityType()+")");
         entryRemoved(entity);
-        showStatistic(distributedMapStats);
+        showStatistic();
     }
 
     @Override
     public void mapEvicted(String mapName) {
         logger.debug("mapEvicted: "+mapName);
         mapCleared(mapName);
-        showStatistic(distributedMapStats);
+        showStatistic();
     }
 
     @Override
-    public void showStatistic(DistributedMapStats distributedMapStats) {
-        if (distributedMapStats!=null) {
-            logger.debug(distributedMapStats.toString());
+    public void showStatistic() {
+        if (logger.isDebugEnabled()) {
+            logger.debug(distributedMap.getStats().toString());
         }
     }
 

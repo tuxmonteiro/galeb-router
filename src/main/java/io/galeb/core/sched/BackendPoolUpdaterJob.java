@@ -16,7 +16,6 @@
 
 package io.galeb.core.sched;
 
-import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
@@ -63,8 +62,7 @@ public class BackendPoolUpdaterJob extends AbstractJob {
                     final BackendPool newBackendPool = new BackendPool((BackendPool) backendPool);
                     newBackendPool.setBackendWithLeastConn(backendWithLeastConn);
                     newBackendPool.setVersion(farm.getVersion());
-                    eventBus.publishEntity(newBackendPool,
-                            BackendPool.class.getSimpleName().toLowerCase(), Action.CHANGE);
+                    distributedMap.getMap(BackendPool.class.getName()).put(newBackendPool.getId(), newBackendPool);
                 }
             }
         }

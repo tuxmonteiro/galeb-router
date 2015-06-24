@@ -24,19 +24,15 @@ import io.galeb.core.cluster.DistributedMapStats;
 import io.galeb.core.controller.BackendController;
 import io.galeb.core.controller.BackendPoolController;
 import io.galeb.core.controller.EntityController;
-import io.galeb.core.controller.EntityController.Action;
 import io.galeb.core.controller.RuleController;
 import io.galeb.core.controller.VirtualHostController;
-import io.galeb.core.eventbus.Event;
-import io.galeb.core.eventbus.IEventBus;
 import io.galeb.core.logging.impl.Log4j2Logger;
 import io.galeb.core.mapreduce.MapReduce;
-import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
-import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
+import io.galeb.core.statsd.StatsdClient;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
@@ -64,26 +60,8 @@ public class AbstractServiceTest {
         private static final long serialVersionUID = 1L;
     }
 
-    static class FakeEventBus implements IEventBus {
-        // Fake
-    }
-
     static class FakeMapReduce implements MapReduce {
         // Fake
-    }
-
-    static class FakeDistributedMap implements DistributedMap<String, Entity> {
-        // Fake
-
-        @Override
-        public ConcurrentMap<String, Entity> getMap(String key) {
-            return null;
-        }
-
-        @Override
-        public void registerListener(DistributedMapListener distributedMapListener) {
-            // NULL
-        }
     }
 
     static class FakeDistributedMapStats implements DistributedMapStats {
@@ -98,8 +76,36 @@ public class AbstractServiceTest {
         }
     }
 
-    static class FakeClusterEvents implements ClusterEvents {
+    static class FakeDistributedMap implements DistributedMap<String, Entity> {
+        // Fake
 
+        @Override
+        public ConcurrentMap<String, Entity> getMap(String key) {
+            return null;
+        }
+
+        @Override
+        public void registerListener(DistributedMapListener distributedMapListener) {
+            // NULL
+        }
+
+        @Override
+        public MapReduce getMapReduce() {
+            return new FakeMapReduce();
+        }
+
+        @Override
+        public DistributedMapStats getStats() {
+            return new FakeDistributedMapStats();
+        }
+    }
+
+    static class FakeClusterEvents implements ClusterEvents {
+        // Fake
+    }
+
+    static class FakeStatsdClient implements StatsdClient {
+        // Fake
     }
 
     @Inject
@@ -113,12 +119,10 @@ public class AbstractServiceTest {
                          .addClasses(
                                  ServiceImplemented.class,
                                  Log4j2Logger.class,
-                                 FakeEventBus.class,
                                  FakeFarm.class,
-                                 FakeMapReduce.class,
                                  FakeDistributedMap.class,
-                                 FakeDistributedMapStats.class,
-                                 FakeClusterEvents.class)
+                                 FakeClusterEvents.class,
+                                 FakeStatsdClient.class)
                          .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
@@ -196,112 +200,6 @@ public class AbstractServiceTest {
 
         final EntityController anEntityInstance = entities.get(getKeyNameFrom(RuleController.class));
         assertThat(anEntityInstance).isInstanceOf(RuleController.class);
-    }
-
-    private Event makeEvent(Action action, Entity entity) {
-        final String id = entity.getClass().getSimpleName().toLowerCase()+"Test";
-
-        entity.setId(id);
-        final Event event = new Event(action, entity);
-
-        serviceImplemented.prelaunch();
-
-        return event;
-    }
-
-    @Test
-    public void onEventAddBackendTest() {
-        final Entity entity = new Backend();
-
-        final Entity parentEntity = new BackendPool();
-        final String parentId = parentEntity.getClass().getSimpleName().toLowerCase()+"Test";
-
-        parentEntity.setParentId(parentId);
-        entity.setParentId(parentId);
-
-        serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
-        serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getCollection(Backend.class)).extracting("id").contains(entity.getId());
-    }
-
-    @Test
-    public void onEventAddBackendPoolTest() {
-        final Entity entity = new BackendPool();
-
-        serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getCollection(BackendPool.class)).extracting("id").contains(entity.getId());
-    }
-
-    @Test
-    public void onEventAddVirtualhostTest() {
-        final Entity entity = new VirtualHost();
-
-        serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getCollection(VirtualHost.class)).extracting("id").contains(entity.getId());
-    }
-
-    @Test
-    public void onEventAddRuleTest() {
-        final Entity entity = new Rule();
-
-        final Entity parentEntity = new VirtualHost();
-        final String parentId = parentEntity.getClass().getSimpleName().toLowerCase()+"Test";
-
-        parentEntity.setParentId(parentId);
-        entity.setParentId(parentId);
-
-        serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
-        serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        assertThat(farm.getCollection(Rule.class)).extracting("id").contains(entity.getId());
-    }
-
-    @Test
-    public void onEventDelBackendTest() {
-        final Entity entity = new Backend();
-        final Entity parentEntity = new BackendPool();
-        final String parentId = parentEntity.getClass().getSimpleName().toLowerCase()+"Test";
-
-        parentEntity.setParentId(parentId);
-        entity.setParentId(parentId);
-
-        serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
-        serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getCollection(Backend.class)).extracting("id").doesNotContain(entity.getId());
-
-    }
-
-    @Test
-    public void onEventDelBackendPoolTest() {
-        final Entity entity = new BackendPool();
-
-        serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getCollection(BackendPool.class)).extracting("id").doesNotContain(entity.getId());
-    }
-
-    @Test
-    public void onEventDelVirtualhostTest() {
-        final Entity entity = new VirtualHost();
-
-        serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getCollection(VirtualHost.class)).extracting("id").doesNotContain(entity.getId());
-    }
-
-    @Test
-    public void onEventDelRuleTest() {
-        final Entity entity = new Rule();
-        final Entity parentEntity = new VirtualHost();
-        final String parentId = parentEntity.getClass().getSimpleName().toLowerCase()+"Test";
-
-        parentEntity.setParentId(parentId);
-        entity.setParentId(parentId);
-
-        serviceImplemented.onEvent(makeEvent(Action.ADD, parentEntity));
-        serviceImplemented.onEvent(makeEvent(Action.ADD, entity));
-        serviceImplemented.onEvent(makeEvent(Action.DEL, entity));
-        assertThat(farm.getCollection(Rule.class)).extracting("id").doesNotContain(entity.getId());
     }
 
 }

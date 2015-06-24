@@ -16,10 +16,13 @@
 
 package io.galeb.core.sched;
 
+import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.Entity;
+import io.galeb.core.statsd.StatsdClient;
 
 import org.quartz.DisallowConcurrentExecution;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -27,6 +30,19 @@ import org.quartz.JobExecutionException;
 public class BackendUpdaterJob extends AbstractJob {
 
     private static final long TTL = 10000L;
+    private StatsdClient statsd;
+    private MapReduce mapReduce;
+
+    @Override
+    protected void setEnvironment(JobDataMap jobDataMap) {
+        super.setEnvironment(jobDataMap);
+        if (statsd==null) {
+            statsd = (StatsdClient) jobDataMap.get(QuartzScheduler.STATSD);
+        }
+        if (mapReduce==null) {
+            mapReduce = distributedMap.getMapReduce();
+        }
+    }
 
     private void changeConnections(Entity backend, int conn) {
         ((Backend) backend).setConnections(conn);
@@ -47,15 +63,24 @@ public class BackendUpdaterJob extends AbstractJob {
         setEnvironment(context.getJobDetail().getJobDataMap());
         cleanUpConnectionsInfo();
 
-        eventBus.getMapReduce().reduce().forEach((key, value) -> {
+        mapReduce.reduce().forEach((key, value) -> {
             farm.getCollection(Backend.class).stream()
                 .filter(backend -> backend.getId().equals(key))
-                .forEach(backend -> changeConnections(backend, value));
+                .forEach(backend -> {
+                        changeConnections(backend, value);
+                        farm.virtualhostsUsingBackend(key).stream()
+                            .map(virtualhost -> virtualhost.getId())
+                            .forEach(virtualhostId -> sendActiveConnections(virtualhostId, key, value));
+                    });
         });
 
         logger.trace(String.format("Job %s done.", this.getClass().getSimpleName()));
     }
 
-
-
+    private void sendActiveConnections(String virtualhostId, String backendId, int conn) {
+        final String virtualhost = StatsdClient.cleanUpKey(virtualhostId);
+        final String backend = StatsdClient.cleanUpKey(backendId);
+        final String key = virtualhost + "." + backend + "." + Backend.PROP_ACTIVECONN;
+        statsd.gauge(key, conn);
+    }
 }
