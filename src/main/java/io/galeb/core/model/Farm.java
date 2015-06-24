@@ -107,13 +107,13 @@ public class Farm extends Entity {
         return getCollection(VirtualHost.class).stream()
             .filter(virtualhost ->
                getCollection(Rule.class).stream()
+                   .filter(rule -> rule.getParentId().equals(virtualhost.getId()))
                    .anyMatch(rule ->
-                       rule.getParentId().equals(virtualhost.getId()) &&
                        getCollection(Backend.class).stream()
-                           .anyMatch(backend ->
-                               backend.getId().equals(backendId) &&
-                               backend.getParentId().equals(rule.getProperty(Rule.PROP_TARGET_ID))
-                           )
+                       .filter(backend -> backend.getId().equals(backendId))
+                       .anyMatch(backend ->
+                           backend.getParentId().equals(rule.getProperty(Rule.PROP_TARGET_ID))
+                       )
                    )
             )
             .collect(Collectors.toList());
