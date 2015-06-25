@@ -21,6 +21,8 @@ import io.galeb.core.model.Backend;
 import io.galeb.core.model.Entity;
 import io.galeb.core.statsd.StatsdClient;
 
+import java.util.concurrent.ConcurrentMap;
+
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -47,7 +49,11 @@ public class BackendUpdaterJob extends AbstractJob {
     private void changeConnections(Entity backend, int conn) {
         ((Backend) backend).setConnections(conn);
         backend.setVersion(farm.getVersion());
-        distributedMap.getMap(Backend.class.getName()).put(backend.getId(), backend);
+        final ConcurrentMap<String, Entity> aMap = distributedMap.getMap(Backend.class.getName());
+        Backend oldBackend = (Backend) aMap.get(backend.getId());
+        if (oldBackend != null && oldBackend.getConnections() != ((Backend) backend).getConnections()) {
+            aMap.put(backend.getId(), backend);
+        }
     }
 
     private void cleanUpConnectionsInfo() {
