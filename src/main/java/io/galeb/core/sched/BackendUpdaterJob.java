@@ -67,7 +67,8 @@ public class BackendUpdaterJob extends AbstractJob {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         setEnvironment(context.getJobDetail().getJobDataMap());
 
-        if (!clusterEvents.isReady()) {
+        if (distributedMap.getMap(Backend.class.getName())==null) {
+            logger.error("BackendUpdaterJob ignored: cluster not ready");
             return;
         }
 
