@@ -51,7 +51,10 @@ public class BackendUpdaterJob extends AbstractJob {
         backend.setVersion(farm.getVersion());
         final ConcurrentMap<String, Entity> aMap = distributedMap.getMap(Backend.class.getName());
         Backend oldBackend = (Backend) aMap.get(backend.getId());
-        if (oldBackend != null && oldBackend.getConnections() != ((Backend) backend).getConnections()) {
+        if (oldBackend != null &&
+                (oldBackend.getModifiedAt() < (System.currentTimeMillis()-1000L) ||
+                        ((Backend)backend).getConnections() < 10) &&
+                oldBackend.getConnections() != ((Backend) backend).getConnections()) {
             aMap.put(backend.getId(), backend);
         }
     }
