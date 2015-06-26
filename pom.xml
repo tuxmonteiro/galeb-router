@@ -194,8 +194,8 @@
             -->
             <argument>-Xbootclasspath/p:${project.build.directory}/alpn.jar</argument>
             <argument>-server</argument>
-            <argument>-Xms1024m</argument>
-            <argument>-Xmx1024m</argument>
+            <argument>-Xms4096m</argument>
+            <argument>-Xmx4096m</argument>
             <argument>-Dlog4j.configurationFile=log4j.xml</argument>
             <argument>-Dhazelcast.config=hazelcast.xml</argument>
             <argument>-Dio.galeb.services.router.port=8080</argument>
