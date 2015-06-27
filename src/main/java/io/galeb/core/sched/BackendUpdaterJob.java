@@ -55,7 +55,7 @@ public class BackendUpdaterJob extends AbstractJob {
                 (oldBackend.getModifiedAt() < (System.currentTimeMillis()-1000L) ||
                         ((Backend)backend).getConnections() < 10) &&
                 oldBackend.getConnections() != ((Backend) backend).getConnections()) {
-            aMap.put(backend.getId(), backend);
+            farm.change(backend);
         }
     }
 
