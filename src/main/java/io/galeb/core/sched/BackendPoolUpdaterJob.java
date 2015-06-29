@@ -18,9 +18,7 @@ package io.galeb.core.sched;
 
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
-import io.galeb.core.model.Entity;
 
-import java.util.Collections;
 import java.util.Comparator;
 
 import org.quartz.DisallowConcurrentExecution;
@@ -34,41 +32,19 @@ public class BackendPoolUpdaterJob extends AbstractJob {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         setEnvironment(context.getJobDetail().getJobDataMap());
 
-        if (distributedMap.getMap(BackendPool.class.getName())==null) {
-            logger.error("BackendPoolUpdaterJob ignored: cluster not ready");
-            return;
-        }
-
-        for (final Entity backendPool: farm.getCollection(BackendPool.class)) {
-            if (((BackendPool) backendPool).getBackends().isEmpty()) {
-                continue;
-            }
-            final Backend backendWithLeastConn = Collections.min(((BackendPool) backendPool).getBackends(),
-                    new Comparator<Backend>() {
-                        @Override
-                        public int compare(Backend backend1, Backend backend2) {
-                            return backend1.getConnections() - backend2.getConnections() ;
-                        }
-                    });
-
-            if (backendWithLeastConn !=null) {
-
-                final Backend backendWithLeastConnOrig = ((BackendPool) backendPool).getBackendWithLeastConn();
-                boolean hasChange = false;
-                if (backendWithLeastConnOrig==null) {
-                    hasChange = true;
-                } else {
-                    if (!backendWithLeastConnOrig.equals(backendWithLeastConn)) {
-                        hasChange = true;
+        try {
+            farm.getCollection(BackendPool.class).stream()
+                .filter(pool -> !((BackendPool) pool).getBackends().isEmpty())
+                .forEach(pool -> {
+                    Backend backendWithLeastConn = ((BackendPool) pool).getBackends().stream()
+                                .min(Comparator.comparingInt(aBackend -> aBackend.getConnections())).get();
+                    if (!backendWithLeastConn.equals(((BackendPool) pool).getBackendWithLeastConn())) {
+                        ((BackendPool) pool).setBackendWithLeastConn(backendWithLeastConn);
+                        farm.change(pool);
                     }
-                }
-                if (hasChange) {
-                    final BackendPool newBackendPool = new BackendPool((BackendPool) backendPool);
-                    newBackendPool.setBackendWithLeastConn(backendWithLeastConn);
-                    newBackendPool.setVersion(farm.getVersion());
-                    distributedMap.getMap(BackendPool.class.getName()).put(newBackendPool.getId(), newBackendPool);
-                }
-            }
+                });
+        } catch (Exception e) {
+            logger.error(e);
         }
 
         logger.trace(String.format("Job %s done.", this.getClass().getSimpleName()));
