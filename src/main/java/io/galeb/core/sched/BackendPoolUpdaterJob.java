@@ -40,7 +40,7 @@ public class BackendPoolUpdaterJob extends AbstractJob {
                                 .min(Comparator.comparingInt(aBackend -> aBackend.getConnections())).get();
                     if (!backendWithLeastConn.equals(((BackendPool) pool).getBackendWithLeastConn())) {
                         ((BackendPool) pool).setBackendWithLeastConn(backendWithLeastConn);
-                        farm.change(pool);
+                        farm.getCollection(BackendPool.class).change(pool);
                     }
                 });
         } catch (Exception e) {
