@@ -18,11 +18,9 @@ package io.galeb.core.loadbalance;
 
 import io.galeb.core.util.SourceIP;
 
-import java.net.URI;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -67,7 +65,7 @@ public abstract class LoadBalancePolicy {
 
     private final AtomicBoolean needRebuild = new AtomicBoolean(true);
 
-    protected List<URI> uris = Collections.emptyList();
+    protected LinkedList<String> uris = new LinkedList<>();
 
     public static LoadBalancePolicy NULL = new LoadBalancePolicy() {
 
@@ -119,7 +117,7 @@ public abstract class LoadBalancePolicy {
         return this;
     }
 
-    public LoadBalancePolicy mapOfHosts(final List<URI> uris) {
+    public LoadBalancePolicy mapOfHosts(final LinkedList<String> uris) {
         if (isReseted()) {
             this.uris = uris;
         }

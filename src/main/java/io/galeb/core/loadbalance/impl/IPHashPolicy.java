@@ -21,7 +21,6 @@ import io.galeb.core.util.consistenthash.ConsistentHash;
 import io.galeb.core.util.consistenthash.HashAlgorithm;
 import io.galeb.core.util.consistenthash.HashAlgorithm.HashType;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class IPHashPolicy extends LoadBalancePolicy {
 
     private void reloadPos() {
         listPos.clear();
-        for (final URI uri: uris) {
+        for (final String uri: uris) {
             listPos.add(uris.indexOf(uri));
         }
     }

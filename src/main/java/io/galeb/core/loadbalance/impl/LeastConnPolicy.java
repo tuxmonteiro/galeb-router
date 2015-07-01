@@ -22,7 +22,6 @@ import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -33,14 +32,9 @@ public class LeastConnPolicy extends LoadBalancePolicy {
     @Override
     public int getChoice() {
         if (backendPool!=null) {
-            for (final URI uri: uris) {
-                final Backend backendWithLeastConn = backendPool.getBackendWithLeastConn();
-                if (backendWithLeastConn==null) {
-                    return 0;
-                }
-                if (uri.toString().equals(backendWithLeastConn.getId())) {
-                    return uris.indexOf(uri);
-                }
+            final Backend backendWithLeastConn = backendPool.getBackendWithLeastConn();
+            if (backendWithLeastConn!=null) {
+                return uris.indexOf(backendWithLeastConn.getId());
             }
         }
         return 0;

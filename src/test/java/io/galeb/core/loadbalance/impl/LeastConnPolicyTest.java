@@ -26,11 +26,8 @@ import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 import io.galeb.core.model.collections.BackendPoolCollection;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -63,13 +60,13 @@ public class LeastConnPolicyTest {
     }
 
     @Test
-    public void getChoiceTest() throws URISyntaxException {
+    public void getChoiceTest() {
         final int numBackends = 10;
         final int maxConn = 1000;
         int minConn = maxConn;
 
         final Entity backendPool = backendPoolCollection.getListByID(backendPoolId).get(0);
-        final List<URI> uris = new LinkedList<>();
+        final LinkedList<String> uris = new LinkedList<>();
 
         for (int pos=0; pos<=numBackends;pos++) {
             final int numConn = (int) (Math.random() * (maxConn - Float.MIN_VALUE));
@@ -83,7 +80,7 @@ public class LeastConnPolicyTest {
                 minConn = numConn;
                 ((BackendPool) backendPool).setBackendWithLeastConn(backend);
             }
-            uris.add(new URI(backendId));
+            uris.add(backendId);
         }
         leastConnPolicy.mapOfHosts(uris);
 
