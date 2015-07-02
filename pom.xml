@@ -199,7 +199,7 @@
             <argument>-Dlog4j.configurationFile=log4j.xml</argument>
             <argument>-Dhazelcast.config=hazelcast.xml</argument>
             <argument>-Dio.galeb.services.router.port=8080</argument>
-            <argument>-Dio.galeb.maxConn=300</argument>
+            <argument>-Dio.galeb.maxConn=2000</argument>
             <argument>-Dio.galeb.accesslog=true</argument>
             <argument>-jar</argument>
             <argument>target/galeb-router-${project.version}-uber.jar</argument>
