@@ -16,6 +16,7 @@
 
 package io.galeb.core.loadbalance.impl;
 
+import static io.galeb.core.util.SourceIP.DEFAULT_SOURCE_IP;
 import io.galeb.core.loadbalance.LoadBalancePolicy;
 import io.galeb.core.util.consistenthash.ConsistentHash;
 import io.galeb.core.util.consistenthash.HashAlgorithm;
@@ -41,8 +42,6 @@ public class IPHashPolicy extends LoadBalancePolicy {
     private final ConsistentHash<Integer> consistentHash =
             new ConsistentHash<Integer>(hashAlgorithm, numReplicas, new ArrayList<Integer>());
 
-    private volatile String sourceIP = "127.0.0.1";
-
     private void reloadPos() {
         listPos.clear();
         for (final String uri: uris) {
@@ -57,7 +56,7 @@ public class IPHashPolicy extends LoadBalancePolicy {
             consistentHash.rebuild(hashAlgorithm, numReplicas, listPos);
             rebuilt();
         }
-        final int chosen = consistentHash.get(sourceIP);
+        final int chosen = consistentHash.get(aKey.orElse(DEFAULT_SOURCE_IP));
         last.lazySet(chosen);
         return chosen;
     }
@@ -72,14 +71,8 @@ public class IPHashPolicy extends LoadBalancePolicy {
         if (numReplicaStr!=null) {
             numReplicas = Integer.valueOf(numReplicaStr);
         }
-        sourceIP = (String) criteria.get(SOURCE_IP_CRITERION);
         reloadPos();
         return this;
-    }
-
-    @Override
-    public boolean needSourceIP() {
-        return true;
     }
 
 }

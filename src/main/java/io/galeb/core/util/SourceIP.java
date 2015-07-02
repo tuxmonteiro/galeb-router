@@ -33,6 +33,4 @@ public interface SourceIP {
 
     public String getRealSourceIP();
 
-    public SourceIP pullFrom(final Object extractable);
-
 }

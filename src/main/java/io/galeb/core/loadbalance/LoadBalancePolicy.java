@@ -22,6 +22,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,6 +68,8 @@ public abstract class LoadBalancePolicy {
 
     protected LinkedList<String> uris = new LinkedList<>();
 
+    protected volatile Optional<String> aKey = Optional.empty();
+
     public static LoadBalancePolicy NULL = new LoadBalancePolicy() {
 
         @Override
@@ -81,10 +84,6 @@ public abstract class LoadBalancePolicy {
     };
 
     public abstract int getChoice();
-
-    public boolean needSourceIP() {
-        return false;
-    }
 
     public int getLastChoice() {
         return last.get();
@@ -110,10 +109,8 @@ public abstract class LoadBalancePolicy {
         return this;
     }
 
-    public LoadBalancePolicy setCriteria(final SourceIP sourceIP, Object extractable) {
-        if (sourceIP!=null && extractable != null && needSourceIP()) {
-            loadBalancePolicyCriteria.put(SOURCE_IP_CRITERION, sourceIP.pullFrom(extractable).getRealSourceIP());
-        }
+    public LoadBalancePolicy setSourceIP(final SourceIP sourceIP) {
+        aKey = Optional.ofNullable(sourceIP != null ? sourceIP.getRealSourceIP() : null);
         return this;
     }
 
