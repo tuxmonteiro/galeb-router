@@ -24,6 +24,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.quartz.SchedulerException;
+
 public class Router extends AbstractService {
 
     private static final String PROP_ROUTER_PREFIX    = Router.class.getPackage().getName()+".";
@@ -47,6 +49,12 @@ public class Router extends AbstractService {
     public void init() {
 
         super.prelaunch();
+
+        try {
+            startSchedulers();
+        } catch (final SchedulerException e) {
+            logger.error(e);
+        }
 
         final int port = Integer.parseInt(System.getProperty(PROP_ROUTER_PORT));
         final String iothreads = System.getProperty(PROP_ROUTER_IOTHREADS);
