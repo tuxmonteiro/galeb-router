@@ -94,12 +94,6 @@ public abstract class AbstractService implements DistributedMapListener,
     protected void prelaunch() {
         registerControllers();
         registerCluster();
-
-        try {
-            startSchedulers();
-        } catch (final SchedulerException e) {
-            logger.error(e);
-        }
     }
 
     protected void registerControllers() {
