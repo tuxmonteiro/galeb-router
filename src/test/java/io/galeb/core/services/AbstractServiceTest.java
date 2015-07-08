@@ -27,7 +27,6 @@ import io.galeb.core.controller.EntityController;
 import io.galeb.core.controller.RuleController;
 import io.galeb.core.controller.VirtualHostController;
 import io.galeb.core.logging.impl.Log4j2Logger;
-import io.galeb.core.mapreduce.MapReduce;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
@@ -61,10 +60,6 @@ public class AbstractServiceTest {
         private static final long serialVersionUID = 1L;
     }
 
-    static class FakeMapReduce implements MapReduce {
-        // Fake
-    }
-
     static class FakeDistributedMapStats implements DistributedMapStats {
         @Override
         public String getStats() {
@@ -88,11 +83,6 @@ public class AbstractServiceTest {
         @Override
         public void registerListener(DistributedMapListener distributedMapListener) {
             // NULL
-        }
-
-        @Override
-        public MapReduce getMapReduce() {
-            return new FakeMapReduce();
         }
 
         @Override
