@@ -84,6 +84,7 @@ public class BackendCollection implements Collection<Backend, BackendPool> {
             backendPools.stream().filter(backendPool -> ((BackendPool) backendPool).containBackend(backend.getId()))
                 .forEach(backendPool -> {
                     final Backend myBackend = ((BackendPool) backendPool).getBackend(backend.getId());
+                    myBackend.setHealth(((Backend) backend).getHealth());
                     myBackend.setProperties(backend.getProperties());
                     myBackend.setConnections(((Backend) backend).getConnections());
                     myBackend.updateHash();
@@ -91,6 +92,7 @@ public class BackendCollection implements Collection<Backend, BackendPool> {
                 });
             backends.stream().filter(myBackend -> myBackend.equals(backend))
                 .forEach(myBackend -> {
+                    ((Backend) myBackend).setHealth(((Backend) backend).getHealth());
                     myBackend.setProperties(backend.getProperties());
                     ((Backend) myBackend).setConnections(((Backend) backend).getConnections());
                     myBackend.updateHash();
