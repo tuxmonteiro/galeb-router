@@ -16,6 +16,7 @@
 
 package io.galeb.core.sched;
 
+import static io.galeb.core.util.Constants.SysProp.PROP_HOSTNAME;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.collections.BackendCollection;
 import io.galeb.core.statsd.StatsdClient;
@@ -60,19 +61,19 @@ public class BackendUpdaterJob extends AbstractJob {
 
         resetConnectionCounter(backendCollection);
 
-        connectionMapManager.reduce().forEach((key, value) -> {
+        connectionMapManager.reduce().forEach((backendID, numConnections) -> {
             backendCollection.stream()
-                .filter(backend -> backend.getId().equals(key) &&
+                .filter(backend -> backend.getId().equals(backendID) &&
                         (backend.getModifiedAt() < (System.currentTimeMillis()-1000L) ||
                             ((Backend)backend).getConnections() < 10) &&
-                            ((Backend)backend).getConnections() != value)
+                            ((Backend)backend).getConnections() != numConnections)
                 .forEach(backend -> {
                     backend.setVersion(farm.getVersion());
-                    ((Backend) backend).setConnections(value);
+                    ((Backend) backend).setConnections(numConnections);
                     backendCollection.change(backend);
-                    farm.virtualhostsUsingBackend(key).stream()
+                    farm.virtualhostsUsingBackend(backendID).stream()
                             .map(virtualhost -> virtualhost.getId())
-                            .forEach(virtualhostId -> sendActiveConnections(virtualhostId, key, value));
+                            .forEach(virtualhostId -> sendActiveConnections(virtualhostId, backendID, numConnections));
                     });
         });
 
@@ -82,7 +83,8 @@ public class BackendUpdaterJob extends AbstractJob {
     private void sendActiveConnections(String virtualhostId, String backendId, int conn) {
         final String virtualhost = StatsdClient.cleanUpKey(virtualhostId);
         final String backend = StatsdClient.cleanUpKey(backendId);
-        final String key = virtualhost + "." + backend + "." + Backend.PROP_ACTIVECONN;
+        final String hostname = StatsdClient.cleanUpKey(PROP_HOSTNAME.toString());
+        final String key = virtualhost + "." + backend + "." + hostname + "." + Backend.PROP_ACTIVECONN;
         statsd.gauge(key, conn);
     }
 }
