@@ -16,12 +16,11 @@
 
 package io.galeb.core.sched;
 
-import io.galeb.core.mapreduce.MapReduce;
+import static io.galeb.core.util.Constants.SysProp.PROP_HOSTNAME;
 import io.galeb.core.model.Backend;
-import io.galeb.core.model.Entity;
+import io.galeb.core.model.collections.BackendCollection;
 import io.galeb.core.statsd.StatsdClient;
-
-import java.util.concurrent.ConcurrentMap;
+import io.galeb.core.util.map.ConnectionMapManager;
 
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDataMap;
@@ -31,9 +30,19 @@ import org.quartz.JobExecutionException;
 @DisallowConcurrentExecution
 public class BackendUpdaterJob extends AbstractJob {
 
+    static {
+        if (System.getProperty(PROP_HOSTNAME.toString())==null) {
+            String hostname = PROP_HOSTNAME.def();
+            if (hostname==null) {
+                hostname="UNDEF";
+            }
+            System.setProperty(PROP_HOSTNAME.toString(), hostname);
+        }
+    }
+
     private static final long TTL = 10000L;
     private StatsdClient statsd;
-    private MapReduce mapReduce;
+    private final ConnectionMapManager connectionMapManager = ConnectionMapManager.INSTANCE;
 
     @Override
     protected void setEnvironment(JobDataMap jobDataMap) {
@@ -41,50 +50,40 @@ public class BackendUpdaterJob extends AbstractJob {
         if (statsd==null) {
             statsd = (StatsdClient) jobDataMap.get(QuartzScheduler.STATSD);
         }
-        if (mapReduce==null) {
-            mapReduce = distributedMap.getMapReduce();
-        }
     }
 
-    private void changeConnections(Entity backend, int conn) {
-        ((Backend) backend).setConnections(conn);
-        backend.setVersion(farm.getVersion());
-        final ConcurrentMap<String, Entity> aMap = distributedMap.getMap(Backend.class.getName());
-        Backend oldBackend = (Backend) aMap.get(backend.getId());
-        if (oldBackend != null &&
-                (oldBackend.getModifiedAt() < (System.currentTimeMillis()-1000L) ||
-                        ((Backend)backend).getConnections() < 10) &&
-                oldBackend.getConnections() != ((Backend) backend).getConnections()) {
-            farm.getCollection(Backend.class).change(backend);
-        }
-    }
-
-    private void cleanUpConnectionsInfo() {
-        farm.getCollection(Backend.class).stream()
-            .filter(backendWithTTL -> ((Backend) backendWithTTL).getConnections()>0 &&
-                    backendWithTTL.getModifiedAt()<(System.currentTimeMillis()-TTL))
-            .forEach(backendWithTTL -> changeConnections(backendWithTTL, 0));
+    private void resetConnectionCounter(final BackendCollection backendCollection) {
+        backendCollection.stream()
+        .filter(backend -> ((Backend) backend).getConnections()>0 &&
+                backend.getModifiedAt()<(System.currentTimeMillis()-TTL))
+        .forEach(backend -> {
+            backend.setVersion(farm.getVersion());
+            ((Backend) backend).setConnections(0);
+            backendCollection.change(backend);
+        });
     }
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         setEnvironment(context.getJobDetail().getJobDataMap());
 
-        if (distributedMap.getMap(Backend.class.getName())==null) {
-            logger.error("BackendUpdaterJob ignored: cluster not ready");
-            return;
-        }
+        final BackendCollection backendCollection = (BackendCollection) farm.getCollection(Backend.class);
 
-        cleanUpConnectionsInfo();
+        resetConnectionCounter(backendCollection);
 
-        mapReduce.reduce().forEach((key, value) -> {
-            farm.getCollection(Backend.class).stream()
-                .filter(backend -> backend.getId().equals(key))
+        connectionMapManager.reduce().forEach((backendID, numConnections) -> {
+            backendCollection.stream()
+                .filter(backend -> backend.getId().equals(backendID) &&
+                        (backend.getModifiedAt() < (System.currentTimeMillis()-1000L) ||
+                            ((Backend)backend).getConnections() < 10) &&
+                            ((Backend)backend).getConnections() != numConnections)
                 .forEach(backend -> {
-                        changeConnections(backend, value);
-                        farm.virtualhostsUsingBackend(key).stream()
+                    backend.setVersion(farm.getVersion());
+                    ((Backend) backend).setConnections(numConnections);
+                    backendCollection.change(backend);
+                    farm.virtualhostsUsingBackend(backendID).stream()
                             .map(virtualhost -> virtualhost.getId())
-                            .forEach(virtualhostId -> sendActiveConnections(virtualhostId, key, value));
+                            .forEach(virtualhostId -> sendActiveConnections(virtualhostId, backendID, numConnections));
                     });
         });
 
@@ -94,7 +93,8 @@ public class BackendUpdaterJob extends AbstractJob {
     private void sendActiveConnections(String virtualhostId, String backendId, int conn) {
         final String virtualhost = StatsdClient.cleanUpKey(virtualhostId);
         final String backend = StatsdClient.cleanUpKey(backendId);
-        final String key = virtualhost + "." + backend + "." + Backend.PROP_ACTIVECONN;
+        final String hostname = StatsdClient.cleanUpKey(System.getProperty(PROP_HOSTNAME.toString()));
+        final String key = virtualhost + "." + backend + "." + hostname + "." + Backend.PROP_ACTIVECONN;
         statsd.gauge(key, conn);
     }
 }

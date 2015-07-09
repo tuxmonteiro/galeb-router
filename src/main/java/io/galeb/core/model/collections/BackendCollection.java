@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 public class BackendCollection implements Collection<Backend, BackendPool> {
 
-    private Set<Entity> backends = new CopyOnWriteArraySet<>();
+    private final Set<Entity> backends = new CopyOnWriteArraySet<>();
 
     private Collection<? extends Entity, ? extends Entity> backendPools;
 
@@ -84,17 +84,13 @@ public class BackendCollection implements Collection<Backend, BackendPool> {
             backendPools.stream().filter(backendPool -> ((BackendPool) backendPool).containBackend(backend.getId()))
                 .forEach(backendPool -> {
                     final Backend myBackend = ((BackendPool) backendPool).getBackend(backend.getId());
+                    backends.remove(myBackend);
+                    myBackend.setHealth(((Backend) backend).getHealth());
                     myBackend.setProperties(backend.getProperties());
                     myBackend.setConnections(((Backend) backend).getConnections());
                     myBackend.updateHash();
                     myBackend.updateModifiedAt();
-                });
-            backends.stream().filter(myBackend -> myBackend.equals(backend))
-                .forEach(myBackend -> {
-                    myBackend.setProperties(backend.getProperties());
-                    ((Backend) myBackend).setConnections(((Backend) backend).getConnections());
-                    myBackend.updateHash();
-                    myBackend.updateModifiedAt();
+                    backends.add(backend);
                 });
         }
         return this;
