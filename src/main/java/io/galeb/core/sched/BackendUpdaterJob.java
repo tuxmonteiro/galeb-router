@@ -30,6 +30,16 @@ import org.quartz.JobExecutionException;
 @DisallowConcurrentExecution
 public class BackendUpdaterJob extends AbstractJob {
 
+    static {
+        if (System.getProperty(PROP_HOSTNAME.toString())==null) {
+            String hostname = PROP_HOSTNAME.def();
+            if (hostname==null) {
+                hostname="UNDEF";
+            }
+            System.setProperty(PROP_HOSTNAME.toString(), hostname);
+        }
+    }
+
     private static final long TTL = 10000L;
     private StatsdClient statsd;
     private final ConnectionMapManager connectionMapManager = ConnectionMapManager.INSTANCE;
@@ -83,7 +93,7 @@ public class BackendUpdaterJob extends AbstractJob {
     private void sendActiveConnections(String virtualhostId, String backendId, int conn) {
         final String virtualhost = StatsdClient.cleanUpKey(virtualhostId);
         final String backend = StatsdClient.cleanUpKey(backendId);
-        final String hostname = StatsdClient.cleanUpKey(PROP_HOSTNAME.toString());
+        final String hostname = StatsdClient.cleanUpKey(System.getProperty(PROP_HOSTNAME.toString()));
         final String key = virtualhost + "." + backend + "." + hostname + "." + Backend.PROP_ACTIVECONN;
         statsd.gauge(key, conn);
     }
