@@ -201,6 +201,7 @@
             <argument>-Dio.galeb.services.router.port=8080</argument>
             <argument>-Dio.galeb.maxConn=2000</argument>
             <argument>-Dio.galeb.accesslog=true</argument>
+            <argument>-Dio.galeb.fqdn=localhost</argument>
             <argument>-jar</argument>
             <argument>target/galeb-router-${project.version}-uber.jar</argument>
           </arguments>
