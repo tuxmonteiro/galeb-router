@@ -33,7 +33,12 @@ public class ConnectionMapManager {
     }
 
     public int sum(String uri) {
-        return getCounterMap(uri).reduceValuesToInt();
+        try {
+            return getCounterMap(uri).reduceValuesToInt();
+        } catch (NullPointerException e) {
+            // Ignore. Already finished.
+        }
+        return 0;
     }
 
     public void clear() {
