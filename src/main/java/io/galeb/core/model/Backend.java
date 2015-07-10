@@ -32,7 +32,7 @@ public class Backend extends Entity {
 
     @Expose private Health health = Health.HEALTHY;
 
-    @Expose private int connections = 0;
+    private int connections = 0;
 
     public Backend() {
         super();
@@ -42,7 +42,7 @@ public class Backend extends Entity {
         super(backend);
         setHealth(backend.getHealth());
         setConnections(backend.getConnections());
-        updateHash();
+        updateETag();
     }
 
     public Health getHealth() {

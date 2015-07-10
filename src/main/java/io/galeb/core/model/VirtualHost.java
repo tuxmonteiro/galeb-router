@@ -37,7 +37,7 @@ public class VirtualHost extends Entity {
     public VirtualHost(VirtualHost virtualhost) {
         super(virtualhost);
         setRules(virtualhost.getRules());
-        updateHash();
+        updateETag();
     }
 
     public void setRules(Set<Rule> arules) {

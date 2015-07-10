@@ -30,7 +30,7 @@ public class Rule extends Entity {
 
     public Rule(Rule rule) {
         super(rule);
-        updateHash();
+        updateETag();
     }
 
     @Override

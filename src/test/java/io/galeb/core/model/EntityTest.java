@@ -54,7 +54,7 @@ public class EntityTest {
 
     @Test
     public void defaultHashIsEmpty() {
-        assertThat(entity.getHash()).isEqualTo("0");
+        assertThat(entity.getETag()).isEqualTo("0");
     }
 
     @Test
@@ -64,8 +64,8 @@ public class EntityTest {
 
     @Test
     public void hashUpdatedInNotEmpty() {
-        entity.updateHash();
-        assertThat(entity.getHash()).isNotEmpty();
+        entity.updateETag();
+        assertThat(entity.getETag()).isNotEmpty();
     }
 
     @Test

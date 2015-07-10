@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class Entity implements Serializable, Comparable<Entity> {
 
@@ -36,19 +37,23 @@ public class Entity implements Serializable, Comparable<Entity> {
     @Expose private String                     parentId      = "";
 
     /** The created at. */
+    @SerializedName("_created_at")
     @Expose private final Long                 createdAt     = System.currentTimeMillis();
 
     /** The modified at. */
+    @SerializedName("_modified_at")
     @Expose private Long                       modifiedAt    = System.currentTimeMillis();
 
     /** The properties. */
     @Expose private final Map<String, Object>  properties    = new ConcurrentHashMap<>(16, 0.9f, 1);
 
     /** The entity type. */
+    @SerializedName("_entity_type")
     @Expose private String                     entityType    = this.getClass().getSimpleName().toLowerCase();
 
     /** The hash. */
-    @Expose private String                     hash          = "0";
+    @SerializedName("_etag")
+    @Expose private String                     etag          = "0";
 
     /** The version */
     @Expose private Integer                    version       = 0;
@@ -135,12 +140,12 @@ public class Entity implements Serializable, Comparable<Entity> {
         return this;
     }
 
-    public String getHash() {
-        return hash;
+    public String getETag() {
+        return etag;
     }
 
-    public final Entity setHash(String hash) {
-        this.hash = hash;
+    public final Entity setETag(String hash) {
+        etag = hash;
         return this;
     }
 
@@ -148,8 +153,8 @@ public class Entity implements Serializable, Comparable<Entity> {
         return createdAt;
     }
 
-    public final Entity updateHash() {
-        hash = "0";
+    public final Entity updateETag() {
+        etag = "0";
         return this;
     }
 

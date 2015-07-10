@@ -88,7 +88,7 @@ public class BackendCollection implements Collection<Backend, BackendPool> {
                     myBackend.setHealth(((Backend) backend).getHealth());
                     myBackend.setProperties(backend.getProperties());
                     myBackend.setConnections(((Backend) backend).getConnections());
-                    myBackend.updateHash();
+                    myBackend.updateETag();
                     myBackend.updateModifiedAt();
                     backends.add(backend);
                 });

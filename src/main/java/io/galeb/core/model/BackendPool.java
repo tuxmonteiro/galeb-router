@@ -28,8 +28,6 @@ public class BackendPool extends Entity {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String PROP_BACKEND_WITH_LEASTCONN = "backendWithLeastConn";
-
     public static final String PROP_HEALTHCHECK_RETURN      = "hcExpectedReturn";
 
     public static final String PROP_HEALTHCHECK_PATH        = "hcPath";
@@ -40,18 +38,14 @@ public class BackendPool extends Entity {
 
     @Expose private final Set<Backend> backends = new CopyOnWriteArraySet<>();
 
+    private Backend backendWithLeastConn = null;
+
     public Backend getBackendWithLeastConn() {
-        if (!getBackends().isEmpty()) {
-            final String backendID = (String) getProperty(PROP_BACKEND_WITH_LEASTCONN);
-            if (backendID!=null) {
-                return getBackend(backendID);
-            }
-        }
-        return null;
+        return backendWithLeastConn;
     }
 
     public synchronized void setBackendWithLeastConn(final Backend backendWithLeastConnObj) {
-        putProperty(PROP_BACKEND_WITH_LEASTCONN, backendWithLeastConnObj.getId());
+        backendWithLeastConn = (Backend) backendWithLeastConnObj.copy();
     }
 
     public BackendPool() {
@@ -61,7 +55,7 @@ public class BackendPool extends Entity {
     public BackendPool(BackendPool backendPool) {
         super(backendPool);
         setBackends(backendPool.getBackends());
-        updateHash();
+        updateETag();
     }
 
     public Backend getBackend(String backendId) {
