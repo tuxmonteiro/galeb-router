@@ -70,6 +70,7 @@ public class BackendPoolUpdaterJobTest {
         jobdataMap.put(QuartzScheduler.FARM, farm);
         jobdataMap.put(QuartzScheduler.LOGGER, logger);
         jobdataMap.put(QuartzScheduler.DISTRIBUTEDMAP, distributedMap);
+        jobdataMap.put(QuartzScheduler.INTERVAL, 1000L);
         when(jobDetail.getJobDataMap()).thenReturn(jobdataMap);
     }
 

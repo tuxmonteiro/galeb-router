@@ -58,6 +58,7 @@ public class BackendUpdaterJobTest {
         jobdataMap.put(QuartzScheduler.FARM, farm);
         jobdataMap.put(QuartzScheduler.LOGGER, logger);
         jobdataMap.put(QuartzScheduler.STATSD, statsd);
+        jobdataMap.put(QuartzScheduler.INTERVAL, 1000L);
 
         when(jobDetail.getJobDataMap()).thenReturn(jobdataMap);
     }

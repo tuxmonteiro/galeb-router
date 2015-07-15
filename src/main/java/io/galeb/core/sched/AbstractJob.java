@@ -31,6 +31,7 @@ public abstract class AbstractJob implements Job {
     protected Farm farm;
     protected DistributedMap<String, Entity> distributedMap;
     protected ClusterEvents clusterEvents;
+    protected long interval = 0L;
 
     @SuppressWarnings("unchecked")
     protected void setEnvironment(final JobDataMap jobDataMap) {
@@ -45,6 +46,9 @@ public abstract class AbstractJob implements Job {
         }
         if (clusterEvents==null) {
             clusterEvents = (ClusterEvents) jobDataMap.get(QuartzScheduler.CLUSTER_EVENTS);
+        }
+        if (interval<=0L) {
+            interval = jobDataMap.getLongValue(QuartzScheduler.INTERVAL);
         }
     }
 }

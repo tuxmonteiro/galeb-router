@@ -46,6 +46,7 @@ public class QuartzScheduler implements JobListener {
     public static final String DISTRIBUTEDMAP  = "distributedMap";
     public static final String STATSD          = "statsd";
     public static final String CLUSTER_EVENTS  = "clusterEvents";
+    public static final String INTERVAL        = "interval";
 
     private final Farm farm;
     private final StatsdClient statsd;
@@ -90,6 +91,7 @@ public class QuartzScheduler implements JobListener {
                 jobdataMap.put(DISTRIBUTEDMAP, distributedMap);
                 jobdataMap.put(STATSD, statsd);
                 jobdataMap.put(CLUSTER_EVENTS, clusterEvents);
+                jobdataMap.put(INTERVAL, interval);
 
                 JobDetail job = newJob(jobClass).withIdentity(jobClass.getSimpleName()+this)
                                                 .setJobData(jobdataMap)
