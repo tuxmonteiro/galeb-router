@@ -30,10 +30,12 @@ import java.util.stream.Collectors;
 
 public class RandomWeightedLeastConnPolicy extends LoadBalancePolicy {
 
+    public static final String PROP_CUTTING_LINE = "lbCuttingLine";
+
     private Farm farm = null;
     private String backendPoolId = null;
     private ConcurrentLinkedQueue<String> backends = new ConcurrentLinkedQueue<>();
-    private double limit = 0.666;
+    private double cuttingLine = 0.666;
 
     @Override
     public int getChoice() {
@@ -45,7 +47,7 @@ public class RandomWeightedLeastConnPolicy extends LoadBalancePolicy {
             backends.addAll(farm.getCollection(Backend.class).stream()
                                 .filter(backend -> backend.getParentId().equals(backendPoolId))
                                 .sorted(backendComparator)
-                                .limit(Integer.toUnsignedLong((int) ((uris.size()*limit) - Float.MIN_VALUE)))
+                                .limit(Integer.toUnsignedLong((int) ((uris.size()*cuttingLine) - Float.MIN_VALUE)))
                                 .map(backend -> backend.getId())
                                 .collect(Collectors.toCollection(LinkedList::new)));
         }
@@ -65,6 +67,10 @@ public class RandomWeightedLeastConnPolicy extends LoadBalancePolicy {
         if (farmObj!=null && farmObj instanceof Farm) {
             farm = (Farm)farmObj;
             backendPoolId = (String) loadBalancePolicyCriteria.get(BackendPool.class.getSimpleName());
+            Double limitObj = (Double) loadBalancePolicyCriteria.get(PROP_CUTTING_LINE);
+            if (limitObj!=null) {
+                cuttingLine = limitObj;
+            }
         }
         return this;
     }
