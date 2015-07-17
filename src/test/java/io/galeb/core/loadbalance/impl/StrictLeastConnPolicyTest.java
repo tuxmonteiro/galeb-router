@@ -34,7 +34,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LeastConnPolicyTest {
+public class StrictLeastConnPolicyTest {
 
     private LoadBalancePolicy leastConnPolicy;
     private final String backendPoolId = "pool1";
