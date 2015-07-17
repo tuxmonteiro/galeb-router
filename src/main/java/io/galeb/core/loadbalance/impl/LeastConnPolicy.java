@@ -22,22 +22,42 @@ import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 
-import java.util.List;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 public class LeastConnPolicy extends LoadBalancePolicy {
 
-    private BackendPool backendPool = null;
+    public static final String PROP_CUTTING_LINE = "lbCuttingLine";
+
+    private Farm farm = null;
+    private String backendPoolId = null;
+    private ConcurrentLinkedQueue<String> backends = new ConcurrentLinkedQueue<>();
+    private double cuttingLine = 0.666;
 
     @Override
     public int getChoice() {
-        if (backendPool!=null) {
-            final Backend backendWithLeastConn = backendPool.getBackendWithLeastConn();
-            if (backendWithLeastConn!=null) {
-                return uris.indexOf(backendWithLeastConn.getId());
-            }
+        if (farm!=null && backendPoolId!=null && backends.isEmpty()) {
+
+            Comparator<? super Entity> backendComparator = (b1, b2) ->
+                Integer.compare(((Backend) b1).getConnections(), ((Backend) b2).getConnections());
+
+            backends.addAll(farm.getCollection(Backend.class).stream()
+                                .filter(backend -> backend.getParentId().equals(backendPoolId))
+                                .sorted(backendComparator)
+                                .limit(Integer.toUnsignedLong((int) ((uris.size()*cuttingLine) - Float.MIN_VALUE)))
+                                .map(backend -> backend.getId())
+                                .collect(Collectors.toCollection(LinkedList::new)));
         }
-        return 0;
+
+        int pos = 0;
+        String choice = backends.poll();
+        if (choice!=null) {
+            pos = uris.indexOf(choice);
+        }
+        return pos >= 0 ? pos : 0;
     }
 
     @Override
@@ -45,13 +65,11 @@ public class LeastConnPolicy extends LoadBalancePolicy {
         super.setCriteria(criteria);
         final Object farmObj = loadBalancePolicyCriteria.get(Farm.class.getSimpleName());
         if (farmObj!=null && farmObj instanceof Farm) {
-            final Farm farm = (Farm)farmObj;
-            final String backendPoolId =
-                    (String) loadBalancePolicyCriteria.get(BackendPool.class.getSimpleName());
-            final List<Entity> backendPools =
-                    farm.getCollection(BackendPool.class).getListByID(backendPoolId);
-            if (!backendPools.isEmpty()) {
-                backendPool = (BackendPool) backendPools.get(0);
+            farm = (Farm)farmObj;
+            backendPoolId = (String) loadBalancePolicyCriteria.get(BackendPool.class.getSimpleName());
+            Double limitObj = (Double) loadBalancePolicyCriteria.get(PROP_CUTTING_LINE);
+            if (limitObj!=null) {
+                cuttingLine = limitObj;
             }
         }
         return this;

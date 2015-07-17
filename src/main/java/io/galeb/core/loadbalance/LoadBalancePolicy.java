@@ -32,8 +32,8 @@ public abstract class LoadBalancePolicy {
         ROUNDROBIN("RoundRobin"),
         RANDOM("Random"),
         IPHASH("IPHash"),
-        LEASTCONN("LeastConn"),
-        RANDOM_WEIGHTED_LEASTCONN("RandomWeightedLeastConn");
+        STRICT_LEASTCONN("StrictLeastConn"),
+        LEASTCONN("LeastConn");
 
         private String algoNameStr = "";
 

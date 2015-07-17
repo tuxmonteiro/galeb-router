@@ -16,7 +16,7 @@
 
 package io.galeb.core.loadbalance.impl;
 
-import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.LEASTCONN;
+import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.STRICT_LEASTCONN;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.galeb.core.loadbalance.LoadBalancePolicy;
 import io.galeb.core.loadbalance.LoadBalancePolicyLocator;
@@ -53,7 +53,7 @@ public class LeastConnPolicyTest {
         final Map<String, Object> criteria = new HashMap<>();
         criteria.put(BackendPool.class.getSimpleName(), backendPool.getId());
         criteria.put(Farm.class.getSimpleName(), farm);
-        criteria.put(BackendPool.PROP_LOADBALANCE_POLICY, LEASTCONN.toString());
+        criteria.put(BackendPool.PROP_LOADBALANCE_POLICY, STRICT_LEASTCONN.toString());
 
         leastConnPolicy  = new LoadBalancePolicyLocator().setParams(criteria).get();
         leastConnPolicy.setCriteria(criteria);
