@@ -16,8 +16,6 @@
 
 package io.galeb.core.loadbalance;
 
-import io.galeb.core.util.SourceIP;
-
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -26,12 +24,15 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.galeb.core.loadbalance.hash.ExtractableKey;
+import io.galeb.core.loadbalance.hash.KeyTypeLocator;
+
 public abstract class LoadBalancePolicy {
 
     public enum Algorithm {
         ROUNDROBIN("RoundRobin"),
         RANDOM("Random"),
-        IPHASH("IPHash"),
+        HASH("Hash"),
         STRICT_LEASTCONN("StrictLeastConn"),
         LEASTCONN("LeastConn");
 
@@ -59,7 +60,7 @@ public abstract class LoadBalancePolicy {
         return ALGORITHM_MAP.containsKey(algorithmStr);
     }
 
-    public static final String SOURCE_IP_CRITERION      = "SourceIP";
+    public static final String  PROP_KEY = "keyType";
 
     protected final Map<String, Object> loadBalancePolicyCriteria = new HashMap<>();
 
@@ -70,6 +71,8 @@ public abstract class LoadBalancePolicy {
     protected LinkedList<String> uris = new LinkedList<>();
 
     protected volatile Optional<String> aKey = Optional.empty();
+
+    protected KeyTypeLocator keyTypeLocator = KeyTypeLocator.NULL;
 
     public static LoadBalancePolicy NULL = new LoadBalancePolicy() {
 
@@ -110,15 +113,22 @@ public abstract class LoadBalancePolicy {
         return this;
     }
 
-    public LoadBalancePolicy setSourceIP(final SourceIP sourceIP) {
-        aKey = Optional.ofNullable(sourceIP != null ? sourceIP.getRealSourceIP() : null);
-        return this;
-    }
-
     public LoadBalancePolicy mapOfHosts(final LinkedList<String> uris) {
         if (isReseted()) {
             this.uris = uris;
         }
+        return this;
+    }
+
+    public LoadBalancePolicy extractKeyFrom(final Object extractable) {
+        final Optional<String> aKeyType = Optional.ofNullable((String) loadBalancePolicyCriteria.get(PROP_KEY));
+        final ExtractableKey extractableKey = keyTypeLocator.getKey(aKeyType.orElse(KeyTypeLocator.DEFAULT_KEY_TYPE));
+        aKey = Optional.ofNullable(extractableKey.get(extractable));
+        return this;
+    }
+
+    public LoadBalancePolicy setKeyTypeLocator(final KeyTypeLocator keyTypeLocator) {
+        this.keyTypeLocator = keyTypeLocator;
         return this;
     }
 

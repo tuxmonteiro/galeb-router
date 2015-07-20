@@ -16,21 +16,20 @@
 
 package io.galeb.core.loadbalance;
 
-import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.IPHASH;
-import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.STRICT_LEASTCONN;
-import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.RANDOM;
+import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.HASH;
 import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.LEASTCONN;
+import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.RANDOM;
 import static io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm.ROUNDROBIN;
-import io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm;
-import io.galeb.core.loadbalance.impl.IPHashPolicy;
-import io.galeb.core.loadbalance.impl.StrictLeastConnPolicy;
-import io.galeb.core.loadbalance.impl.RandomPolicy;
-import io.galeb.core.loadbalance.impl.LeastConnPolicy;
-import io.galeb.core.loadbalance.impl.RoundRobinPolicy;
-import io.galeb.core.model.BackendPool;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import io.galeb.core.loadbalance.LoadBalancePolicy.Algorithm;
+import io.galeb.core.loadbalance.impl.HashPolicy;
+import io.galeb.core.loadbalance.impl.LeastConnPolicy;
+import io.galeb.core.loadbalance.impl.RandomPolicy;
+import io.galeb.core.loadbalance.impl.RoundRobinPolicy;
+import io.galeb.core.model.BackendPool;
 
 public class LoadBalancePolicyLocator {
 
@@ -43,8 +42,7 @@ public class LoadBalancePolicyLocator {
     public LoadBalancePolicyLocator() {
         loadbalanceCriterionMap.put(ROUNDROBIN.toString(), new RoundRobinPolicy());
         loadbalanceCriterionMap.put(RANDOM.toString(), new RandomPolicy());
-        loadbalanceCriterionMap.put(IPHASH.toString(), new IPHashPolicy());
-        loadbalanceCriterionMap.put(STRICT_LEASTCONN.toString(), new StrictLeastConnPolicy());
+        loadbalanceCriterionMap.put(HASH.toString(), new HashPolicy());
         loadbalanceCriterionMap.put(LEASTCONN.toString(), new LeastConnPolicy());
     }
 

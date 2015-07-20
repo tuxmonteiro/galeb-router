@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package io.galeb.core.util;
+package io.galeb.core.extractable;
 
 import java.util.Optional;
 
-public interface SourceIP {
+import io.galeb.core.loadbalance.hash.ExtractableKey;
+
+public interface SourceIP extends ExtractableKey {
 
     public static final String DEFAULT_SOURCE_IP = "127.0.0.1";
 
@@ -31,6 +33,8 @@ public interface SourceIP {
             Optional.ofNullable(System.getProperty(SourceIP.class.getPackage().getName()+
                     IGNORE_XFORWARDED_FOR_PROPERTY));
 
-    public String getRealSourceIP();
-
+    @Override
+    default String get(Object extractable) {
+        return DEFAULT_SOURCE_IP;
+    }
 }

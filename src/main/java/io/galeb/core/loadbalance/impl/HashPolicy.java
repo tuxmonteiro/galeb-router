@@ -16,18 +16,19 @@
 
 package io.galeb.core.loadbalance.impl;
 
-import static io.galeb.core.util.SourceIP.DEFAULT_SOURCE_IP;
-import io.galeb.core.loadbalance.LoadBalancePolicy;
-import io.galeb.core.util.consistenthash.ConsistentHash;
-import io.galeb.core.util.consistenthash.HashAlgorithm;
-import io.galeb.core.util.consistenthash.HashAlgorithm.HashType;
-
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class IPHashPolicy extends LoadBalancePolicy {
+import io.galeb.core.loadbalance.LoadBalancePolicy;
+import io.galeb.core.util.consistenthash.ConsistentHash;
+import io.galeb.core.util.consistenthash.HashAlgorithm;
+import io.galeb.core.util.consistenthash.HashAlgorithm.HashType;
+
+public class HashPolicy extends LoadBalancePolicy {
+
+    public static final String DEFAULT_KEY = "NULL";
 
     public static final String HASH_ALGORITHM = "HashAlgorithm";
 
@@ -56,7 +57,7 @@ public class IPHashPolicy extends LoadBalancePolicy {
             consistentHash.rebuild(hashAlgorithm, numReplicas, listPos);
             rebuilt();
         }
-        final int chosen = consistentHash.get(aKey.orElse(DEFAULT_SOURCE_IP));
+        final int chosen = consistentHash.get(aKey.orElse(DEFAULT_KEY));
         last.lazySet(chosen);
         return chosen;
     }
