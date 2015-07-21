@@ -60,9 +60,9 @@ public abstract class LoadBalancePolicy {
         return ALGORITHM_MAP.containsKey(algorithmStr);
     }
 
-    public static final String  PROP_KEY_TYPE = "keyType";
-
+    public static final String PROP_KEY_TYPE    = "keyType";
     public static final String PROP_FROM_ATTRIB = "fromAttrib";
+    public static final String PROP_STICK       = "enableStickCookie";
 
     protected final Map<String, Object> loadBalancePolicyCriteria = new HashMap<>();
 
