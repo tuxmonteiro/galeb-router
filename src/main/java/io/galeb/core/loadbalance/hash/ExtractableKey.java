@@ -8,6 +8,10 @@ public interface ExtractableKey {
         // NULL
     };
 
+    default ExtractableKey from(String from) {
+        return this;
+    }
+
     default String get(Object extractable) {
         return HashPolicy.DEFAULT_KEY;
     }

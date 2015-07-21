@@ -60,7 +60,9 @@ public abstract class LoadBalancePolicy {
         return ALGORITHM_MAP.containsKey(algorithmStr);
     }
 
-    public static final String  PROP_KEY = "keyType";
+    public static final String  PROP_KEY_TYPE = "keyType";
+
+    public static final String PROP_FROM_ATTRIB = "fromAttrib";
 
     protected final Map<String, Object> loadBalancePolicyCriteria = new HashMap<>();
 
@@ -121,9 +123,10 @@ public abstract class LoadBalancePolicy {
     }
 
     public LoadBalancePolicy extractKeyFrom(final Object extractable) {
-        final Optional<String> aKeyType = Optional.ofNullable((String) loadBalancePolicyCriteria.get(PROP_KEY));
+        final Optional<String> aKeyType = Optional.ofNullable((String) loadBalancePolicyCriteria.get(PROP_KEY_TYPE));
         final ExtractableKey extractableKey = keyTypeLocator.getKey(aKeyType.orElse(KeyTypeLocator.DEFAULT_KEY_TYPE));
-        aKey = Optional.ofNullable(extractableKey.get(extractable));
+        String from = (String) loadBalancePolicyCriteria.get(PROP_FROM_ATTRIB);
+        aKey = Optional.ofNullable(extractableKey.from(from).get(extractable));
         return this;
     }
 
