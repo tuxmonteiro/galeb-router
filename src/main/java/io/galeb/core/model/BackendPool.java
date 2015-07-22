@@ -16,13 +16,13 @@
 
 package io.galeb.core.model;
 
-import io.galeb.core.json.JsonObject;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.google.gson.annotations.Expose;
+
+import io.galeb.core.json.JsonObject;
 
 public class BackendPool extends Entity {
 
@@ -37,16 +37,6 @@ public class BackendPool extends Entity {
     public static final String PROP_LOADBALANCE_POLICY      = "loadBalancePolicy";
 
     @Expose private final Set<Backend> backends = new CopyOnWriteArraySet<>();
-
-    private Backend backendWithLeastConn = null;
-
-    public Backend getBackendWithLeastConn() {
-        return backendWithLeastConn;
-    }
-
-    public synchronized void setBackendWithLeastConn(final Backend backendWithLeastConnObj) {
-        backendWithLeastConn = (Backend) backendWithLeastConnObj.copy();
-    }
 
     public BackendPool() {
         super();
