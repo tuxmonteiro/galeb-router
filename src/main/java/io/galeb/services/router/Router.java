@@ -16,8 +16,7 @@
 
 package io.galeb.services.router;
 
-import io.galeb.core.services.AbstractService;
-import io.galeb.undertow.router.RouterApplication;
+import static io.galeb.core.util.Constants.SysProp.PROP_SCHEDULER_INTERVAL;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +24,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.quartz.SchedulerException;
+
+import io.galeb.core.services.AbstractService;
+import io.galeb.services.router.sched.BackendUpdaterJob;
+import io.galeb.services.router.sched.QuartzScheduler;
+import io.galeb.undertow.router.RouterApplication;
 
 public class Router extends AbstractService {
 
@@ -35,6 +39,8 @@ public class Router extends AbstractService {
     private static final String PROP_ROUTER_IOTHREADS = PROP_ROUTER_PREFIX+"iothread";
 
     public static final int     DEFAULT_PORT          = 8080;
+
+    private boolean schedulerStarted = false;
 
     static {
         if (System.getProperty(PROP_ROUTER_PORT)==null) {
@@ -73,6 +79,17 @@ public class Router extends AbstractService {
 
     public Router() {
         super();
+    }
+
+    private void startSchedulers() throws SchedulerException {
+        if (schedulerStarted) {
+            return;
+        }
+        final long interval = Long.parseLong(System.getProperty(PROP_SCHEDULER_INTERVAL.toString(), PROP_SCHEDULER_INTERVAL.def()));
+        new QuartzScheduler(farm, statsdClient, distributedMap, clusterEvents, logger)
+                        .startPeriodicJob(BackendUpdaterJob.class, interval);
+        logger.info("scheduler started");
+        schedulerStarted = true;
     }
 
 }
