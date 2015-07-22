@@ -16,7 +16,12 @@
 
 package io.galeb.core.services;
 
-import static io.galeb.core.util.Constants.SysProp.PROP_SCHEDULER_INTERVAL;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.inject.Inject;
+
 import io.galeb.core.cluster.ClusterEvents;
 import io.galeb.core.cluster.ClusterListener;
 import io.galeb.core.cluster.DistributedMap;
@@ -34,21 +39,17 @@ import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
-import io.galeb.core.sched.BackendPoolUpdaterJob;
-import io.galeb.core.sched.BackendUpdaterJob;
-import io.galeb.core.sched.QuartzScheduler;
 import io.galeb.core.statsd.StatsdClient;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.inject.Inject;
-
-import org.quartz.SchedulerException;
 
 public abstract class AbstractService implements DistributedMapListener,
                                                  ClusterListener {
+
+    public static final String LOGGER          = "logger";
+    public static final String FARM            = "farm";
+    public static final String DISTRIBUTEDMAP  = "distributedMap";
+    public static final String STATSD          = "statsd";
+    public static final String CLUSTER_EVENTS  = "clusterEvents";
+    public static final String INTERVAL        = "interval";
 
     @Inject
     protected Farm farm;
@@ -65,11 +66,7 @@ public abstract class AbstractService implements DistributedMapListener,
     @Inject
     protected StatsdClient statsdClient;
 
-    protected QuartzScheduler scheduler;
-
     private boolean clusterListenerRegistered = false;
-
-    private boolean schedulerStarted = false;
 
     public AbstractService() {
         super();
@@ -111,18 +108,6 @@ public abstract class AbstractService implements DistributedMapListener,
         entityMap.put(EntityController.getControllerName(FarmController.class),
                 new FarmController(farm, entityMap));
 
-    }
-
-    protected void startSchedulers() throws SchedulerException {
-        if (schedulerStarted) {
-            return;
-        }
-        final long interval = Long.parseLong(System.getProperty(PROP_SCHEDULER_INTERVAL.toString(), PROP_SCHEDULER_INTERVAL.def()));
-        scheduler = new QuartzScheduler(farm, statsdClient, distributedMap, clusterEvents, logger)
-                        .startPeriodicJob(BackendPoolUpdaterJob.class, interval)
-                        .startPeriodicJob(BackendUpdaterJob.class, interval);
-        logger.info("scheduler started");
-        schedulerStarted = true;
     }
 
     public Farm getFarm() {
