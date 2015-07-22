@@ -20,7 +20,6 @@
     <org.apache.logging.log4j.version>2.1</org.apache.logging.log4j.version>
     <org.apache.commons.commons-lang3.version>3.3.2</org.apache.commons.commons-lang3.version>
     <guava.version>18.0</guava.version>
-    <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
     <mockito.version>1.10.19</mockito.version>
     <assertj.version>2.0.0</assertj.version>
     <junit.version>4.12</junit.version>
@@ -68,16 +67,6 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>${org.apache.commons.commons-lang3.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.quartz-scheduler</groupId>
-      <artifactId>quartz</artifactId>
-      <version>${org.quartz-scheduler.version}</version>
-    </dependency>
-     <dependency>
-      <groupId>org.quartz-scheduler</groupId>
-      <artifactId>quartz-jobs</artifactId>
-      <version>${org.quartz-scheduler.version}</version>
     </dependency>
 
     <!--Test dependencies-->
