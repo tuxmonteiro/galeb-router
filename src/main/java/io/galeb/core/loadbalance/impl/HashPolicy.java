@@ -64,6 +64,7 @@ public class HashPolicy extends LoadBalancePolicy {
 
     @Override
     public synchronized LoadBalancePolicy setCriteria(final Map<String, Object> criteria) {
+        super.setCriteria(criteria);
         final String hashAlgorithmStr = (String) criteria.get(HASH_ALGORITHM);
         if (hashAlgorithmStr!=null && HashAlgorithm.hashTypeFromString(hashAlgorithmStr)!=null) {
             hashAlgorithm = new HashAlgorithm(hashAlgorithmStr);
