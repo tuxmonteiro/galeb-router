@@ -32,13 +32,20 @@ import io.galeb.undertow.router.RouterApplication;
 
 public class Router extends AbstractService {
 
-    private static final String PROP_ROUTER_PREFIX    = Router.class.getPackage().getName()+".";
+    private static final String PROP_ROUTER_PREFIX       = Router.class.getPackage().getName()+".";
 
-    private static final String PROP_ROUTER_PORT      = PROP_ROUTER_PREFIX+"port";
+    private static final String PROP_ROUTER_PORT         = PROP_ROUTER_PREFIX+"port";
 
-    private static final String PROP_ROUTER_IOTHREADS = PROP_ROUTER_PREFIX+"iothread";
+    private static final String PROP_ROUTER_IOTHREADS    = PROP_ROUTER_PREFIX+"iothread";
 
-    public static final int     DEFAULT_PORT          = 8080;
+    private static final String PROP_ROUTER_WORK_THREADS = PROP_ROUTER_PREFIX+"workers";
+
+    private static final String PROP_ROUTER_MAX_WORKS    = PROP_ROUTER_PREFIX+"max_workers";
+
+    private static final String PROP_ROUTER_BACKLOG      = PROP_ROUTER_PREFIX+"backlog";
+
+    public static final int     DEFAULT_PORT             = 8080;
+
 
     private boolean schedulerStarted = false;
 
@@ -48,6 +55,15 @@ public class Router extends AbstractService {
         }
         if (System.getProperty(PROP_ROUTER_IOTHREADS)==null) {
             System.setProperty(PROP_ROUTER_IOTHREADS, String.valueOf(Runtime.getRuntime().availableProcessors()));
+        }
+        if (System.getProperty(PROP_ROUTER_WORK_THREADS)==null) {
+            System.setProperty(PROP_ROUTER_WORK_THREADS, String.valueOf(Runtime.getRuntime().availableProcessors()*8));
+        }
+        if (System.getProperty(PROP_ROUTER_MAX_WORKS)==null) {
+            System.setProperty(PROP_ROUTER_MAX_WORKS, System.getProperty(PROP_ROUTER_WORK_THREADS));
+        }
+        if (System.getProperty(PROP_ROUTER_BACKLOG)==null) {
+            System.setProperty(PROP_ROUTER_BACKLOG, "1000");
         }
     }
 
@@ -64,9 +80,15 @@ public class Router extends AbstractService {
 
         final int port = Integer.parseInt(System.getProperty(PROP_ROUTER_PORT));
         final String iothreads = System.getProperty(PROP_ROUTER_IOTHREADS);
+        final String workers = System.getProperty(PROP_ROUTER_WORK_THREADS);
+        final String maxWorks = System.getProperty(PROP_ROUTER_MAX_WORKS);
+        final String backLog = System.getProperty(PROP_ROUTER_BACKLOG);
 
         final Map<String, String> options = new HashMap<>();
         options.put("IoThreads", iothreads);
+        options.put("workers", workers);
+        options.put("max_workers", maxWorks);
+        options.put("backlog", backLog);
 
         new RouterApplication().setHost("0.0.0.0")
                                .setPort(port)
