@@ -27,6 +27,9 @@ public class Entity implements Serializable, Comparable<Entity> {
 
     private static final long serialVersionUID = 1L;
 
+    protected static final String SEP_COMPOUND_ID = "#";
+
+
     /** The primary key */
     @Expose private int                        pk            = -1;
 
@@ -171,20 +174,24 @@ public class Entity implements Serializable, Comparable<Entity> {
         return new Entity(this);
     }
 
+    public String compoundId() {
+        return getId()+SEP_COMPOUND_ID+getParentId();
+    }
+
     @Override
     public int hashCode() {
-        return getId().hashCode();
+        return (compoundId()).hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Entity
-               && ((Entity) obj).getId().equals(getId());
+               && ((Entity) obj).compoundId().equals(compoundId());
     }
 
     @Override
     public int compareTo(Entity o) {
-        return getId().compareTo(o.getId());
+        return (compoundId()).compareTo(o.compoundId());
     }
 
 }
