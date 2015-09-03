@@ -28,13 +28,15 @@ public class BackendPool extends Entity {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String PROP_HEALTHCHECK_RETURN      = "hcExpectedReturn";
+    public static final String PROP_HEALTHCHECK_RETURN = "hcBody";
 
-    public static final String PROP_HEALTHCHECK_PATH        = "hcPath";
+    public static final String PROP_HEALTHCHECK_PATH   = "hcPath";
 
-    public static final String PROP_HEALTHCHECK_HOST        = "hcHost";
+    public static final String PROP_HEALTHCHECK_HOST   = "hcHost";
 
-    public static final String PROP_LOADBALANCE_POLICY      = "loadBalancePolicy";
+    public static final String PROP_HEALTHCHECK_CODE   = "hcStatusCode";
+
+    public static final String PROP_LOADBALANCE_POLICY = "loadBalancePolicy";
 
     @Expose private final Set<Backend> backends = new CopyOnWriteArraySet<>();
 
