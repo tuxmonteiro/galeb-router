@@ -84,4 +84,13 @@ public class EntityTest {
 
         assertThat(entity.getProperties()).hasSize(1).containsKey(newFirstKey);
     }
+
+    @Test
+    public void testCompoundKey() {
+        final String id = "myId";
+        final String parentId = "myParentId";
+        entity.setId(id).setParentId(parentId);
+
+        assertThat(entity.compoundId()).isEqualTo(id+Entity.SEP_COMPOUND_ID+parentId);
+    }
 }
