@@ -16,6 +16,8 @@
 
 package io.galeb.core.controller;
 
+import java.util.stream.Collectors;
+
 import io.galeb.core.json.JsonObject;
 import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
@@ -113,7 +115,7 @@ public abstract class EntityController {
         }
         if (id != null && !"".equals(id)) {
             return JsonObject.toJsonString(farm.getCollection(clazz).stream()
-                        .filter(entity -> entity.getId().equals(id)));
+                        .filter(entity -> entity.getId().equals(id)).collect(Collectors.toList()));
         } else {
             return JsonObject.toJsonString(farm.getCollection(clazz));
         }
