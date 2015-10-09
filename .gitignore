@@ -4,3 +4,4 @@ dependency-reduced-pom.xml
 tmp/
 /target
 /target
+.idea
