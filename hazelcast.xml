@@ -9,11 +9,7 @@
         <property name="hazelcast.wait.seconds.before.join">0</property>
         <property name="hazelcast.health.monitoring.level">OFF</property>
         <property name="hazelcast.logging.type">log4j2</property>
-        <property name="hazelcast.backpressure.enabled">true</property>
-        <property name="hazelcast.socket.receive.buffer.size">512</property>
-        <property name="hazelcast.socket.send.buffer.size">512</property>
-        <property name="hazelcast.event.thread.count">10</property>
-        <property name="hazelcast.event.queue.capacity">10000000</property>
+        <property name="hazelcast.event.thread.count">24</property>
     </properties>
 
     <group>
