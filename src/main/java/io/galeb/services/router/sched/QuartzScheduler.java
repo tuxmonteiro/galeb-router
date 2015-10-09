@@ -45,7 +45,7 @@ public class QuartzScheduler implements JobListener {
 
     private final Farm farm;
     private final StatsdClient statsd;
-    private final DistributedMap<String, Entity> distributedMap;
+    private final DistributedMap<String, String> distributedMap;
     private final ClusterEvents clusterEvents;
     private final Logger logger;
     private final Scheduler scheduler;
@@ -53,7 +53,7 @@ public class QuartzScheduler implements JobListener {
 
     public QuartzScheduler(Farm farm,
                            StatsdClient statsd,
-                           DistributedMap<String, Entity> distributedMap,
+                           DistributedMap<String, String> distributedMap,
                            ClusterEvents clusterEvents,
                            Logger logger) throws SchedulerException {
         this.farm = farm;

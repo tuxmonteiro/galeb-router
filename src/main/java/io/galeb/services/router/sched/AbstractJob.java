@@ -30,7 +30,7 @@ public abstract class AbstractJob implements Job {
 
     protected Logger logger;
     protected Farm farm;
-    protected DistributedMap<String, Entity> distributedMap;
+    protected DistributedMap<String, String> distributedMap;
     protected ClusterEvents clusterEvents;
     protected long interval = 0L;
 
@@ -43,7 +43,7 @@ public abstract class AbstractJob implements Job {
             farm = (Farm) jobDataMap.get(AbstractService.FARM);
         }
         if (distributedMap==null) {
-            distributedMap = (DistributedMap<String, Entity>) jobDataMap.get(AbstractService.DISTRIBUTEDMAP);
+            distributedMap = (DistributedMap<String, String>) jobDataMap.get(AbstractService.DISTRIBUTEDMAP);
         }
         if (clusterEvents==null) {
             clusterEvents = (ClusterEvents) jobDataMap.get(AbstractService.CLUSTER_EVENTS);
