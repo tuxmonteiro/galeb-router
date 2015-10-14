@@ -63,7 +63,7 @@
     </dependency>
     <dependency>
       <groupId>io.galeb</groupId>
-      <artifactId>galeb-hazelcast</artifactId>
+      <artifactId>galeb-infinispan</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -221,7 +221,6 @@
             <argument>-Xms4096m</argument>
             <argument>-Xmx4096m</argument>
             <argument>-Dlog4j.configurationFile=log4j.xml</argument>
-            <argument>-Dhazelcast.config=hazelcast.xml</argument>
             <argument>-Dio.galeb.services.router.port=8080</argument>
             <argument>-Dio.galeb.maxConn=2000</argument>
             <argument>-Dio.galeb.schedulerInterval=100</argument>
