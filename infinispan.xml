@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan>
+
+    <jgroups>
+        <stack-file name="tcp" path="jgroups.xml"/>
+    </jgroups>
+
+    <cache-container default-cache="default">
+        <transport stack="tcp" cluster="infinispan-cluster" />
+        <distributed-cache name="default" mode="ASYNC" />
+    </cache-container>
+
+</infinispan>
