@@ -3,7 +3,7 @@
 
   <groupId>io.galeb</groupId>
   <artifactId>galeb-router</artifactId>
-  <version>3.1.5-SNAPSHOT</version>
+  <version>3.1.11-SNAPSHOT</version>
 
   <licenses>
     <license>
@@ -227,6 +227,8 @@
             <argument>-Dio.galeb.accesslog=true</argument>
             <argument>-Dio.galeb.fqdn=localhost</argument>
             <argument>-Dio.galeb.pool.softMaxConnectionsPerThread=0</argument>
+            <argument>-Dio.galeb.services.router.idleTimeout=30000</argument>
+            <argument>-Dio.galeb.reuseXForwarded=true</argument>
             <argument>-jar</argument>
             <argument>target/galeb-router-${project.version}-uber.jar</argument>
           </arguments>
