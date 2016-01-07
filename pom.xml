@@ -3,7 +3,7 @@
 
   <groupId>io.galeb</groupId>
   <artifactId>galeb-router</artifactId>
-  <version>3.1.11-SNAPSHOT</version>
+  <version>3.1.11.3-SNAPSHOT</version>
 
   <licenses>
     <license>
@@ -63,13 +63,25 @@
     </dependency>
     <dependency>
       <groupId>io.galeb</groupId>
-      <artifactId>galeb-hazelcast</artifactId>
+      <artifactId>galeb-statsd</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.galeb</groupId>
-      <artifactId>galeb-statsd</artifactId>
-      <version>${project.version}</version>
+      <groupId>javax.cache</groupId>
+      <artifactId>cache-api</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>com.hazelcast</groupId>
+      <artifactId>hazelcast</artifactId>
+      <version>3.5.4</version>
+    </dependency>
+    -->
+    <dependency>
+      <groupId>org.apache.ignite</groupId>
+      <artifactId>ignite-core</artifactId>
+      <version>1.5.0.final</version>
     </dependency>
 
     <dependency>
