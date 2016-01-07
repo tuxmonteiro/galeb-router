@@ -76,6 +76,7 @@ public class Router extends AbstractService {
     public void init() {
 
         super.prelaunch();
+        super.startProcessorScheduler();
 
         try {
             startSchedulers();
