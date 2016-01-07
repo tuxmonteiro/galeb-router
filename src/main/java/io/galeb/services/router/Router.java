@@ -76,6 +76,7 @@ public class Router extends AbstractService {
     public void init() {
 
         super.prelaunch();
+        super.startProcessorScheduler();
 
         try {
             startSchedulers();
@@ -115,7 +116,7 @@ public class Router extends AbstractService {
             return;
         }
         final long interval = Long.parseLong(System.getProperty(PROP_SCHEDULER_INTERVAL.toString(), PROP_SCHEDULER_INTERVAL.def()));
-        new QuartzScheduler(farm, statsdClient, distributedMap, clusterEvents, logger)
+        new QuartzScheduler(farm, statsdClient, logger)
                         .startPeriodicJob(BackendUpdaterJob.class, interval);
         logger.info("scheduler started");
         schedulerStarted = true;

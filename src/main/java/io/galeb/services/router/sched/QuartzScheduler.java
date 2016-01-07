@@ -33,10 +33,7 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
-import io.galeb.core.cluster.ClusterEvents;
-import io.galeb.core.cluster.DistributedMap;
 import io.galeb.core.logging.Logger;
-import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 import io.galeb.core.services.AbstractService;
 import io.galeb.core.statsd.StatsdClient;
@@ -45,22 +42,16 @@ public class QuartzScheduler implements JobListener {
 
     private final Farm farm;
     private final StatsdClient statsd;
-    private final DistributedMap<String, String> distributedMap;
-    private final ClusterEvents clusterEvents;
     private final Logger logger;
     private final Scheduler scheduler;
     private boolean started = false;
 
     public QuartzScheduler(Farm farm,
                            StatsdClient statsd,
-                           DistributedMap<String, String> distributedMap,
-                           ClusterEvents clusterEvents,
                            Logger logger) throws SchedulerException {
         this.farm = farm;
         this.statsd = statsd;
         this.logger = logger;
-        this.distributedMap = distributedMap;
-        this.clusterEvents = clusterEvents;
         scheduler = new StdSchedulerFactory().getScheduler();
         scheduler.getListenerManager().addJobListener(this);
         scheduler.start();
@@ -83,9 +74,7 @@ public class QuartzScheduler implements JobListener {
                 JobDataMap jobdataMap = new JobDataMap();
                 jobdataMap.put(AbstractService.FARM, farm);
                 jobdataMap.put(AbstractService.LOGGER, logger);
-                jobdataMap.put(AbstractService.DISTRIBUTEDMAP, distributedMap);
                 jobdataMap.put(AbstractService.STATSD, statsd);
-                jobdataMap.put(AbstractService.CLUSTER_EVENTS, clusterEvents);
                 jobdataMap.put(AbstractService.INTERVAL, interval);
 
                 JobDetail job = newJob(jobClass).withIdentity(jobClass.getSimpleName()+this)
