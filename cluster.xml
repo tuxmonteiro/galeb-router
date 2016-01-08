@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="ignite.cfg" class="org.apache.ignite.configuration.IgniteConfiguration">
+      <property name="cacheConfiguration">
+        <list>
+          <bean class="org.apache.ignite.configuration.CacheConfiguration" parent="replicated-offheap">
+            <property name="name" value="io.galeb.core.model.VirtualHost"/>
+          </bean>
+          <bean class="org.apache.ignite.configuration.CacheConfiguration" parent="replicated-offheap">
+            <property name="name" value="io.galeb.core.model.BackendPool"/>
+          </bean>
+          <bean class="org.apache.ignite.configuration.CacheConfiguration" parent="replicated-offheap">
+            <property name="name" value="io.galeb.core.model.Backend"/>
+          </bean>
+          <bean class="org.apache.ignite.configuration.CacheConfiguration" parent="replicated-offheap">
+            <property name="name" value="io.galeb.core.model.Rule"/>
+          </bean>
+        </list>
+      </property>
+      <property name="discoverySpi">
+          <bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
+            <property name="ipFinder">
+              <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder">
+                <property name="addresses">
+                  <list>
+                    <value>127.0.0.1:47500..47509</value>
+                  </list>
+                </property>
+              </bean>
+            </property>
+          </bean>
+      </property>
+  </bean>
+
+  <bean id="replicated-offheap" class="org.apache.ignite.configuration.CacheConfiguration" abstract="true">
+    <property name="cacheMode" value="REPLICATED"/>
+    <property name="memoryMode" value="OFFHEAP_TIERED"/>
+    <property name="offHeapMaxMemory" value="0"/>
+  </bean>
+
+</beans>

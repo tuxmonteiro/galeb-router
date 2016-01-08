@@ -4,29 +4,19 @@
     <Property name="LOGLEVEL">INFO</Property>
   </Properties>
   <Appenders>
-    <File name="System" fileName="galeb.log">
+<Console name="SlowConsole" target="SYSTEM_OUT">
+</Console>
+    <Console name="STDOUT" target="SYSTEM_OUT">
       <PatternLayout>
-        <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
+          <Pattern>%highlight{%d %p %c{1.} [%t] %m %ex%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=blue, DEBUG=green bold, TRACE=gray}</Pattern>
       </PatternLayout>
-    </File>
-    <File name="AccessLog" fileName="accesslog.log" immediateFlush="false">
-      <PatternLayout>
-        <Pattern>%d %p %m %ex%n</Pattern>
-      </PatternLayout>
-    </File>
+    </Console>
     <Async name="AsyncSystem">
-      <AppenderRef ref="System"/>
-    </Async>
-    <Async name="AsyncAccessLog">
-      <AppenderRef ref="AccessLog"/>
+      <AppenderRef ref="STDOUT"/>
     </Async>
   </Appenders>
   <Loggers>
-    <Logger name="org.xnio.listener" level="FATAL" additivity="false"/>
-    <Logger name="io.undertow.request" level="FATAL" additivity="false"/>
-    <Logger name="io.galeb.accesslog" level="debug" additivity="false">
-      <AppenderRef ref="AsyncAccessLog" level="${env:LOGLEVEL}"/>
-    </Logger>
+    <Logger name="org.springframework.data.rest.webmvc.AbstractRepositoryRestController" level="OFF" additivity="false"/>
     <Root level="trace">
       <AppenderRef ref="AsyncSystem" level="${env:LOGLEVEL}"/>
     </Root>
