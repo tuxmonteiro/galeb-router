@@ -228,6 +228,7 @@
             <argument>-Dio.galeb.pool.softMaxConnectionsPerThread=0</argument>
             <argument>-Dio.galeb.services.router.idleTimeout=30000</argument>
             <argument>-Dio.galeb.reuseXForwarded=true</argument>
+            <argument>-DIGNITE_JETTY_PORT=50002</argument>
             <argument>-jar</argument>
             <argument>target/galeb-router-${project.version}-uber.jar</argument>
           </arguments>
@@ -244,6 +245,7 @@
           <instrumentation>
             <ignoreTrivial>true</ignoreTrivial>
           </instrumentation>
+          <check/>
         </configuration>
       </plugin>
     </plugins>
