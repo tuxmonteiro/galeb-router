@@ -73,7 +73,7 @@ public class BackendUpdaterJobTest {
         Backend backend = new Backend();
         backend.setConnections(0).setId(backendTestedStr).setParentId(backendPoolId);
         farm.add(backend);
-        connectionMapManager.putOnCounterMap(backendTestedStr, backendTestedStr, 10);
+        connectionMapManager.putOnCounterMap(backendTestedStr, 10);
 
         new BackendUpdaterJob().execute(jobExecutionContext);
         assertThat(backend.getConnections()).isEqualTo(10);

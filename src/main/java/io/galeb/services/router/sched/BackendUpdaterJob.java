@@ -76,11 +76,8 @@ public class BackendUpdaterJob extends AbstractJob {
         connectionMapManager.reduce().forEach((backendID, numConnections) -> {
             backendCollection.stream()
                 .filter(backend -> backend.getId().equals(backendID) &&
-                        (backend.getModifiedAt() < (System.currentTimeMillis()-interval) ||
-                            ((Backend)backend).getConnections() < 10) &&
                             ((Backend)backend).getConnections() != numConnections)
                 .forEach(backend -> {
-                    backend.setVersion(farm.getVersion());
                     ((Backend) backend).setConnections(numConnections);
                     backendCollection.change(backend);
                     farm.virtualhostsUsingBackend(backendID).stream()
