@@ -23,6 +23,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import io.galeb.core.cluster.ignite.IgniteCacheFactory;
+import io.galeb.core.cluster.ignite.IgniteClusterLocker;
 import org.quartz.SchedulerException;
 
 import io.galeb.core.services.AbstractService;
@@ -74,8 +76,16 @@ public class Router extends AbstractService {
 
     @PostConstruct
     public void init() {
+        cacheFactory = IgniteCacheFactory.getInstance(this)
+                                            .setFarm(farm)
+                                            .listeningPutEvent()
+                                            .listeningRemoveEvent()
+                                            .listeningReadEvent()
+                                            .start();
+        clusterLocker = IgniteClusterLocker.INSTANCE;
+        cacheFactory.setLogger(logger);
+        clusterLocker.setLogger(logger);
 
-        super.prelaunch();
         super.startProcessorScheduler();
 
         try {
@@ -122,4 +132,12 @@ public class Router extends AbstractService {
         schedulerStarted = true;
     }
 
+    @Override
+    public void onClusterRead(String json, String cacheName) {
+        try {
+            entityAdd(json, Class.forName(cacheName));
+        } catch (ClassNotFoundException e) {
+            logger.error(e);
+        }
+    }
 }
