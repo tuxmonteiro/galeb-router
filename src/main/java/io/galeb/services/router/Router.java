@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.cache.Cache;
 
 import io.galeb.core.cluster.ignite.IgniteCacheFactory;
 import io.galeb.core.cluster.ignite.IgniteClusterLocker;
@@ -78,13 +79,11 @@ public class Router extends AbstractService {
     public void init() {
         cacheFactory = IgniteCacheFactory.getInstance(this)
                                             .setFarm(farm)
+                                            .setLogger(logger)
                                             .listeningPutEvent()
                                             .listeningRemoveEvent()
-                                            .listeningReadEvent()
                                             .start();
-        clusterLocker = IgniteClusterLocker.INSTANCE;
-        cacheFactory.setLogger(logger);
-        clusterLocker.setLogger(logger);
+        clusterLocker = IgniteClusterLocker.getInstance().setLogger(logger).start();
 
         super.startProcessorScheduler();
 
@@ -122,6 +121,7 @@ public class Router extends AbstractService {
     }
 
     private void startSchedulers() throws SchedulerException {
+        schedulerStarted = true;
         if (schedulerStarted) {
             return;
         }
@@ -133,11 +133,21 @@ public class Router extends AbstractService {
     }
 
     @Override
-    public void onClusterRead(String json, String cacheName) {
-        try {
-            entityAdd(json, Class.forName(cacheName));
-        } catch (ClassNotFoundException e) {
-            logger.error(e);
+    public void onClusterLoaded(String cacheName) {
+        logger.warn("Loading map " + cacheName);
+        final Cache<String, String> cache = cacheFactory.getCache(cacheName);
+        if (cache != null) {
+            cache.forEach(entry -> {
+                try {
+                    String json = entry.getValue();
+                    logger.warn("Loading entity: " + json);
+                    entityAdd(json, Class.forName(cacheName));
+                } catch (ClassNotFoundException e) {
+                    logger.error(e);
+                }
+            });
+        } else {
+            logger.error("Map " + cacheName + " is NULL");
         }
     }
 }
