@@ -16,13 +16,22 @@
 
 package io.galeb.services.router;
 
+import static io.galeb.core.services.ProcessorScheduler.PROP_PROCESSOR_INTERVAL;
 import static io.galeb.core.util.Constants.SysProp.PROP_SCHEDULER_INTERVAL;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.cache.Cache;
 
+import io.galeb.core.cluster.ignite.IgniteCacheFactory;
+import io.galeb.core.cluster.ignite.IgniteClusterLocker;
+import io.galeb.core.model.Backend;
+import io.galeb.core.model.BackendPool;
+import io.galeb.core.model.Rule;
+import io.galeb.core.model.VirtualHost;
 import org.quartz.SchedulerException;
 
 import io.galeb.core.services.AbstractService;
@@ -34,17 +43,19 @@ public class Router extends AbstractService {
 
     private static final String PROP_ROUTER_PREFIX       = Router.class.getPackage().getName()+".";
 
-    private static final String PROP_ROUTER_PORT         = PROP_ROUTER_PREFIX+"port";
+    private static final String PROP_ROUTER_PORT         = PROP_ROUTER_PREFIX + "port";
 
-    private static final String PROP_ROUTER_IOTHREADS    = PROP_ROUTER_PREFIX+"iothread";
+    private static final String PROP_ROUTER_IOTHREADS    = PROP_ROUTER_PREFIX + "iothread";
 
-    private static final String PROP_ROUTER_WORK_THREADS = PROP_ROUTER_PREFIX+"workers";
+    private static final String PROP_ROUTER_WORK_THREADS = PROP_ROUTER_PREFIX + "workers";
 
-    private static final String PROP_ROUTER_MAX_WORKS    = PROP_ROUTER_PREFIX+"max_workers";
+    private static final String PROP_ROUTER_MAX_WORKS    = PROP_ROUTER_PREFIX + "max_workers";
 
-    private static final String PROP_ROUTER_BACKLOG      = PROP_ROUTER_PREFIX+"backlog";
+    private static final String PROP_ROUTER_BACKLOG      = PROP_ROUTER_PREFIX + "backlog";
 
-    private static final String PROP_ROUTER_IDLETIMEOUT  = PROP_ROUTER_PREFIX+"idleTimeout";
+    private static final String PROP_ROUTER_IDLETIMEOUT  = PROP_ROUTER_PREFIX + "idleTimeout";
+
+    private static final String PROP_DELAY_ON_BOOT       = PROP_ROUTER_PREFIX + "delayOnBoot";
 
     public static final int     DEFAULT_PORT             = 8080;
 
@@ -74,15 +85,18 @@ public class Router extends AbstractService {
 
     @PostConstruct
     public void init() {
+        cacheFactory = IgniteCacheFactory.getInstance()
+                                            .setFarm(farm)
+                                            .setLogger(logger)
+                                            .listeningPutEvent()
+                                            .listeningRemoveEvent()
+                                            .start();
+        clusterLocker = IgniteClusterLocker.getInstance().setLogger(logger).start();
 
-        super.prelaunch();
-        super.startProcessorScheduler();
 
-        try {
-            startSchedulers();
-        } catch (final SchedulerException e) {
-            logger.error(e);
-        }
+        final long delayOnBoot = Long.parseLong(System.getProperty(PROP_DELAY_ON_BOOT, "5000"));
+
+        syncMaps(delayOnBoot);
 
         final int port = Integer.parseInt(System.getProperty(PROP_ROUTER_PORT));
         final String iothreads = System.getProperty(PROP_ROUTER_IOTHREADS);
@@ -103,8 +117,26 @@ public class Router extends AbstractService {
                                .setOptions(options)
                                .setFarm(farm)
                                .start();
+        try {
+            startSchedulers();
+        } catch (final SchedulerException e) {
+            logger.error(e);
+        }
+
 
         logger.debug(String.format("[0.0.0.0:%d] ready", port));
+    }
+
+    private void syncMaps(long delayOnBoot) {
+        try {
+            Thread.sleep(delayOnBoot);
+            preload();
+            super.startProcessorScheduler();
+            int interval = Integer.parseInt(System.getProperty(PROP_PROCESSOR_INTERVAL, "1"));
+            Thread.sleep(interval * 1000L);
+        } catch (InterruptedException e) {
+            logger.error(e);
+        }
     }
 
     public Router() {
@@ -122,4 +154,17 @@ public class Router extends AbstractService {
         schedulerStarted = true;
     }
 
+    private void preload() {
+        Arrays.asList(Backend.class, BackendPool.class, Rule.class, VirtualHost.class).stream()
+                .forEach(clazz -> {
+                    Cache<String, String> cache = cacheFactory.getCache(clazz.getName());
+                    if (cache != null) {
+                        cache.forEach(entry -> {
+                            String json = entry.getValue();
+                            entityAdd(json, clazz);
+                            logger.warn("Loaded entity: " + json);
+                        });
+                    }
+                });
+    }
 }
