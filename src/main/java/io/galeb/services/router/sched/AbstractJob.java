@@ -16,29 +16,25 @@
 
 package io.galeb.services.router.sched;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 
-import io.galeb.core.cluster.ClusterEvents;
-import io.galeb.core.cluster.DistributedMap;
-import io.galeb.core.logging.Logger;
-import io.galeb.core.model.Entity;
 import io.galeb.core.model.Farm;
 import io.galeb.core.services.AbstractService;
 
 public abstract class AbstractJob implements Job {
 
-    protected Logger logger;
+    private static final Logger LOGGER = LogManager.getLogger(AbstractJob.class);
+
     protected Farm farm;
     protected long interval = 0L;
 
     @SuppressWarnings("unchecked")
     protected void setEnvironment(final JobDataMap jobDataMap) {
-        if (logger==null) {
-            logger = (Logger) jobDataMap.get(AbstractService.LOGGER);
-        }
         if (farm==null) {
-            farm = (Farm) jobDataMap.get(AbstractService.FARM);
+            farm = (Farm) jobDataMap.get(AbstractService.FARM_KEY);
         }
         if (interval<=0L) {
             interval = jobDataMap.getLongValue(AbstractService.INTERVAL);

@@ -18,6 +18,8 @@ package io.galeb.services.router.sched;
 
 import static io.galeb.core.util.Constants.SysProp.PROP_HOSTNAME;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -31,6 +33,8 @@ import io.galeb.core.util.map.ConnectionMapManager;
 
 @DisallowConcurrentExecution
 public class BackendUpdaterJob extends AbstractJob {
+
+    private static final Logger LOGGER = LogManager.getLogger(BackendUpdaterJob.class);
 
     static {
         if (System.getProperty(PROP_HOSTNAME.toString())==null) {
@@ -89,7 +93,7 @@ public class BackendUpdaterJob extends AbstractJob {
                     });
         });
 
-        logger.trace(String.format("Job %s done.", this.getClass().getSimpleName()));
+        LOGGER.trace(String.format("Job %s done.", this.getClass().getSimpleName()));
     }
 
     private void sendActiveConnections(String virtualhostId, String backendId, int conn) {

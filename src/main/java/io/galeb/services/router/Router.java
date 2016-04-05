@@ -32,6 +32,8 @@ import io.galeb.core.model.Backend;
 import io.galeb.core.model.BackendPool;
 import io.galeb.core.model.Rule;
 import io.galeb.core.model.VirtualHost;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.quartz.SchedulerException;
 
 import io.galeb.core.services.AbstractService;
@@ -40,6 +42,8 @@ import io.galeb.services.router.sched.QuartzScheduler;
 import io.galeb.undertow.router.RouterApplication;
 
 public class Router extends AbstractService {
+
+    private static final Logger LOGGER = LogManager.getLogger(Router.class);
 
     private static final String PROP_ROUTER_PREFIX       = Router.class.getPackage().getName()+".";
 
@@ -87,11 +91,10 @@ public class Router extends AbstractService {
     public void init() {
         cacheFactory = IgniteCacheFactory.getInstance()
                                             .setFarm(farm)
-                                            .setLogger(logger)
                                             .listeningPutEvent()
                                             .listeningRemoveEvent()
                                             .start();
-        clusterLocker = IgniteClusterLocker.getInstance().setLogger(logger).start();
+        clusterLocker = IgniteClusterLocker.getInstance().start();
 
 
         final long delayOnBoot = Long.parseLong(System.getProperty(PROP_DELAY_ON_BOOT, "5000"));
@@ -120,11 +123,11 @@ public class Router extends AbstractService {
         try {
             startSchedulers();
         } catch (final SchedulerException e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
 
 
-        logger.debug(String.format("[0.0.0.0:%d] ready", port));
+        LOGGER.debug(String.format("[0.0.0.0:%d] ready", port));
     }
 
     private void syncMaps(long delayOnBoot) {
@@ -135,7 +138,7 @@ public class Router extends AbstractService {
             int interval = Integer.parseInt(System.getProperty(PROP_PROCESSOR_INTERVAL, "1"));
             Thread.sleep(interval * 1000L);
         } catch (InterruptedException e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
     }
 
@@ -148,9 +151,9 @@ public class Router extends AbstractService {
             return;
         }
         final long interval = Long.parseLong(System.getProperty(PROP_SCHEDULER_INTERVAL.toString(), PROP_SCHEDULER_INTERVAL.def()));
-        new QuartzScheduler(farm, statsdClient, logger)
+        new QuartzScheduler(farm, statsdClient)
                         .startPeriodicJob(BackendUpdaterJob.class, interval);
-        logger.info("scheduler started");
+        LOGGER.info("scheduler started");
         schedulerStarted = true;
     }
 
@@ -162,7 +165,7 @@ public class Router extends AbstractService {
                         cache.forEach(entry -> {
                             String json = entry.getValue();
                             entityAdd(json, clazz);
-                            logger.warn("Loaded entity: " + json);
+                            LOGGER.warn("Loaded entity: " + json);
                         });
                     }
                 });

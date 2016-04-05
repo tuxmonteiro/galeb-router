@@ -22,6 +22,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -33,25 +35,23 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
-import io.galeb.core.logging.Logger;
 import io.galeb.core.model.Farm;
 import io.galeb.core.services.AbstractService;
 import io.galeb.core.statsd.StatsdClient;
 
 public class QuartzScheduler implements JobListener {
 
+    private static final Logger LOGGER = LogManager.getLogger(QuartzScheduler.class);
+
     private final Farm farm;
     private final StatsdClient statsd;
-    private final Logger logger;
     private final Scheduler scheduler;
     private boolean started = false;
 
     public QuartzScheduler(Farm farm,
-                           StatsdClient statsd,
-                           Logger logger) throws SchedulerException {
+                           StatsdClient statsd) throws SchedulerException {
         this.farm = farm;
         this.statsd = statsd;
-        this.logger = logger;
         scheduler = new StdSchedulerFactory().getScheduler();
         scheduler.getListenerManager().addJobListener(this);
         scheduler.start();
@@ -72,8 +72,7 @@ public class QuartzScheduler implements JobListener {
                                               .build();
 
                 JobDataMap jobdataMap = new JobDataMap();
-                jobdataMap.put(AbstractService.FARM, farm);
-                jobdataMap.put(AbstractService.LOGGER, logger);
+                jobdataMap.put(AbstractService.FARM_KEY, farm);
                 jobdataMap.put(AbstractService.STATSD, statsd);
                 jobdataMap.put(AbstractService.INTERVAL, interval);
 
@@ -84,7 +83,7 @@ public class QuartzScheduler implements JobListener {
                 scheduler.scheduleJob(job, trigger);
             }
         } catch (SchedulerException e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
 
         return this;
@@ -97,18 +96,18 @@ public class QuartzScheduler implements JobListener {
 
     @Override
     public void jobToBeExecuted(JobExecutionContext context) {
-        logger.trace(context.getJobDetail().getKey().getName()+" to be executed");
+        LOGGER.trace(context.getJobDetail().getKey().getName()+" to be executed");
     }
 
     @Override
     public void jobExecutionVetoed(JobExecutionContext context) {
-        logger.trace(context.getJobDetail().getKey().getName()+" vetoed");
+        LOGGER.trace(context.getJobDetail().getKey().getName()+" vetoed");
     }
 
     @Override
     public void jobWasExecuted(JobExecutionContext context,
             JobExecutionException jobException) {
-        logger.trace(context.getJobDetail().getKey().getName()+" was executed");
+        LOGGER.trace(context.getJobDetail().getKey().getName()+" was executed");
     }
 
 }

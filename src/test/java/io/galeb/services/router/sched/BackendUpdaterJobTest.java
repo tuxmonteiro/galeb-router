@@ -17,8 +17,6 @@
 package io.galeb.services.router.sched;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +27,6 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import io.galeb.core.logging.Logger;
 import io.galeb.core.model.Backend;
 import io.galeb.core.model.Farm;
 import io.galeb.core.services.AbstractService;
@@ -48,17 +45,13 @@ public class BackendUpdaterJobTest {
     public void setUp() {
         connectionMapManager.clear();
 
-        final Logger logger = mock(Logger.class);
         final StatsdClient statsd = mock(StatsdClient.class);
-        doNothing().when(logger).error(any(Throwable.class));
-        doNothing().when(logger).debug(any(Throwable.class));
 
         final JobDetail jobDetail = mock(JobDetail.class);
         when(jobExecutionContext.getJobDetail()).thenReturn(jobDetail);
 
         final JobDataMap jobdataMap = new JobDataMap();
-        jobdataMap.put(AbstractService.FARM, farm);
-        jobdataMap.put(AbstractService.LOGGER, logger);
+        jobdataMap.put(AbstractService.FARM_KEY, farm);
         jobdataMap.put(AbstractService.STATSD, statsd);
         jobdataMap.put(AbstractService.INTERVAL, 1000L);
 
