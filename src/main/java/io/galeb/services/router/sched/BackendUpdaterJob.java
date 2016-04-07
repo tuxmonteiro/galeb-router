@@ -34,7 +34,7 @@ import io.galeb.core.util.map.ConnectionMapManager;
 @DisallowConcurrentExecution
 public class BackendUpdaterJob extends AbstractJob {
 
-    private static final Logger LOGGER = LogManager.getLogger(BackendUpdaterJob.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     static {
         if (System.getProperty(PROP_HOSTNAME.toString())==null) {

@@ -26,7 +26,7 @@ import io.galeb.core.services.AbstractService;
 
 public abstract class AbstractJob implements Job {
 
-    private static final Logger LOGGER = LogManager.getLogger(AbstractJob.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected Farm farm;
     protected long interval = 0L;

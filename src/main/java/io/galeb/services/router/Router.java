@@ -43,7 +43,7 @@ import io.galeb.undertow.router.RouterApplication;
 
 public class Router extends AbstractService {
 
-    private static final Logger LOGGER = LogManager.getLogger(Router.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String PROP_ROUTER_PREFIX       = Router.class.getPackage().getName()+".";
 

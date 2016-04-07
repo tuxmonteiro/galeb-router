@@ -41,7 +41,7 @@ import io.galeb.core.statsd.StatsdClient;
 
 public class QuartzScheduler implements JobListener {
 
-    private static final Logger LOGGER = LogManager.getLogger(QuartzScheduler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Farm farm;
     private final StatsdClient statsd;
