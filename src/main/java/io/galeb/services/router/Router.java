@@ -47,6 +47,8 @@ public class Router extends AbstractService {
 
     private static final String PROP_ROUTER_PREFIX       = Router.class.getPackage().getName()+".";
 
+    private static final String PROP_ROUTER_BIND         = PROP_ROUTER_PREFIX + "bind";
+
     private static final String PROP_ROUTER_PORT         = PROP_ROUTER_PREFIX + "port";
 
     private static final String PROP_ROUTER_IOTHREADS    = PROP_ROUTER_PREFIX + "iothread";
@@ -101,6 +103,7 @@ public class Router extends AbstractService {
 
         syncMaps(delayOnBoot);
 
+        final String bind = System.getProperty(PROP_ROUTER_BIND, "0.0.0.0");
         final int port = Integer.parseInt(System.getProperty(PROP_ROUTER_PORT));
         final String iothreads = System.getProperty(PROP_ROUTER_IOTHREADS);
         final String workers = System.getProperty(PROP_ROUTER_WORK_THREADS);
@@ -115,7 +118,7 @@ public class Router extends AbstractService {
         options.put("backlog", backLog);
         options.put("idleTimeout", idleTimeout);
 
-        new RouterApplication().setHost("0.0.0.0")
+        new RouterApplication().setHost(bind)
                                .setPort(port)
                                .setOptions(options)
                                .setFarm(farm)
@@ -127,7 +130,7 @@ public class Router extends AbstractService {
         }
 
 
-        LOGGER.debug(String.format("[0.0.0.0:%d] ready", port));
+        LOGGER.info(String.format("Router [%s:%d] ready", bind, port));
     }
 
     private void syncMaps(long delayOnBoot) {
