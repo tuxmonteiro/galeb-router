@@ -68,27 +68,6 @@ public class Router extends AbstractService {
 
     private boolean schedulerStarted = false;
 
-    static {
-        if (System.getProperty(PROP_ROUTER_PORT)==null) {
-            System.setProperty(PROP_ROUTER_PORT, Integer.toString(DEFAULT_PORT));
-        }
-        if (System.getProperty(PROP_ROUTER_IOTHREADS)==null) {
-            System.setProperty(PROP_ROUTER_IOTHREADS, String.valueOf(Runtime.getRuntime().availableProcessors()));
-        }
-        if (System.getProperty(PROP_ROUTER_WORK_THREADS)==null) {
-            System.setProperty(PROP_ROUTER_WORK_THREADS, String.valueOf(Runtime.getRuntime().availableProcessors()*8));
-        }
-        if (System.getProperty(PROP_ROUTER_MAX_WORKS)==null) {
-            System.setProperty(PROP_ROUTER_MAX_WORKS, System.getProperty(PROP_ROUTER_WORK_THREADS));
-        }
-        if (System.getProperty(PROP_ROUTER_BACKLOG)==null) {
-            System.setProperty(PROP_ROUTER_BACKLOG, "1000");
-        }
-        if (System.getProperty(PROP_ROUTER_IDLETIMEOUT)==null) {
-            System.setProperty(PROP_ROUTER_IDLETIMEOUT, "60");
-        }
-    }
-
     @PostConstruct
     public void init() {
         cacheFactory = IgniteCacheFactory.getInstance()
@@ -104,12 +83,12 @@ public class Router extends AbstractService {
         syncMaps(delayOnBoot);
 
         final String bind = System.getProperty(PROP_ROUTER_BIND, "0.0.0.0");
-        final int port = Integer.parseInt(System.getProperty(PROP_ROUTER_PORT));
-        final String iothreads = System.getProperty(PROP_ROUTER_IOTHREADS);
-        final String workers = System.getProperty(PROP_ROUTER_WORK_THREADS);
-        final String maxWorks = System.getProperty(PROP_ROUTER_MAX_WORKS);
-        final String backLog = System.getProperty(PROP_ROUTER_BACKLOG);
-        final String idleTimeout = System.getProperty(PROP_ROUTER_IDLETIMEOUT);
+        final int port = Integer.parseInt(System.getProperty(PROP_ROUTER_PORT, Integer.toString(DEFAULT_PORT)));
+        final String iothreads = System.getProperty(PROP_ROUTER_IOTHREADS, String.valueOf(Runtime.getRuntime().availableProcessors()));
+        final String workers = System.getProperty(PROP_ROUTER_WORK_THREADS, String.valueOf(Runtime.getRuntime().availableProcessors() * 8));
+        final String maxWorks = System.getProperty(PROP_ROUTER_MAX_WORKS, workers);
+        final String backLog = System.getProperty(PROP_ROUTER_BACKLOG, "1000");
+        final String idleTimeout = System.getProperty(PROP_ROUTER_IDLETIMEOUT, "60");
 
         final Map<String, String> options = new HashMap<>();
         options.put("IoThreads", iothreads);
