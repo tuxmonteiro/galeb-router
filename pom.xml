@@ -3,7 +3,7 @@
 
   <groupId>io.galeb</groupId>
   <artifactId>galeb-router</artifactId>
-  <version>3.2.2-SNAPSHOT</version>
+  <version>3.2.3-SNAPSHOT</version>
 
   <licenses>
     <license>
@@ -20,7 +20,6 @@
     <google.gson.version>2.3.1</google.gson.version>
     <org.jboss.weld.version>2.2.8.Final</org.jboss.weld.version>
     <org.jboss.logging.version>3.2.0.Final</org.jboss.logging.version>
-    <org.apache.logging.log4j.version>2.1</org.apache.logging.log4j.version>
     <org.apache.commons.commons-lang3.version>3.3.2</org.apache.commons.commons-lang3.version>
     <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
     <mockito.version>1.10.19</mockito.version>
@@ -86,21 +85,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>${org.apache.logging.log4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>${org.apache.logging.log4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-jul</artifactId>
-      <version>${org.apache.logging.log4j.version}</version>
-    </dependency>
+
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
@@ -110,11 +95,6 @@
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz-jobs</artifactId>
       <version>${org.quartz-scheduler.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j-impl</artifactId>
-      <version>${org.apache.logging.log4j.version}</version>
     </dependency>
 
     <!--Test dependencies-->
@@ -187,9 +167,21 @@
             </goals>
             <configuration>
               <outputFile>target/galeb-router-${project.version}-uber.jar</outputFile>
+              <transformers>
+                <transformer
+                        implementation="com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer">
+                </transformer>
+              </transformers>
             </configuration>
           </execution>
         </executions>
+        <dependencies>
+          <dependency>
+            <groupId>com.github.edwgiz</groupId>
+            <artifactId>maven-shade-plugin.log4j2-cachefile-transformer</artifactId>
+            <version>2.1</version>
+          </dependency>
+        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -216,9 +208,10 @@
             -->
             <argument>-Xbootclasspath/p:${project.build.directory}/alpn.jar</argument>
             <argument>-server</argument>
-            <argument>-Xms4096m</argument>
-            <argument>-Xmx4096m</argument>
+            <argument>-Xms1024m</argument>
+            <argument>-Xmx1024m</argument>
             <argument>-Dlog4j.configurationFile=log4j.xml</argument>
+            <argument>-Dio.galeb.cluster.conf=cluster.xml</argument>
             <argument>-Dio.galeb.services.router.port=8080</argument>
             <argument>-Dio.galeb.maxConn=2000</argument>
             <argument>-Dio.galeb.schedulerInterval=100</argument>
@@ -230,6 +223,10 @@
             <argument>-Dio.galeb.core.statsd.host=127.0.0.1</argument>
             <argument>-Dio.galeb.core.statsd.port=8125</argument>
             <argument>-DIGNITE_JETTY_PORT=50002</argument>
+            <argument>-Dcom.sun.management.jmxremote.port=9998</argument>
+            <argument>-Dcom.sun.management.jmxremote.local.only=false</argument>
+            <argument>-Dcom.sun.management.jmxremote.authenticate=false</argument>
+            <argument>-Dcom.sun.management.jmxremote.ssl=false</argument>
             <argument>-jar</argument>
             <argument>target/galeb-router-${project.version}-uber.jar</argument>
           </arguments>
