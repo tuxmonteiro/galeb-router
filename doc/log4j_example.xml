@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="LOGLEVEL">INFO</Property>
+        <Property name="logDir">logs</Property>
+        <Property name="purgeTo">/tmp/purged</Property>
+        <Property name="maxInt">18250</Property>
+    </Properties>
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>%highlight{%d %p %c{1.} [%t] %m %ex%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=blue, DEBUG=green bold, TRACE=gray}</Pattern>
+            </PatternLayout>
+        </Console>
+        <Async name="AsyncSystem">
+            <AppenderRef ref="RollingFile"/>
+        </Async>
+        <RollingFile name="RollingFile" fileName="${logDir}/app.log"
+                     filePattern="${purgeTo}/%d{yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d %p %c{1.} [%t] %m%n" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <DefaultRolloverStrategy max="${maxInt}"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="org.springframework.data.rest.webmvc.AbstractRepositoryRestController" level="OFF" additivity="false"/>
+        <!--
+        <Logger name="io.galeb.undertow.scheduler.UndertowProcessorScheduler" level="OFF" additivity="false"/>
+        <Logger name="org.quartz.core.JobRunShell" level="OFF" additivity="false"/>
+        <Logger name="org.quartz.core.QuartzSchedulerThread" level="OFF" additivity="false"/>
+        <Logger name="org.quartz.simpl.PropertySettingJobFactory" level="OFF" additivity="false"/>
+        <Logger name="io.galeb.core.cluster.ignite.IgniteCacheFactory" level="OFF" additivity="false"/>
+        -->
+        <Root level="trace">
+            <AppenderRef ref="AsyncSystem" level="${env:LOGLEVEL}"/>
+        </Root>
+    </Loggers>
+</Configuration>
