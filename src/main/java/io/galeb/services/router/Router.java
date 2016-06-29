@@ -28,10 +28,7 @@ import javax.cache.Cache;
 
 import io.galeb.core.cluster.ignite.IgniteCacheFactory;
 import io.galeb.core.cluster.ignite.IgniteClusterLocker;
-import io.galeb.core.model.Backend;
-import io.galeb.core.model.BackendPool;
-import io.galeb.core.model.Rule;
-import io.galeb.core.model.VirtualHost;
+import io.galeb.core.model.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quartz.SchedulerException;
@@ -65,6 +62,10 @@ public class Router extends AbstractService {
 
     public static final int     DEFAULT_PORT             = 8080;
 
+    static {
+        Farm.STATIC_PROPERTIES.put(Farm.MAX_REQUEST_TIME_FARM_PROP, System.getProperty(PROP_ROUTER_IDLETIMEOUT, "0"));
+        Farm.STATIC_PROPERTIES.put(Farm.FORCE_CHANGE_STATUS_FARM_PROP, System.getProperty(Farm.FORCE_CHANGE_STATUS_FARM_PROP, String.valueOf(false)));
+    }
 
     private boolean schedulerStarted = false;
 
@@ -88,7 +89,7 @@ public class Router extends AbstractService {
         final String workers = System.getProperty(PROP_ROUTER_WORK_THREADS, String.valueOf(Runtime.getRuntime().availableProcessors() * 8));
         final String maxWorks = System.getProperty(PROP_ROUTER_MAX_WORKS, workers);
         final String backLog = System.getProperty(PROP_ROUTER_BACKLOG, "1000");
-        final String idleTimeout = System.getProperty(PROP_ROUTER_IDLETIMEOUT, "60");
+        final String idleTimeout = System.getProperty(PROP_ROUTER_IDLETIMEOUT, "0");
 
         final Map<String, String> options = new HashMap<>();
         options.put("IoThreads", iothreads);
