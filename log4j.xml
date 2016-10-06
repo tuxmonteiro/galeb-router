@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="WARN" packages="biz.paluch.logging.gelf.log4j2">
   <Properties>
     <Property name="LOGLEVEL">INFO</Property>
   </Properties>
   <Appenders>
-<Console name="SlowConsole" target="SYSTEM_OUT">
-</Console>
+    <Console name="SlowConsole" target="SYSTEM_OUT">
+    </Console>
     <Console name="STDOUT" target="SYSTEM_OUT">
       <PatternLayout>
           <Pattern>%highlight{%d %p %c{1.} [%t] %m %ex%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=blue, DEBUG=green bold, TRACE=gray}</Pattern>
@@ -14,11 +14,38 @@
     <Async name="AsyncSystem">
       <AppenderRef ref="STDOUT"/>
     </Async>
+    <Async name="AsyncGrayLog">
+      <AppenderRef ref="Graylog"/>
+    </Async>
+    <Gelf name="Graylog" host="udp:localhost" port="12201" version="1.1" extractStackTrace="true"
+        filterStackTrace="true" mdcProfiling="true" includeFullMdc="true" maximumMessageSize="8192"
+        originHost="%host{fqdn}" additionalFieldTypes="fieldName1=String,fieldName2=Double,fieldName3=Long">
+      <Field name="timestamp" pattern="%d{dd MMM yyyy HH:mm:ss,SSS}" />
+      <Field name="level" pattern="%level" />
+      <Field name="simpleClassName" pattern="%C{1}" />
+      <Field name="className" pattern="%C" />
+      <Field name="server" pattern="%host" />
+      <Field name="server.fqdn" pattern="%host{fqdn}" />
+
+      <!-- This is a static field -->
+      <Field name="fieldName2" literal="fieldValue2" />
+
+      <!-- This is a field using MDC -->
+      <Field name="mdcField2" mdc="mdcField2" />
+      <DynamicMdcFields regex="mdc.*" />
+      <DynamicMdcFields regex="(mdc|MDC)fields" />
+    </Gelf>
+    <Failover name="Failover" primary="AsyncGrayLog" retryIntervalSeconds="60">
+      <Failovers>
+          <AppenderRef ref="AsyncSystem"/>
+      </Failovers>
+    </Failover>
   </Appenders>
   <Loggers>
     <Logger name="org.springframework.data.rest.webmvc.AbstractRepositoryRestController" level="OFF" additivity="false"/>
     <Root level="trace">
-      <AppenderRef ref="AsyncSystem" level="${env:LOGLEVEL}"/>
+        <AppenderRef ref="AsyncGrayLog" level="${env:LOGLEVEL}"/>
+        <AppenderRef ref="AsyncSystem" level="${env:LOGLEVEL}"/>
     </Root>
   </Loggers>
 </Configuration>
