@@ -179,6 +179,8 @@
           <manifest>
             <mainClass>io.galeb.services.router.Starter</mainClass>
             <addClasspath>true</addClasspath>
+            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
           </manifest>
         </archive>
        </configuration>
