@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package io.galeb.services.router;
+package io.galeb.services.router.api.jaxrs;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import io.galeb.core.starter.AbstractStarter;
-import io.galeb.services.router.api.Api;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Starter extends AbstractStarter {
+@ApplicationPath("/")
+public class ApiApplication extends Application {
 
-    private Starter() {
-        // main class
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    @Override
+    public Set<Class<?>> getClasses() {
+        final Set<Class<?>> classes = new HashSet<>();
+        classes.add(ApiResources.class);
+        return classes;
     }
-
-    public static void main(String[] args) {
-
-        loadService(Router.class);
-        loadService(Api.class);
-
-    }
-
 }
