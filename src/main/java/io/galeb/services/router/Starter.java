@@ -18,6 +18,7 @@ package io.galeb.services.router;
 
 
 import io.galeb.core.starter.AbstractStarter;
+import io.galeb.services.router.api.Api;
 
 public class Starter extends AbstractStarter {
 
@@ -28,6 +29,7 @@ public class Starter extends AbstractStarter {
     public static void main(String[] args) {
 
         loadService(Router.class);
+        loadService(Api.class);
 
     }
 

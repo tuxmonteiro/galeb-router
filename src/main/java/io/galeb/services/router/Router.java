@@ -29,6 +29,7 @@ import javax.cache.Cache;
 import io.galeb.core.cluster.ignite.IgniteCacheFactory;
 import io.galeb.core.cluster.ignite.IgniteClusterLocker;
 import io.galeb.core.model.*;
+import io.galeb.services.router.api.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quartz.SchedulerException;
@@ -103,6 +104,7 @@ public class Router extends AbstractService {
                                .setOptions(options)
                                .setFarm(farm)
                                .start();
+
         try {
             startSchedulers();
         } catch (final SchedulerException e) {
