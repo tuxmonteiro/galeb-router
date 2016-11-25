@@ -19,7 +19,6 @@ package io.galeb.services.router;
 import static io.galeb.core.services.ProcessorScheduler.PROP_PROCESSOR_INTERVAL;
 import static io.galeb.core.util.Constants.SysProp.PROP_SCHEDULER_INTERVAL;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -30,7 +29,6 @@ import javax.cache.Cache;
 import io.galeb.core.cluster.ignite.IgniteCacheFactory;
 import io.galeb.core.cluster.ignite.IgniteClusterLocker;
 import io.galeb.core.model.*;
-import io.galeb.services.router.api.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quartz.SchedulerException;
