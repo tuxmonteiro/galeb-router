@@ -22,6 +22,7 @@ import static io.galeb.core.util.Constants.SysProp.PROP_SCHEDULER_INTERVAL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.cache.Cache;
@@ -143,7 +144,7 @@ public class Router extends AbstractService {
     }
 
     private void preload() {
-        Arrays.asList(Backend.class, BackendPool.class, Rule.class, VirtualHost.class).stream()
+        Stream.of(Backend.class, BackendPool.class, Rule.class, VirtualHost.class)
                 .forEach(clazz -> {
                     Cache<String, String> cache = cacheFactory.getCache(clazz.getName());
                     if (cache != null) {
