@@ -58,6 +58,10 @@ public class Router extends AbstractService {
 
     private static final String PROP_ROUTER_IDLETIMEOUT  = PROP_ROUTER_PREFIX + "idleTimeout";
 
+    private static final String PROP_ROUTER_READTIMEOUT  = PROP_ROUTER_PREFIX + "readTimeout";
+
+    private static final String PROP_ROUTER_NOREQUESTTIMEOUT = PROP_ROUTER_PREFIX + "noRequestTimeout";
+
     private static final String PROP_DELAY_ON_BOOT       = PROP_ROUTER_PREFIX + "delayOnBoot";
 
     public static final int     DEFAULT_PORT             = 8080;
@@ -90,6 +94,8 @@ public class Router extends AbstractService {
         final String maxWorks = System.getProperty(PROP_ROUTER_MAX_WORKS, workers);
         final String backLog = System.getProperty(PROP_ROUTER_BACKLOG, "1000");
         final String idleTimeout = System.getProperty(PROP_ROUTER_IDLETIMEOUT, "0");
+        final String readTimeout = System.getProperty(PROP_ROUTER_READTIMEOUT, "120000");
+        final String noRequestTimeout = System.getProperty(PROP_ROUTER_NOREQUESTTIMEOUT, "120000");
 
         final Map<String, String> options = new HashMap<>();
         options.put("IoThreads", iothreads);
@@ -97,6 +103,8 @@ public class Router extends AbstractService {
         options.put("max_workers", maxWorks);
         options.put("backlog", backLog);
         options.put("idleTimeout", idleTimeout);
+        options.put("readTimeout", readTimeout);
+        options.put("noRequestTimeout", noRequestTimeout);
 
         new RouterApplication().setHost(bind)
                                .setPort(port)
