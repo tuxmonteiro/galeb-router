@@ -63,7 +63,7 @@ public class Router extends AbstractService {
     public static final int     DEFAULT_PORT             = 8080;
 
     static {
-        Farm.STATIC_PROPERTIES.put(Farm.MAX_REQUEST_TIME_FARM_PROP, System.getProperty(PROP_ROUTER_IDLETIMEOUT, "0"));
+        Farm.STATIC_PROPERTIES.put(Farm.MAX_REQUEST_TIME_FARM_PROP, System.getProperty(Farm.MAX_REQUEST_TIME_FARM_PROP, "0"));
         Farm.STATIC_PROPERTIES.put(Farm.FORCE_CHANGE_STATUS_FARM_PROP, System.getProperty(Farm.FORCE_CHANGE_STATUS_FARM_PROP, String.valueOf(false)));
     }
 
