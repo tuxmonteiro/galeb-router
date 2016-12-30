@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="WARN" packages="org.graylog2.log4j2">
   <Properties>
     <Property name="LOGLEVEL">INFO</Property>
   </Properties>
   <Appenders>
-<Console name="SlowConsole" target="SYSTEM_OUT">
-</Console>
+    <Console name="SlowConsole" target="SYSTEM_OUT">
+    </Console>
     <Console name="STDOUT" target="SYSTEM_OUT">
       <PatternLayout>
           <Pattern>%highlight{%d %p %c{1.} [%t] %m %ex%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=blue, DEBUG=green bold, TRACE=gray}</Pattern>
@@ -14,11 +14,23 @@
     <Async name="AsyncSystem">
       <AppenderRef ref="STDOUT"/>
     </Async>
+    <Async name="AsyncGrayLog">
+      <AppenderRef ref="Graylog"/>
+    </Async>
+    <GELF name="Graylog" server="localhost" port="12201" protocol="tcp" hostName="localhost">
+      <PatternLayout pattern="%m %ex%n"/>
+    </GELF>
+    <Failover name="Failover" primary="AsyncGrayLog" retryIntervalSeconds="60">
+      <Failovers>
+          <AppenderRef ref="AsyncSystem"/>
+      </Failovers>
+    </Failover>
   </Appenders>
   <Loggers>
     <Logger name="org.springframework.data.rest.webmvc.AbstractRepositoryRestController" level="OFF" additivity="false"/>
     <Root level="trace">
-      <AppenderRef ref="AsyncSystem" level="${env:LOGLEVEL}"/>
+        <AppenderRef ref="AsyncGrayLog" level="${env:LOGLEVEL}"/>
+        <AppenderRef ref="AsyncSystem" level="${env:LOGLEVEL}"/>
     </Root>
   </Loggers>
 </Configuration>
