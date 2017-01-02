@@ -3,7 +3,7 @@
 
   <groupId>io.galeb</groupId>
   <artifactId>galeb-router</artifactId>
-  <version>3.2.11-SNAPSHOT</version>
+  <version>3.2.12-SNAPSHOT</version>
 
   <licenses>
     <license>
